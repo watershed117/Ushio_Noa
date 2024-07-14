@@ -1,8 +1,4 @@
 # 项目名称
+Ushio_Noa
 
-项目简短描述。
-
-## 简介
-
-本项目是一个什么样的项目，它解决了什么问题，或者提供了什么功能。在这里可以详细描述一下项目的背景和目的。
-
+Qui aimes-tu le mieux, homme énigmatique, dis ?
