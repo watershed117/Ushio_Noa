@@ -164,20 +164,55 @@ label tmp:
                     renpy.pause(0.1)
             n+=1
         renpy.jump("main")
+
+screen page(conversation_number,conversation_list):
+    viewport:
+        #frame
+        vbox:
+            pos(1101,162)
+            spacing 51
+            for n in range(0,conversation_number):
+                add "images/ui/frame.png"
+        #text
+        vbox:
+            pos(1125, 185)
+            spacing 105
+            for n in range(0,conversation_number):
+                python:
+                    title=conversation_list[n].get("title")
+                    if len(title)>10:
+                        title=title[:10].replace("\n", "")
+                hbox:
+                    spacing 60
+                    text "{size=32}[n+1]{/size}" 
+                    text "{size=32}[title]{/size}" 
+        #button
+        vbox:
+            pos(1683, 170)
+            spacing 63
+            for n in range(0,conversation_number):
+                button:
+                    add "images/ui/button.png"
+                    action Function(change,conversation_list[n].get("conversation_id"))
 screen entry():
     default conversation_number=len(conversation_list)
     if conversation_number:
-        if conversation_number<=6:
+        viewport:
+            pos(1101,162)
+            xsize 800
+            ysize 854
+            mousewheel True
+            scrollbars("vertical")
             #frame
             vbox:
-                pos(1101,162)
+                pos(0,0)
                 spacing 51
                 for n in range(0,conversation_number):
                     add "images/ui/frame.png"
             #text
             vbox:
-                pos(1125, 185)
-                spacing 105
+                pos(30, 25)
+                spacing 103
                 for n in range(0,conversation_number):
                     python:
                         title=conversation_list[n].get("title")
@@ -189,42 +224,12 @@ screen entry():
                         text "{size=32}[title]{/size}" 
             #button
             vbox:
-                pos(1683, 170)
+                pos(582,13)
                 spacing 63
                 for n in range(0,conversation_number):
                     button:
                         add "images/ui/button.png"
                         action Function(change,conversation_list[n].get("conversation_id"))
-    # python:
-    #     y=162
-    #     button_y=170
-    #     text_y=185
-    # default conversation_number=len(conversation_list)
-    # if conversation_number:
-    #     for n in range(0,conversation_number):#最多六个
-    #         python:
-    #             title=conversation_list[n].get("title")
-    #             if len(title)>10:
-    #                 title=title[:10].replace("\n", "")
-
-    #         add "images/ui/frame.png" pos(1101,y)
-    #         text "{size=32}[n+1]{/size}" pos(1125,text_y)
-    #         text "{size=32}[title]{/size}" pos(1185,text_y)
-    #         button:
-    #             add "images/ui/button.png"
-    #             pos (1683, button_y)
-    #             action Function(change,conversation_list[n].get("conversation_id"))
-    #         python:
-    #             y+=144
-    #             button_y+=144
-    #             text_y+=144
-    #     add "images/ui/frame.png" pos(1101,y)
-    #     text "{size=32}[n+2]{/size}" pos(1125,text_y)
-    #     text "{size=32}新建会话{/size}" pos(1185,text_y)
-    #     button:
-    #         add "images/ui/button.png"
-    #         pos (1683, button_y)
-    #         action Function(new_conversation)
 screen show_face(name):
     add "images/face/[face.get(name)]" pos (0, 766)
 screen full(name):
