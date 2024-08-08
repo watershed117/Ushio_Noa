@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 201: 'size' is not a keyword argument or valid child of the frame statement.
-    size(727,637)
-        ^
+File "game/script.rpy", line 64: expected statement.
+    repeat
+          ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Fri Jul 19 17:42:39 2024
+Sun Aug  4 17:43:14 2024

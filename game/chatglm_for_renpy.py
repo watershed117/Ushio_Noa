@@ -3,7 +3,6 @@ import json
 import queue
 
 
-
 class Chatglm():
     def __init__(self,
                  token: str,
@@ -42,17 +41,17 @@ class Chatglm():
         # self.__get_conversations = None
         # self.__refresh = None
 
-        self.send_ready=False
-        self.send_output=None
+        self.send_ready = False
+        self.send_output = None
 
-        self.recommand_ready=False
-        self.recommand_output=None
+        self.recommand_ready = False
+        self.recommand_output = None
 
-        self.get_conversations_ready=False
-        self.get_conversations_output=None
-        
-        self.refresh_ready=False
-        self.refresh_output=None
+        self.get_conversations_ready = False
+        self.get_conversations_output = None
+
+        self.refresh_ready = False
+        self.refresh_output = None
     # @property
     # def send_output(self):
     #     return self.__send
@@ -105,7 +104,7 @@ class Chatglm():
                 }
             ],
             "meta_data": {
-                "mention_conversation_id":"",
+                "mention_conversation_id": "",
                 "is_test": False,
                 "input_question_type": "xxxx",
                 "channel": "",
@@ -114,7 +113,7 @@ class Chatglm():
         }
         with self.client.post(url="https://chatglm.cn/chatglm/backend-api/assistant/stream", json=payload, stream=True, timeout=self.timeout, proxies={"all": self.proxy}) as response:
             # response.raise_for_status()
-            if response.status_code!=200:
+            if response.status_code != 200:
                 print(response.json())
                 return None
             for line in response.iter_lines():
@@ -133,7 +132,7 @@ class Chatglm():
             self.conversation_id = conversation_id
             self.send_output = {
                 "conversation_id": conversation_id, "text": text}
-            self.send_ready=True
+            self.send_ready = True
 
     def delete(self, conversation_id: str):
         url = "https://chatglm.cn/chatglm/backend-api/assistant/conversation/delete"
@@ -149,7 +148,7 @@ class Chatglm():
             url=url, timeout=self.timeout, proxies={"all": self.proxy})
         response.raise_for_status()
         self.recommand_output = response.json().get("result").get("list")
-        self.recommand_ready=True
+        self.recommand_ready = True
 
     def get_conversations(self, page: int = 1, page_size: int = 25):
         url = f"https://chatglm.cn/chatglm/backend-api/assistant/conversation/list?assistant_id={self.assistant_id}&page={page}&page_size={page_size}"
@@ -167,7 +166,7 @@ class Chatglm():
                                 "conversation_id": conversation_id, "title": title})
             self.get_conversations_output = (tmp_list, response.json().get(
                 "result").get("has_more") or False, page)
-            self.get_conversations_ready=True
+            self.get_conversations_ready = True
 
     def get_history(self, conversation_id: str):
         url = f"https://chatglm.cn/chatglm/backend-api/assistant/conversation?assistant_id={self.assistant_id}&conversation_id={conversation_id}"
@@ -194,8 +193,9 @@ class Chatglm():
         response = self.client.post(
             url=url, timeout=self.timeout, proxies={"all": self.proxy})
         if response.status_code == 200:
-            self.token = response.json().get("result").get("accessToken")
-            self.acw_tc = response.cookies.get("acw_tc")
+            self.token = response.json().get("result").get("accessToken") or self.token
+            self.refresh_token = response.json().get("result").get(
+                "refresh_token") or self.refresh_token
             self.headers = {
                 'Authorization': f'Bearer {self.token}',
                 'Content-Type': 'application/json',
@@ -204,10 +204,10 @@ class Chatglm():
             }
             self.client.headers.update(self.headers)
             self.refresh_output = True
-            self.refresh_ready=True
+            self.refresh_ready = True
         else:
             self.refresh_output = False
-            self.refresh_ready=True
+            self.refresh_ready = True
 
     def run(self):
         while True:
