@@ -32,37 +32,7 @@ image side noa_image normal="images/face/3.png"
 image side noa_image close="images/face/4.png"
 image side noa_image embarrassed="images/face/6.png"
 
-layeredimage ushio_noa:
-    always:
-        "layers/base.png"
-    group face:
-        attribute joy:
-            "layers/2.png"
-        attribute sadness:
-            "layers/4.png"
-        attribute anger:
-            "layers/6.png"
-        attribute surprise:
-            "layers/5.png"
-        attribute fear:
-            "layers/4.png"
-        attribute disgust:
-            "layers/7.png"
-        attribute normal default:
-            "layers/2.png"
-        attribute embarrassed:
-            "layers/5.png"
-        attribute normal_close:
-            "layers/3.png"
-        attribute joy_close:
-            "layers/1.png"
 
-image blink:
-    "ushio_noa joy"
-    pause 2
-    "ushio_noa joy_close"
-    pause 1
-    repeat
 init -997 python:
     glm=Chatglm(token=token,
                 refresh_token=refresh_token,
@@ -163,14 +133,14 @@ init -996 python:
             else:
                 time.sleep(0.1)
         renpy.jump("tmp")
-    renpy.invoke_in_thread(glm.run)
-    glm.event_queue.put({"refresh":(glm.refresh_token,)})
-    while True:
-        if glm.refresh_ready:
-            break
-        else:
-            time.sleep(0.1)
-    renpy.invoke_in_thread(gen.run)
+    # renpy.invoke_in_thread(glm.run)
+    # glm.event_queue.put({"refresh":(glm.refresh_token,)})
+    # while True:
+    #     if glm.refresh_ready:
+    #         break
+    #     else:
+    #         time.sleep(0.1)
+    # renpy.invoke_in_thread(gen.run)
 
 label tmp:
     hide screen entry
@@ -293,12 +263,20 @@ label say_with_face(emo,text):
     elif emo=="生气":
         noa anger "{cps=20}[text]{/cps}"
         return
-transform noa_pos:
-    pos(200,200)
+
 label start:
     stop music fadeout 1.0
-    # show ushio_noa at truecenter
-    show blink at noa_pos
+    call noa_blink
+    pause
+    call emoji_angry
+    pause
+    call emoji_bulb
+    pause
+    call emoji_chat
+    pause
+    call emoji_dot
+    pause
+    noa ""
     pause
     return
     scene ui

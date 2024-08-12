@@ -1,30 +1,49 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 300, in script
-    show blink with position(200,200)
-TypeError: 'position' object is not callable
+  File "game/script.rpy", line 278, in script
+    pause
+  File "renpy/common/000statements.rpy", line 462, in execute_pause
+    renpy.pause()
+OSError: Couldn't find file 'SFX_Emoticon_Motion_Dot.wav'.
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 300, in script
-    show blink with position(200,200)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1363, in execute
-    renpy.exports.with_statement(trans, paired=paired)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports.py", line 1781, in with_statement
-    return renpy.game.interface.do_with(trans, paired, clear=clear)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 1548, in do_with
-    return self.interact(trans_pause=True,
+  File "game/script.rpy", line 278, in script
+    pause
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1968, in execute
+    self.call("execute")
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1950, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\statements.py", line 349, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 462, in execute_pause
+    renpy.pause()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports.py", line 1661, in pause
+    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay, pause_modal=modal)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2165, in interact
     repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2608, in interact_core
-    trans = instantiate_transition(None, old_root, layers_root)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2518, in instantiate_transition
-    trans = self.ongoing_transition[layer](
-TypeError: 'position' object is not callable
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 3022, in interact_core
+    renpy.audio.audio.periodic()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1205, in periodic
+    raise_(exc[0], exc[1], exc[2])
+  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1183, in periodic_thread_main
+    periodic_pass()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1125, in periodic_pass
+    c.periodic()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\audio\audio.py", line 534, in periodic
+    topf = load(filename)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\audio\audio.py", line 72, in load
+    rv = renpy.loader.load(fn, directory="audio")
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\loader.py", line 672, in load
+    raise IOError("Couldn't find file '%s'." % name)
+OSError: Couldn't find file 'SFX_Emoticon_Motion_Dot.wav'.
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.2.1.24030407
 Ushio_Noa 0.1.0_beta
-Sun Aug  4 17:55:02 2024
+Mon Aug 12 17:21:44 2024
