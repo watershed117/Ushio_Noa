@@ -1,4 +1,3 @@
-import httpx
 import os
 from uuid import uuid4
 import json
@@ -6,14 +5,18 @@ import requests
 
 
 class ChatGLM:
-    def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = ""):
+    def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = None):
         self.model = model
         self.client = requests.Session()
         self.client.headers.update({"Authorization": f"Bearer {api_key}"})
         self.history = []
         self.storage = storage
+        self.tools = tools
+        self.system_prompt = system_prompt
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
+        if system_prompt:
+            self.history.append({"role": "system", "content": system_prompt})
 
     def is_valid_path(self, path_str: str):
         try:
@@ -25,15 +28,13 @@ class ChatGLM:
     def get_creation_time(self, file_path):
         return os.path.getctime(file_path)
 
-    def send(self, messages: dict, tools: list = []):
+    def send(self, messages: dict):
         url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         with self.client as client:
             self.history.append(messages)
-            if tools:
-                playload = {"model": self.model,
-                            "messages": self.history, "tools": tools,"tool_choice":"auto"}
-            else:
-                playload = {"model": self.model, "messages": self.history}
+            playload = {"model": self.model, "messages": self.history}
+            if self.tools:
+                playload.update({"tools": self.tools})
             response = client.post(url, json=playload)
             if response.status_code == 200:
                 result = response.json()
@@ -95,9 +96,6 @@ class ChatGLM:
 
 if __name__ == "__main__":
     api_key = "937041ab8a8913329177a408cc96fd4b.lC8CldSAjskjGtgS"
-    chatglm = ChatGLM(
-        api_key, storage="C:\\Users\\water\\Desktop\\bot\\noa\\data\\chatglm",
-        model="glm-4")
     tools = [
         {
             "type": "function",
@@ -125,12 +123,18 @@ if __name__ == "__main__":
             }
         }
     ]
+    with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"),"r",encoding="utf-8") as file:
+        prompt=file.read()
+    chatglm = ChatGLM(
+        api_key, storage="C:\\Users\\water\\Desktop\\bot\\noa\\data\\chatglm",
+        model="glm-4",tools=tools,system_prompt=prompt)
+
     messages = {
-            "role": "user",
-            "content": "你能帮我查询2024年1月1日从北京南站到上海的火车票吗？"
-        }
-    
-    reply = chatglm.send(messages=messages, tools=tools)
+        "role": "user",
+        "content": "你好"
+    }
+
+    reply = chatglm.send(messages=messages)
     print(reply)
     # id = chatglm.save()
     # print(id)
@@ -141,4 +145,3 @@ if __name__ == "__main__":
     # chatglm.delete_conversation(id)
     # conversations = chatglm.get_conversations()
     # print(conversations)
-    
