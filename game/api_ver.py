@@ -127,7 +127,7 @@ if __name__ == "__main__":
         prompt=file.read()
     chatglm = ChatGLM(
         api_key, storage="C:\\Users\\water\\Desktop\\bot\\noa\\data\\chatglm",
-        model="glm-4",tools=tools,system_prompt=prompt)
+        model="glm-4-flash",tools=tools,system_prompt=prompt)
 
     messages = {
         "role": "user",

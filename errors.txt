@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/trans.rpy", line 77: expected 'comma or end of line' not found.
-    return
-    ^
+File "game/trans.rpy", line 126: end of line expected.
+    show emoji dot2 as basebulb behind emoji heart at bulb 
+                                             ^
 
-Ren'Py Version: Ren'Py 8.2.1.24030407
-Mon Aug 12 16:28:09 2024
+Ren'Py Version: Ren'Py 8.3.2.24090902
+Fri Sep 20 01:11:28 2024

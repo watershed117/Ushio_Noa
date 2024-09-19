@@ -59,7 +59,7 @@ transform bulb:
     pos(825,325)
     anchor (1.0,1.0)
     zoom 0.3
-    linear 0.5 zoom 0.4
+    linear 0.1 zoom 0.4
     
 image emoji bulb="images/emoji/bulb.png"
 label emoji_bulb:
@@ -105,5 +105,36 @@ label emoji_dot:
     show emoji dot1 as dot3 at dot3
     return
 
+#exclaim
+image emoji exclaim="images/emoji/Emoticon_ExclamationMark.png"
+transform emoji_exclaim:
+    pos(825,325)
+    zoom 0
+    rotate 0
+    linear 0.1 zoom 0.45
+label emoji_exclaim:
+    show emoji exclaim at emoji_exclaim
+    play sound "audio/emotion/SFX_Emoticon_Motion_Exclaim.wav"
+    return
 
+#heart
+image emoji heart="images/emoji/Emoticon_Heart.png"
+transform emoji_heart:
+    pos(810,320)
+    yzoom 0
+    linear 0.1 yzoom 1
+    linear 0.1 yzoom 0.8
+    linear 0.1 yzoom 1
+    linear 0.1 yzoom 0.8
+    linear 0.1 yzoom 1
 
+label emoji_heart:
+    show emoji dot2 as basebulb behind emoji at bulb 
+    show emoji heart at emoji_heart
+    play sound "audio/emotion/SFX_Emoticon_Motion_Heart.wav"
+    return
+
+#music
+image emoji music="images/emoji/Emoticon_Music.png"
+transform emoji_music:
+    pos(825,325)

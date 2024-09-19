@@ -268,14 +268,27 @@ label start:
     stop music fadeout 1.0
     call noa_blink
     pause
+    # hide emoji
     call emoji_angry
     pause
+    # hide emoji
     call emoji_bulb
     pause
+    # hide emoji
     call emoji_chat
     pause
+    # hide emoji
     call emoji_dot
     pause
+    hide dot1
+    hide dot2
+    hide dot3
+    # hide emoji
+    call emoji_exclaim
+    pause
+    call emoji_heart
+    pause
+    # hide emoji
     noa ""
     pause
     return
