@@ -135,6 +135,19 @@ label emoji_heart:
     return
 
 #music
-image emoji music="images/emoji/Emoticon_Music.png"
+image emoji music="images/emoji/Emoticon_Note.png"
 transform emoji_music:
-    pos(825,325)
+    pos(785, 235)
+    zoom 0.3
+    linear 0.1 xpos 783 ypos 232 zoom 0.5 rotate 5 
+    linear 0.2 xpos 762 ypos 233 zoom 0.5 rotate -5 
+    linear 0.1 xpos 754 ypos 234 rotate 5
+    linear 0.2 xpos 750 rotate -5
+    linear 0.1 xpos 740 rotate 5  
+    linear 0.2 xpos 735
+    linear 0.1 alpha 0 
+    # linear 0.2 xpos 745 zoom 0.5 rotate -5 
+label emoji_music:
+    show emoji music at emoji_music
+    play sound "audio/emotion/SFX_Emoticon_Motion_Music.wav"
+    return

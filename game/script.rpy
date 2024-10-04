@@ -286,11 +286,13 @@ label start:
     # hide emoji
     call emoji_exclaim
     pause
-    call emoji_heart
+    call emoji_heart 
     pause
-    # hide emoji
+    hide emoji
+    hide basebulb
+    call emoji_music
+    pause
     noa ""
-    pause
     return
     scene ui
     python:
