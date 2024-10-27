@@ -146,8 +146,67 @@ transform emoji_music:
     linear 0.1 xpos 740 rotate 5  
     linear 0.2 xpos 735
     linear 0.1 alpha 0 
-    # linear 0.2 xpos 745 zoom 0.5 rotate -5 
+    linear 0.2 xpos 745 zoom 0.5 rotate -5 
 label emoji_music:
     show emoji music at emoji_music
     play sound "audio/emotion/SFX_Emoticon_Motion_Music.wav"
+    return
+
+#question
+image emoji question="images/emoji/Emoticon_QuestionMark.png"
+transform emoji_question:
+    anchor (0.5,1.0)
+    pos(775,300)
+    zoom 0.3
+    linear 0.2 zoom 0.5
+label emoji_question:
+    show emoji question at emoji_question
+    play sound "audio/emotion/SFX_Emoticon_Motion_Question.wav"
+    return
+
+#respond
+image emoji respond="images/emoji/Emoticon_Action.png"
+transform emoji_respond:
+    pos(765,325)
+    pause 0.1
+    alpha 0
+    pause 0.1
+    alpha 1
+    pause 0.1
+    alpha 0
+label emoji_respond:
+    show emoji respond at emoji_respond
+    play sound "audio/emotion/SFX_Emoticon_Motion_Respond.wav"
+    return
+
+#sad
+image emoji sad="images/emoji/Emoji_Sad.png"
+transform emoji_sad:
+    pos(750,225)
+    zoom 0.6
+    linear 0.3 ypos 275
+label emoji_sad:
+    show emoji sad at emoji_sad
+    play sound "audio/emotion/SFX_Emoticon_Motion_Sad.wav"
+    return
+
+#shy
+image emoji shy="images/emoji/Emoticon_Shy.png"
+transform shy_base:
+    pos(675,250)
+    zoom 0.3
+    linear 0.1 zoom 0.4
+transform emoji_shy:
+    zoom 0.4
+    pos(725,285)
+    anchor(0.5,0.5)
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+    linear 0.1 rotate 5
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+label emoji_shy:
+    show emoji shy at emoji_shy
+    show emoji dot2 as base at shy_base behind emoji
+    play sound "audio/emotion/SFX_Emoticon_Motion_Shy.wav"
     return

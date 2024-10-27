@@ -292,6 +292,16 @@ label start:
     hide basebulb
     call emoji_music
     pause
+    call emoji_question
+    pause
+    call emoji_respond
+    pause
+    hide emoji
+    call emoji_sad
+    pause
+    call emoji_shy
+    pause
+    hide base
     noa ""
     return
     scene ui

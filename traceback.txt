@@ -1,34 +1,22 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 289, in script call
-    call emoji_heart
-  File "game/trans.rpy", line 130, in script
-    show emoji heart zoder 1 at emoji_heart
-Exception: Image 'emoji heart' does not accept attributes 'zoder 1'.
+  File "game/trans.rpy", line 180, in script
+    return
+Exception: Could not find return label ('game/script.rpy', 1730025578, 23).
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 289, in script call
-    call emoji_heart
-  File "game/trans.rpy", line 130, in script
-    show emoji heart zoder 1 at emoji_heart
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1111, in execute
-    show_imspec(self.imspec, atl=getattr(self, "atl", None))
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1074, in show_imspec
-    renpy.config.show(name,
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\displayexports.py", line 477, in show
-    if not base.find_target() and renpy.config.missing_show:
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\image.py", line 421, in find_target
-    self.target = target._duplicate(a)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 249, in _duplicate
-    args.extraneous()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 109, in extraneous
-    raise Exception("Image '{}' does not accept attributes '{}'.".format(
-Exception: Image 'emoji heart' does not accept attributes 'zoder 1'.
+  File "game/trans.rpy", line 180, in script
+    return
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1493, in execute
+    next_node(renpy.game.context().lookup_return(pop=True))
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\execution.py", line 744, in lookup_return
+    raise Exception("Could not find return label {!r}.".format(self.return_stack[-1]))
+Exception: Could not find return label ('game/script.rpy', 1730025578, 23).
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Fri Sep 20 00:48:01 2024
+Sun Oct 27 18:45:28 2024

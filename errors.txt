@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/trans.rpy", line 126: end of line expected.
-    show emoji dot2 as basebulb behind emoji heart at bulb 
-                                             ^
+File "game/trans.rpy", line 195: expected ':' not found.
+    transform shy_ base:
+                   ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Fri Sep 20 01:11:28 2024
+Sun Oct 27 23:45:21 2024
