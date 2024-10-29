@@ -302,6 +302,27 @@ label start:
     call emoji_shy
     pause
     hide base
+    call emoji_sigh
+    pause
+    call emoji_steam
+    pause
+    call emoji_surprise
+    pause
+    hide surprise1
+    hide surprise2
+    call emoji_sweat
+    pause
+    hide emoji
+    call emoji_tear
+    pause
+    hide tear1
+    hide tear2
+    call emoji_think
+    pause
+    hide emoji
+    hide ice
+    call emoji_twinkle
+    pause
     noa ""
     return
     scene ui

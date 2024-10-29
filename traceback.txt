@@ -1,22 +1,22 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/trans.rpy", line 180, in script
+  File "game/trans.rpy", line 322, in script
     return
-Exception: Could not find return label ('game/script.rpy', 1730025578, 23).
+Exception: Could not find return label ('game/script.rpy', 1730222460, 26).
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/trans.rpy", line 180, in script
+  File "game/trans.rpy", line 322, in script
     return
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1493, in execute
     next_node(renpy.game.context().lookup_return(pop=True))
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\execution.py", line 744, in lookup_return
     raise Exception("Could not find return label {!r}.".format(self.return_stack[-1]))
-Exception: Could not find return label ('game/script.rpy', 1730025578, 23).
+Exception: Could not find return label ('game/script.rpy', 1730222460, 26).
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Sun Oct 27 18:45:28 2024
+Wed Oct 30 01:22:45 2024

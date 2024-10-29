@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/trans.rpy", line 195: expected ':' not found.
-    transform shy_ base:
-                   ^
+File "game/trans.rpy", line 271: expected 'simple_expression' not found.
+    show emoji sweat at truecenter zorder=999
+                                         ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Sun Oct 27 23:45:21 2024
+Wed Oct 30 00:50:40 2024
