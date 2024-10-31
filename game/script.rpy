@@ -323,6 +323,18 @@ label start:
     hide ice
     call emoji_twinkle
     pause
+    hide part1
+    hide part2
+    hide part3
+    call emoji_upset
+    pause
+    hide emoji
+    hide base
+    call emoji_zzz
+    pause
+    hide part1
+    hide part2
+    hide part3
     noa ""
     return
     scene ui

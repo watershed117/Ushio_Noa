@@ -372,3 +372,47 @@ label emoji_twinkle:
     play sound "audio/emotion/SFX_Emoticon_Motion_Twinkle.wav"
     return
 
+#upset
+image emoji upset="images/emoji/Emoticon_Anxiety.png"
+transform emoji_upset:
+    anchor(0.5,0.5)
+    pos(720,290)
+    zoom 0.55
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+    linear 0.1 rotate -5
+    linear 0.1 rotate 5
+label emoji_upset:
+    show emoji dot2 as base at emoji_think
+    show emoji upset at emoji_upset
+    play sound "audio/emotion/SFX_Emoticon_Motion_Upset.wav"
+    return
+
+#zzz
+image emoji zzz="images/emoji/Emoji_Zzz.png"
+transform emoji_zzz1:
+    anchor(0.5,0.5)
+    pos(825,295)
+    zoom 0.3
+    rotate 15
+transform emoji_zzz2:
+    anchor(0.5,0.5)
+    pos(795,280)
+    zoom 0.4
+transform emoji_zzz3:
+    anchor(0.5,0.5)
+    pos(765,300)
+    zoom 0.5
+    rotate -15
+label emoji_zzz:
+    play sound "audio/emotion/SFX_Emoticon_Motion_Zzz.wav"
+    show emoji zzz as part1 at emoji_zzz1
+    pause 0.5
+    show emoji zzz as part2 at emoji_zzz2
+    pause 0.5
+    show emoji zzz as part3 at emoji_zzz3
+    return

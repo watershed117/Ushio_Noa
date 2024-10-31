@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/trans.rpy", line 271: expected 'simple_expression' not found.
-    show emoji sweat at truecenter zorder=999
-                                         ^
+File "game/trans.rpy", line 380: show statement expects a non-empty block.
+    show emoji bulb as base:pos(750,250)
+                            ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Wed Oct 30 00:50:40 2024
+Thu Oct 31 16:42:47 2024
