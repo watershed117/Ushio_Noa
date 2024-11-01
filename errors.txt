@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/trans.rpy", line 380: show statement expects a non-empty block.
-    show emoji bulb as base:pos(750,250)
-                            ^
+File "game/frame.rpy", line 98: expected a keyword argument or child statement.
+    "emoji dot1" at dot1
+    ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Thu Oct 31 16:42:47 2024
+Sat Nov  2 01:44:34 2024

@@ -22,17 +22,6 @@ default face_list=["微笑"]
 default audio_text=[""]
 default message=""
 
-image side noa_image joy="images/face/2.png"
-image side noa_image sadness="images/face/5.png"
-image side noa_image anger="images/face/8.png"
-image side noa_image surprise="images/face/1.png"
-image side noa_image fear="images/face/5.png"
-image side noa_image disgust="images/face/7.png"
-image side noa_image normal="images/face/3.png"
-image side noa_image close="images/face/4.png"
-image side noa_image embarrassed="images/face/6.png"
-
-
 init -997 python:
     glm=Chatglm(token=token,
                 refresh_token=refresh_token,
@@ -231,110 +220,33 @@ screen entry():
                     button:
                         add "images/ui/button.png"
                         action Function(change,conversation_list[n].get("conversation_id"))
-screen show_face(name):
-    add "images/face/[face.get(name)]" pos (0, 766)
-screen full(name):
-    add "images/full/[face.get(name)]" pos(610,300)
-screen default_pic:
-    add "images/noa_default.png" pos(610,300)
-label say_with_face(emo,text):
-    # play sound audio_byte
-    if emo=="惊讶":
-        noa surprise "{cps=20}[text]{/cps}"
-        return
-    elif emo=="闭眼微笑":
-        noa joy "{cps=20}[text]{/cps}"
-        return
-    elif emo=="微笑":
-        noa normal "{cps=20}[text]{/cps}"
-        return
-    elif emo=="闭眼":
-        noa close "{cps=20}[text]{/cps}"
-        return
-    elif emo=="伤心":
-        noa sadness "{cps=20}[text]{/cps}"
-        return
-    elif emo=="尴尬":
-        noa embarrassed "{cps=20}[text]{/cps}"
-        return
-    elif emo=="严肃":
-        noa disgust "{cps=20}[text]{/cps}"
-        return
-    elif emo=="生气":
-        noa anger "{cps=20}[text]{/cps}"
-        return
 
+default position_map={
+    "1": (0, 100),
+    "2": (300, 100),
+    "3": (600, 100),
+    "4": (900, 100),
+    "5": (1200, 100)
+}
+
+default position="2"
+default emotion="joy"
 label start:
     stop music fadeout 1.0
-    call noa_blink
+    call angry("3","joy")
     pause
-    # hide emoji
-    call emoji_angry
+    call bulb("3","joy")
     pause
-    # hide emoji
-    call emoji_bulb
+    call chat("3","joy")
     pause
-    # hide emoji
-    call emoji_chat
+    call dot("3","joy")
     pause
-    # hide emoji
-    call emoji_dot
+    call exclaim("3","joy")
     pause
-    hide dot1
-    hide dot2
-    hide dot3
-    # hide emoji
-    call emoji_exclaim
+    call heart("3","joy")
     pause
-    call emoji_heart 
+    call music("3","joy")
     pause
-    hide emoji
-    hide basebulb
-    call emoji_music
-    pause
-    call emoji_question
-    pause
-    call emoji_respond
-    pause
-    hide emoji
-    call emoji_sad
-    pause
-    call emoji_shy
-    pause
-    hide base
-    call emoji_sigh
-    pause
-    call emoji_steam
-    pause
-    call emoji_surprise
-    pause
-    hide surprise1
-    hide surprise2
-    call emoji_sweat
-    pause
-    hide emoji
-    call emoji_tear
-    pause
-    hide tear1
-    hide tear2
-    call emoji_think
-    pause
-    hide emoji
-    hide ice
-    call emoji_twinkle
-    pause
-    hide part1
-    hide part2
-    hide part3
-    call emoji_upset
-    pause
-    hide emoji
-    hide base
-    call emoji_zzz
-    pause
-    hide part1
-    hide part2
-    hide part3
     noa ""
     return
     scene ui
