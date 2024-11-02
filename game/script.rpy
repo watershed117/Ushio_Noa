@@ -247,6 +247,33 @@ label start:
     pause
     call music("3","joy")
     pause
+    call question("3","joy")
+    pause
+    call respond("3","joy")
+    pause
+    call sad("3","joy")
+    pause
+    call shy("3","joy")
+    pause
+    call sigh("3","joy")
+    pause
+    call steam("3","joy")
+    pause
+    call surprise("3","joy")
+    pause
+    call sweat("3","joy")
+    pause
+    call tear("3","joy")
+    pause
+    call think("3","joy")
+    pause
+    noa ""
+    call twinkle("3","joy")
+    pause
+    call upset("3","joy")
+    pause
+    call zzz("3","joy")
+    pause
     noa ""
     return
     scene ui

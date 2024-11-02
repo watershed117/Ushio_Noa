@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/frame.rpy", line 98: expected a keyword argument or child statement.
-    "emoji dot1" at dot1
-    ^
+File "game/frame.rpy", line 305: The add statement is not a valid child of the on statement.
+    add "emoji think1" at ice
+       ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Sat Nov  2 01:44:34 2024
+Sat Nov  2 16:14:12 2024

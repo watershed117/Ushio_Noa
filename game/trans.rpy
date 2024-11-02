@@ -68,7 +68,7 @@ transform emoji_chat:
 #dot
 image emoji dot1="images/emoji/Emoticon_Idea.png"
 image emoji dot2="images/emoji/Emoticon_Balloon_N.png"
-image dot:
+image emoji dot:
     contains:
         pause 0.5
         "emoji dot1"
@@ -109,7 +109,6 @@ transform emoji_heart:
 #music
 image emoji music="images/emoji/Emoticon_Note.png"
 transform emoji_music:
-    # pos(785, 235)
     pos(220,150)
     zoom 0.3
     linear 0.1 xoffset -5 yoffset -3 zoom 0.5 rotate 5
@@ -118,149 +117,117 @@ transform emoji_music:
     linear 0.2 xoffset -38 rotate -6
     linear 0.1 xoffset -48 rotate -1
     linear 0.2 xoffset -53
-    linear 0.1 alpha 0
-    
+    # linear 0.1 alpha 0
+
 #question
 image emoji question="images/emoji/Emoticon_QuestionMark.png"
 transform emoji_question:
     anchor (0.5,1.0)
-    pos(775,300)
+    pos(200,225)
     zoom 0.3
     linear 0.2 zoom 0.5
-label emoji_question:
-    show emoji question at emoji_question
-    play sound "audio/emotion/SFX_Emoticon_Motion_Question.wav"
-    return
 
 #respond
 image emoji respond="images/emoji/Emoticon_Action.png"
 transform emoji_respond:
-    pos(765,325)
+    pos(150,150)
+    zoom 0.5
     pause 0.2
     alpha 0
     pause 0.2
     alpha 1
     pause 0.2
-    alpha 0
-label emoji_respond:
-    show emoji respond at emoji_respond
-    play sound "audio/emotion/SFX_Emoticon_Motion_Respond.wav"
-    return
+    # alpha 0
 
 #sad
 image emoji sad="images/emoji/Emoji_Sad.png"
 transform emoji_sad:
-    pos(750,225)
+    pos(175,125)
     zoom 0.6
-    linear 0.3 ypos 275
-label emoji_sad:
-    show emoji sad at emoji_sad
-    play sound "audio/emotion/SFX_Emoticon_Motion_Sad.wav"
-    return
+    linear 0.3 yoffset 50
 
 #shy
 image emoji shy="images/emoji/Emoticon_Shy.png"
 transform shy_base:
-    pos(675,250)
+    pos(100,175)
     zoom 0.3
     linear 0.1 zoom 0.4
 transform emoji_shy:
     zoom 0.4
-    pos(725,285)
+    pos(150,210)
     anchor(0.5,0.5)
     linear 0.1 rotate -5
     linear 0.1 rotate 5
     linear 0.1 rotate 5
     linear 0.1 rotate -5
     linear 0.1 rotate 5
-label emoji_shy:
-    show emoji shy at emoji_shy
-    show emoji dot2 as base at shy_base behind emoji
-    play sound "audio/emotion/SFX_Emoticon_Motion_Shy.wav"
-    return
 
 #sigh
 image emoji sigh="images/emoji/Emoji_Sigh.png"
 transform emoji_sigh:
     anchor(1.0,1.0)
     zoom 0.3
-    pos(825,450)
-    linear 0.1 zoom 0.5 xpos 800 ypos 475
-label emoji_sigh:
-    show emoji sigh at emoji_sigh
-    play sound "audio/emotion/SFX_Emoticon_Motion_Sigh.wav"
-    return
+    pos(225,330)
+    linear 0.1 zoom 0.5 xoffset -25 yoffset 25
 
 #steam
 image emoji steam="images/emoji/Emoji_Steam.png"
 transform emoji_steam:
-    pos(750,350)
+    anchor(1.0,1.0)
+    pos(175,250)
     zoom 0
     rotate -20
     linear 0.2 zoom 0.4
     linear 0.2 alpha 0
     alpha 1
-    pos(750,300)
+    pos(175,200)
     zoom 0
     rotate 15
     linear 0.2 zoom 0.5
-    linear 0.2 alpha 0
-label emoji_steam:
-    show emoji steam at emoji_steam
-    play sound "audio/emotion/SFX_Emoticon_Motion_Steam.wav"
-    return
+    # linear 0.2 alpha 0
 
 #surprise
 image emoji surprise1="images/emoji/Emoticon_Exclamation.png"
 image emoji surprise2="images/emoji/Emoticon_Question.png"
 transform emoji_surprise1:
     anchor(0.5,1.0)
-    pos(790,325)
+    pos(210,225)
     xzoom 0.4
     yzoom 0
     linear 0.1 xzoom 0.5  yzoom 0.5 xoffset -50
 transform emoji_surprise2:
     anchor(0.5,1.0)
-    pos(825,325)
+    pos(245,225)
     xzoom 0.4
     yzoom 0
     linear 0.2 xzoom 0.5 yzoom 0.5 xoffset -50
-label emoji_surprise:
-    show emoji surprise1 as surprise1 at emoji_surprise1
-    show emoji surprise2 as surprise2 at emoji_surprise2
-    play sound "audio/emotion/SFX_Emoticon_Motion_Surprise.wav"
-    return
 
 #sweat
 image emoji sweat="images/emoji/Emoticon_Sweat.png"
 transform emoji_sweat:
-    linear 0.3 yoffset -50
-label emoji_sweat:
-    show emoji sweat at truecenter zorder 999
-    play sound "audio/emotion/SFX_Emoticon_Motion_Sweat.wav"
-    return
+    zoom 0.5
+    pos(215,95)
+    linear 0.3 yoffset 60
 
 #tear
 image emoji tear1="images/emoji/Emoji_Tear_1.png"
 image emoji tear2="images/emoji/Emoji_Tear_2.png"
-transform emoji_tear1:
-    anchor(1.0,1.0)
-    pos(775,330)
-    zoom 0
-    linear 0.4 zoom 0.6
-    linear 0.6 alpha 0
-transform emoji_tear2:
-    anchor(1.0,0.5)
-    pos(775,270)
-    zoom 0
-    linear 0.4 zoom 0.7
-    linear 0.6 alpha 0
-label emoji_tear:
-    show emoji tear2 as tear2 at emoji_tear2
-    pause 0.1
-    show emoji tear1 as tear1 at emoji_tear1
-    play sound "audio/emotion/SFX_Emoticon_Motion_Tear.wav"
-    return
+image emoji tear:
+    contains:
+        "emoji tear2"
+        anchor(1.0,0.5)
+        pos(190,180)
+        zoom 0
+        linear 0.4 zoom 0.7
+        # linear 0.6 alpha 0
+    contains:
+        "emoji tear1"
+        anchor(1.0,0.0)
+        pos(190,185)
+        zoom 0
+        pause 0.1
+        linear 0.4 zoom 0.6
+        # linear 0.6 alpha 0
 
 #think
 image emoji think0="images/emoji/Emoticon_Balloon_T.png"
@@ -269,12 +236,12 @@ image emoji think2="images/emoji/Emoticon_Ice_S.png"
 image emoji think3="images/emoji/Emoticon_Ice_V.png"
 transform emoji_think:
     anchor(1.0,1.0)
-    pos(785,345)
+    pos(200,250)
     zoom 0
     linear 0.1 zoom 0.5
 transform ice:
     anchor(0.5,0.5)
-    pos(720,285)
+    pos(135,190)
     zoom 0
     linear 0.1 zoom 0.5
     linear 0.2 rotate -5
@@ -283,23 +250,12 @@ transform ice:
     linear 0.2 rotate 5
     linear 0.2 rotate -5
     linear 0.2 rotate 5
-label emoji_think:
-    show emoji think0 at emoji_think
-    $ random_num = renpy.random.randint(1, 3)
-    if random_num == 1:
-        show  emoji think1 as ice at ice
-    elif random_num == 2:
-        show  emoji think2 as ice at ice
-    else:
-        show  emoji think1 as ice at ice
-    play sound "audio/emotion/SFX_Emoticon_Motion_Think.wav"
-    return
 
 #twinkle
 image emoji twinkle="images/emoji/Emoticon_Twinkle.png"
 transform emoji_twinkle1:
     anchor(0.5,0.5)
-    pos(740,290)
+    pos(175,175)
     zoom 0
     linear 0.3 zoom 0.5
     linear 0.2 zoom 0.4
@@ -308,10 +264,10 @@ transform emoji_twinkle1:
     linear 0.3 zoom 0.5
     linear 0.2 zoom 0.4
     linear 0.3 zoom 0.5
-    linear 0.2 alpha 0
+    # linear 0.2 alpha 0
 transform emoji_twinkle2:
     anchor(0.5,0.5)
-    pos(775,265)
+    pos(210,150)
     zoom 0
     linear 0.2 zoom 0.4
     linear 0.3 zoom 0.3
@@ -320,10 +276,10 @@ transform emoji_twinkle2:
     linear 0.2 zoom 0.4
     linear 0.3 zoom 0.3
     linear 0.2 zoom 0.4
-    linear 0.2 alpha 0
+    # linear 0.2 alpha 0
 transform emoji_twinkle3:
     anchor(0.5,0.5)
-    pos(775,315)
+    pos(210,200)
     zoom 0
     linear 0.3 zoom 0.3
     linear 0.2 zoom 0.2
@@ -332,19 +288,13 @@ transform emoji_twinkle3:
     linear 0.3 zoom 0.3
     linear 0.2 zoom 0.2
     linear 0.3 zoom 0.3
-    linear 0.2 alpha 0
-label emoji_twinkle:
-    show emoji twinkle as part1 at emoji_twinkle1
-    show emoji twinkle as part2 at emoji_twinkle2
-    show emoji twinkle as part3 at emoji_twinkle3
-    play sound "audio/emotion/SFX_Emoticon_Motion_Twinkle.wav"
-    return
+    # linear 0.2 alpha 0
 
 #upset
 image emoji upset="images/emoji/Emoticon_Anxiety.png"
 transform emoji_upset:
     anchor(0.5,0.5)
-    pos(720,290)
+    pos(135,195)
     zoom 0.55
     linear 0.1 rotate -5
     linear 0.1 rotate 5
@@ -354,33 +304,29 @@ transform emoji_upset:
     linear 0.1 rotate 5
     linear 0.1 rotate -5
     linear 0.1 rotate 5
-label emoji_upset:
-    show emoji dot2 as base at emoji_think
-    show emoji upset at emoji_upset
-    play sound "audio/emotion/SFX_Emoticon_Motion_Upset.wav"
-    return
 
 #zzz
-image emoji zzz="images/emoji/Emoji_Zzz.png"
-transform emoji_zzz1:
-    anchor(0.5,0.5)
-    pos(825,295)
-    zoom 0.3
-    rotate 15
-transform emoji_zzz2:
-    anchor(0.5,0.5)
-    pos(795,280)
-    zoom 0.4
-transform emoji_zzz3:
-    anchor(0.5,0.5)
-    pos(765,300)
-    zoom 0.5
-    rotate -15
-label emoji_zzz:
-    play sound "audio/emotion/SFX_Emoticon_Motion_Zzz.wav"
-    show emoji zzz as part1 at emoji_zzz1
-    pause 0.5
-    show emoji zzz as part2 at emoji_zzz2
-    pause 0.5
-    show emoji zzz as part3 at emoji_zzz3
-    return
+image emoji zzz1="images/emoji/Emoji_Zzz.png"
+image emoji zzz:
+    contains:
+        "emoji zzz1"
+        anchor(0.5,0.5)
+        # pos(825,295)
+        pos(245,190)
+        zoom 0.3
+        rotate 15
+    contains:
+        pause 0.5
+        "emoji zzz1"
+        anchor(0.5,0.5)
+        # pos(795,280)
+        pos(215,180)
+        zoom 0.4
+    contains:
+        pause 1.0
+        "emoji zzz1"
+        anchor(0.5,0.5)
+        # pos(765,300)
+        pos(185,200)
+        zoom 0.5
+        rotate -15

@@ -1,28 +1,26 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 247, in script
+  File "game/script.rpy", line 269, in script
     pause
   File "renpy/common/000statements.rpy", line 462, in execute_pause
     renpy.pause()
-  File "game/frame.rpy", line 121, in execute
-    screen heart(position,emotion,atl=None):
-  File "game/frame.rpy", line 121, in execute
-    screen heart(position,emotion,atl=None):
-  File "game/frame.rpy", line 123, in execute
+  File "game/frame.rpy", line 294, in execute
+    screen think(position,emotion,atl=None):
+  File "game/frame.rpy", line 294, in execute
+    screen think(position,emotion,atl=None):
+  File "game/frame.rpy", line 296, in execute
     frame at atl:
-  File "game/frame.rpy", line 129, in execute
-    add "emoji dot2" at bulb
-  File "game/frame.rpy", line 129, in keywords
-    add "emoji dot2" at bulb
-  File "game/frame.rpy", line 129, in <module>
-    add "emoji dot2" at bulb
-NameError: name 'bulb' is not defined
+  File "game/frame.rpy", line 304, in execute
+    if random_num == 1:
+  File "game/frame.rpy", line 304, in <module>
+    if random_num == 1:
+NameError: name 'random_num' is not defined
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 247, in script
+  File "game/script.rpy", line 269, in script
     pause
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1974, in execute
     self.call("execute")
@@ -54,21 +52,19 @@ Full traceback:
     self.update()
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
     self.screen.function(**self.scope)
-  File "game/frame.rpy", line 121, in execute
-    screen heart(position,emotion,atl=None):
-  File "game/frame.rpy", line 121, in execute
-    screen heart(position,emotion,atl=None):
-  File "game/frame.rpy", line 123, in execute
+  File "game/frame.rpy", line 294, in execute
+    screen think(position,emotion,atl=None):
+  File "game/frame.rpy", line 294, in execute
+    screen think(position,emotion,atl=None):
+  File "game/frame.rpy", line 296, in execute
     frame at atl:
-  File "game/frame.rpy", line 129, in execute
-    add "emoji dot2" at bulb
-  File "game/frame.rpy", line 129, in keywords
-    add "emoji dot2" at bulb
-  File "game/frame.rpy", line 129, in <module>
-    add "emoji dot2" at bulb
-NameError: name 'bulb' is not defined
+  File "game/frame.rpy", line 304, in execute
+    if random_num == 1:
+  File "game/frame.rpy", line 304, in <module>
+    if random_num == 1:
+NameError: name 'random_num' is not defined
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Sat Nov  2 02:13:32 2024
+Sat Nov  2 16:14:25 2024
