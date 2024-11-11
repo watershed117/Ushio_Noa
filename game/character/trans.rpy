@@ -22,6 +22,8 @@ layeredimage ushio_noa:
             "layers/3.png"
         attribute joy_close:
             "layers/1.png"
+        attribute black:
+            "layers/8.png"
 
 image noa_blink:
     "ushio_noa joy"
@@ -311,7 +313,6 @@ image emoji zzz:
     contains:
         "emoji zzz1"
         anchor(0.5,0.5)
-        # pos(825,295)
         pos(245,190)
         zoom 0.3
         rotate 15
@@ -319,14 +320,13 @@ image emoji zzz:
         pause 0.5
         "emoji zzz1"
         anchor(0.5,0.5)
-        # pos(795,280)
         pos(215,180)
         zoom 0.4
     contains:
         pause 1.0
         "emoji zzz1"
         anchor(0.5,0.5)
-        # pos(765,300)
         pos(185,200)
         zoom 0.5
         rotate -15
+

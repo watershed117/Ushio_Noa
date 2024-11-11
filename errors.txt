@@ -2,9 +2,7 @@
 errors listed below, and try again.
 
 
-File "game/frame.rpy", line 305: The add statement is not a valid child of the on statement.
-    add "emoji think1" at ice
-       ^
+File "game/character/character_screens.rpy", line 255: Indentation mismatch.
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Sat Nov  2 16:14:12 2024
+Mon Nov 11 15:16:44 2024

@@ -134,7 +134,6 @@ init -996 python:
 label tmp:
     hide screen entry
     scene bg
-    show screen default_pic
     python:
         renpy.notify("新建会话成功")
         n=0
@@ -222,16 +221,15 @@ screen entry():
                         action Function(change,conversation_list[n].get("conversation_id"))
 
 default position_map={
-    "1": (0, 100),
-    "2": (300, 100),
-    "3": (600, 100),
-    "4": (900, 100),
-    "5": (1200, 100)
+    "1": (0, 400),
+    "2": (300, 400),
+    "3": (600, 400),
+    "4": (900, 400),
+    "5": (1200, 400)
 }
 
-default position="2"
-default emotion="joy"
 label start:
+    scene bg
     stop music fadeout 1.0
     call angry("3","joy")
     pause
@@ -267,13 +265,13 @@ label start:
     pause
     call think("3","joy")
     pause
-    noa ""
     call twinkle("3","joy")
     pause
     call upset("3","joy")
     pause
     call zzz("3","joy")
     pause
+    show screen noa_base("3","joy")
     noa ""
     return
     scene ui
@@ -293,14 +291,13 @@ label main:
     hide ui
     hide screen entry
     scene bg
-    show screen default_pic
     while True:
         $ glm.event_queue.put({"recommand":(glm.conversation_id,)})
         if glm.recommand_ready:
             $ glm.recommand_ready=False
             if glm.recommand_output:
                 menu recommand:
-                    noa normal "[reply_list[-1]]"
+                    noa "[reply_list[-1]]"
                     "[glm.recommand_output[0]]":
                         $ store.message=glm.recommand_output[0]
                     "[glm.recommand_output[1]]":
