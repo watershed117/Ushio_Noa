@@ -2,7 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/character/character_screens.rpy", line 255: Indentation mismatch.
+File "game/character/action.rpy", line 12: expected 'simple_expression' not found.
+    linear 0.3 rotate -15 yoffset 
+                                  ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Mon Nov 11 15:16:44 2024
+Mon Nov 11 21:33:56 2024

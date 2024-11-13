@@ -111,14 +111,14 @@ transform emoji_heart:
 #music
 image emoji music="images/emoji/Emoticon_Note.png"
 transform emoji_music:
-    pos(220,150)
+    pos(245,170)
     zoom 0.3
-    linear 0.1 xoffset -5 yoffset -3 zoom 0.5 rotate 5
-    linear 0.2 xoffset -26 yoffset -2 zoom 0.5 rotate -5
-    linear 0.1 xoffset -34 yoffset -1 rotate 5
-    linear 0.2 xoffset -38 rotate -6
-    linear 0.1 xoffset -48 rotate -1
-    linear 0.2 xoffset -53
+    anchor(0.5,0.5)
+    easeout 0.2 xoffset -10 yoffset -5 zoom 0.6 rotate 5
+    ease 0.3 xoffset -20 yoffset 0  zoom 0.5 rotate -5
+    ease 0.2 xoffset -30 yoffset -5 rotate 5
+    ease 0.3 xoffset -40 yoffset 0 rotate -5
+    easein 0.2 xoffset -50 yoffset -5 rotate 5
     # linear 0.1 alpha 0
 
 #question

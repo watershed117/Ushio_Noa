@@ -221,57 +221,24 @@ screen entry():
                         action Function(change,conversation_list[n].get("conversation_id"))
 
 default position_map={
-    "1": (0, 400),
-    "2": (300, 400),
-    "3": (600, 400),
-    "4": (900, 400),
-    "5": (1200, 400)
+    "1": (0, 200),
+    "2": (300, 200),
+    "3": (600, 200),
+    "4": (900, 200),
+    "5": (1200, 200)
 }
 
 label start:
     scene bg
     stop music fadeout 1.0
-    call angry("3","joy")
-    pause
-    call bulb("3","joy")
-    pause
-    call chat("3","joy")
-    pause
-    call dot("3","joy")
-    pause
-    call exclaim("3","joy")
-    pause
-    call heart("3","joy")
-    pause
-    call music("3","joy")
-    pause
-    call question("3","joy")
-    pause
-    call respond("3","joy")
-    pause
-    call sad("3","joy")
-    pause
-    call shy("3","joy")
-    pause
-    call sigh("3","joy")
-    pause
-    call steam("3","joy")
-    pause
-    call surprise("3","joy")
-    pause
-    call sweat("3","joy")
-    pause
-    call tear("3","joy")
-    pause
-    call think("3","joy")
-    pause
-    call twinkle("3","joy")
-    pause
-    call upset("3","joy")
-    pause
-    call zzz("3","joy")
-    pause
-    show screen noa_base("3","joy")
+    show screen angry("3","joy") as stand
+    show screen angry("3","joy",down) as tmp
+    noa ""
+    show screen angry("3","joy",left_down) as tmp
+    show screen angry("3","joy",left_down,scaleup)
+    noa ""
+    show screen angry("3","joy",right_down) as tmp
+    show screen angry("3","joy",right_down,scaleup)
     noa ""
     return
     scene ui

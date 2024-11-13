@@ -2,7 +2,7 @@ transform blank:
     pass
 
 transform scaleup:
-    zoom 1.25
+    zoom 1.5
 
 transform appear:
     alpha 0
