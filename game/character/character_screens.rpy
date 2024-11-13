@@ -4,17 +4,6 @@ screen noa_blink(position):
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         add "noa_blink"
 
@@ -51,23 +40,12 @@ screen noa_blink(position):
 #     show screen emoji(position,emotion,emoji,emoji_action,frame_action)
 #     play sound "audio/emotion/[emoji].wav"
 
-screen angry(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen angry(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -76,25 +54,14 @@ screen angry(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji angry" at emoji_angry
-        on "show" action Play("sound","audio/emotion/angry.wav")
+    on ("show","replace") action Play("sound","audio/emotion/angry.wav")
 
-screen bulb(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen bulb(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -103,25 +70,14 @@ screen bulb(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji bulb" at emoji_bulb
-        on "show" action Play("sound","audio/emotion/bulb.wav")
+    on ("show","replace") action Play("sound","audio/emotion/bulb.wav")
 
-screen chat(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen chat(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -130,25 +86,14 @@ screen chat(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji chat" at emoji_chat
-        on "show" action Play("sound","audio/emotion/chat.wav")
+    on ("show","replace") action Play("sound","audio/emotion/chat.wav")
 
-screen dot(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen dot(noa_position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
-        pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
+        pos position_map[noa_position]
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -158,25 +103,14 @@ screen dot(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "ushio_noa [emotion]"
         add "emoji dot2" at emoji_bulb
         add "emoji dot"
-        on "show" action Play("sound","audio/emotion/dot.wav")
+    on ("show","replace") action Play("sound","audio/emotion/dot.wav")
 
-screen exclaim(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen exclaim(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -185,25 +119,14 @@ screen exclaim(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji exclaim" at emoji_exclaim
-        on "show" action Play("sound","audio/emotion/exclaim.wav")
+    on ("show","replace") action Play("sound","audio/emotion/exclaim.wav")
 
-screen heart(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen heart(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -213,25 +136,14 @@ screen heart(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "ushio_noa [emotion]"
         add "emoji dot2" at emoji_bulb 
         add "emoji heart" at emoji_heart
-        on "show" action Play("sound","audio/emotion/heart.wav")
+    on ("show","replace") action Play("sound","audio/emotion/heart.wav")
 
-screen music(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen music(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -240,25 +152,14 @@ screen music(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji music" at emoji_music
-        on "show" action Play("sound","audio/emotion/music.wav")
+    on ("show","replace") action Play("sound","audio/emotion/music.wav")
 
-screen question(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen question(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -267,25 +168,14 @@ screen question(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji question" at emoji_question
-        on "show" action Play("sound","audio/emotion/question.wav")
+    on ("show","replace") action Play("sound","audio/emotion/question.wav")
 
-screen respond(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen respond(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -294,25 +184,14 @@ screen respond(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji respond" at emoji_respond
-        on "show" action Play("sound","audio/emotion/respond.wav")
+    on ("show","replace") action Play("sound","audio/emotion/respond.wav")
 
-screen sad(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen sad(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -321,11 +200,11 @@ screen sad(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji sad" at emoji_sad
-        on "show" action Play("sound","audio/emotion/sad.wav")
+    on ("show","replace") action Play("sound","audio/emotion/sad.wav")
 
-screen shy(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen shy(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 1351        
         pos position_map[position]
@@ -338,25 +217,14 @@ screen shy(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "ushio_noa [emotion]"
         add "emoji dot2" at shy_base
         add "emoji shy" at emoji_shy
-        on "show" action Play("sound","audio/emotion/shy.wav")
+    on ("show","replace") action Play("sound","audio/emotion/shy.wav")
 
-screen sigh(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen sigh(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -365,25 +233,14 @@ screen sigh(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji sigh" at emoji_sigh
-        on "show" action Play("sound","audio/emotion/sigh.wav")
+    on ("show","replace") action Play("sound","audio/emotion/sigh.wav")
 
-screen steam(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen steam(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -392,11 +249,11 @@ screen steam(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji steam" at emoji_steam
-        on "show" action Play("sound","audio/emotion/steam.wav")
+    on ("show","replace") action Play("sound","audio/emotion/steam.wav")
 
-screen surprise(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen surprise(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754        
         ysize 1351
         pos position_map[position]
@@ -409,25 +266,14 @@ screen surprise(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "ushio_noa [emotion]"
         add "emoji surprise1" at emoji_surprise1
         add "emoji surprise2" at emoji_surprise2
-        on "show" action Play("sound","audio/emotion/surprise.wav")
+    on ("show","replace") action Play("sound","audio/emotion/surprise.wav")
 
-screen sweat(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen sweat(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -436,25 +282,14 @@ screen sweat(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji sweat" at emoji_sweat
-        on "show" action Play("sound","audio/emotion/sweat.wav")
+    on ("show","replace") action Play("sound","audio/emotion/sweat.wav")
 
-screen tear(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen tear(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -463,30 +298,19 @@ screen tear(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji tear"
-        on "show" action Play("sound","audio/emotion/tear.wav")
+    on ("show","replace") action Play("sound","audio/emotion/tear.wav")
 
 # init python:
 #     def randint(a, b):
 #         renpy.random_num = renpy.random.randint(a, b)
 # default random_num = 1
 
-screen think(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen think(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -503,25 +327,14 @@ screen think(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "emoji think2" at ice
         else:
             add "emoji think1" at ice
-        on "show" action Play("sound","audio/emotion/think.wav")
+    on ("show","replace") action Play("sound","audio/emotion/think.wav")
 
-screen twinkle(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen twinkle(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -532,25 +345,14 @@ screen twinkle(position,emotion,action=blank,scaleup=blank,transition=blank):
         add "emoji twinkle" at emoji_twinkle1
         add "emoji twinkle" at emoji_twinkle2
         add "emoji twinkle" at emoji_twinkle3
-        on "show" action Play("sound","audio/emotion/twinkle.wav")
+    on ("show","replace") action Play("sound","audio/emotion/twinkle.wav")
 
-screen upset(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen upset(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -560,25 +362,14 @@ screen upset(position,emotion,action=blank,scaleup=blank,transition=blank):
             add "ushio_noa [emotion]"
         add "emoji dot2" at emoji_think
         add "emoji upset" at emoji_upset
-        on "show" action Play("sound","audio/emotion/upset.wav")
+    on ("show","replace") action Play("sound","audio/emotion/upset.wav")
 
-screen zzz(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen zzz(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at scaleup,action:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"
@@ -587,30 +378,14 @@ screen zzz(position,emotion,action=blank,scaleup=blank,transition=blank):
         else:
             add "ushio_noa [emotion]"
         add "emoji zzz"
-    on "show" action Play("sound","audio/emotion/zzz.wav")
+    on ("show","replace") action Play("sound","audio/emotion/zzz.wav")
 
-label zzz_(position,emotion,action=blank,scaleup=blank,transition=blank):
-    show screen zzz(position,emotion,action,scaleup,transition)
-    play sound "audio/emotion/zzz.wav"
-    return
-
-screen noa_base(position,emotion,action=blank,scaleup=blank,transition=blank):
+screen noa_base(position,emotion,action=blank,transition=blank):
     tag emoji
-    frame at action,scaleup:
+    frame at action:
         xsize 754
         ysize 880
         pos position_map[position]
-        if scaleup==blank:
-            pass
-        else:
-            if action==down:
-                xoffset -125
-            elif action==left_down:
-                xoffset -225
-                yoffset -70
-            elif action==right_down:
-                xoffset -225
-                yoffset -70
         background None
         if transition=="hide":
             add "ushio_noa black"

@@ -231,15 +231,34 @@ default position_map={
 label start:
     scene bg
     stop music fadeout 1.0
-    show screen angry("3","joy") as stand
-    show screen angry("3","joy",down) as tmp
-    noa ""
-    show screen angry("3","joy",left_down) as tmp
-    show screen angry("3","joy",left_down,scaleup)
-    noa ""
-    show screen angry("3","joy",right_down) as tmp
-    show screen angry("3","joy",right_down,scaleup)
-    noa ""
+    show screen angry("3","joy",down)
+    pause
+    show screen angry("3","joy",left_down)
+    pause
+    show screen angry("3","joy",right_down)
+    pause
+    show screen angry("3","joy",up_up)
+    pause
+    show screen angry("3","joy",up)
+    pause
+    show screen angry("3","joy",shake)
+    pause
+    show screen angry("3","joy",shake_more)
+    pause
+    show screen angry("3","joy",down)
+    pause
+    show screen bulb("3","joy",left_down)
+    pause
+    show screen chat("3","joy",right_down)
+    pause
+    show screen dot("3","joy",up_up)
+    pause
+    show screen exclaim("3","joy",up)
+    pause
+    show screen heart("3","joy",shake)
+    pause
+    show screen music("3","joy",shake_more)
+    pause
     return
     scene ui
     python:
