@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/character/character_screens.rpy", line 45: 'action' is not a keyword argument or valid child of the frame statement.
-    frame action:
-                ^
+File "game/character/character_screens.rpy", line 43: duplicate parameter name 'scaleup'
+    screen angry(position,emotion,action=blank,transition=blank,scaleup=blank,scaleup=blank):
+                                                                                           ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Thu Nov 14 03:19:57 2024
+Thu Nov 14 18:09:09 2024

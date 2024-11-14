@@ -2,6 +2,7 @@ transform blank:
     pass
 
 transform scaleup:
+    xoffset -125
     zoom 1.5
 
 transform appear:

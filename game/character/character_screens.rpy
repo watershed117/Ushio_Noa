@@ -40,9 +40,9 @@ screen noa_blink(position):
 #     show screen emoji(position,emotion,emoji,emoji_action,frame_action)
 #     play sound "audio/emotion/[emoji].wav"
 
-screen angry(position,emotion,action=blank,transition=blank):
+screen angry(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -52,13 +52,14 @@ screen angry(position,emotion,action=blank,transition=blank):
         elif transition=="holo":
             add holo(f"ushio_noa {emotion}")
         else:
-            add "ushio_noa [emotion]"
+            add "ushio_noa [emotion]":
+                pos(0,0)
         add "emoji angry" at emoji_angry
     on ("show","replace") action Play("sound","audio/emotion/angry.wav")
 
-screen bulb(position,emotion,action=blank,transition=blank):
+screen bulb(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -72,9 +73,9 @@ screen bulb(position,emotion,action=blank,transition=blank):
         add "emoji bulb" at emoji_bulb
     on ("show","replace") action Play("sound","audio/emotion/bulb.wav")
 
-screen chat(position,emotion,action=blank,transition=blank):
+screen chat(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -88,9 +89,9 @@ screen chat(position,emotion,action=blank,transition=blank):
         add "emoji chat" at emoji_chat
     on ("show","replace") action Play("sound","audio/emotion/chat.wav")
 
-screen dot(noa_position,emotion,action=blank,transition=blank):
+screen dot(noa_position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[noa_position]
@@ -105,9 +106,9 @@ screen dot(noa_position,emotion,action=blank,transition=blank):
         add "emoji dot"
     on ("show","replace") action Play("sound","audio/emotion/dot.wav")
 
-screen exclaim(position,emotion,action=blank,transition=blank):
+screen exclaim(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -121,9 +122,9 @@ screen exclaim(position,emotion,action=blank,transition=blank):
         add "emoji exclaim" at emoji_exclaim
     on ("show","replace") action Play("sound","audio/emotion/exclaim.wav")
 
-screen heart(position,emotion,action=blank,transition=blank):
+screen heart(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -138,9 +139,9 @@ screen heart(position,emotion,action=blank,transition=blank):
         add "emoji heart" at emoji_heart
     on ("show","replace") action Play("sound","audio/emotion/heart.wav")
 
-screen music(position,emotion,action=blank,transition=blank):
+screen music(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -154,9 +155,9 @@ screen music(position,emotion,action=blank,transition=blank):
         add "emoji music" at emoji_music
     on ("show","replace") action Play("sound","audio/emotion/music.wav")
 
-screen question(position,emotion,action=blank,transition=blank):
+screen question(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -170,9 +171,9 @@ screen question(position,emotion,action=blank,transition=blank):
         add "emoji question" at emoji_question
     on ("show","replace") action Play("sound","audio/emotion/question.wav")
 
-screen respond(position,emotion,action=blank,transition=blank):
+screen respond(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -186,9 +187,9 @@ screen respond(position,emotion,action=blank,transition=blank):
         add "emoji respond" at emoji_respond
     on ("show","replace") action Play("sound","audio/emotion/respond.wav")
 
-screen sad(position,emotion,action=blank,transition=blank):
+screen sad(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -202,9 +203,9 @@ screen sad(position,emotion,action=blank,transition=blank):
         add "emoji sad" at emoji_sad
     on ("show","replace") action Play("sound","audio/emotion/sad.wav")
 
-screen shy(position,emotion,action=blank,transition=blank):
+screen shy(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 1351        
         pos position_map[position]
@@ -219,9 +220,9 @@ screen shy(position,emotion,action=blank,transition=blank):
         add "emoji shy" at emoji_shy
     on ("show","replace") action Play("sound","audio/emotion/shy.wav")
 
-screen sigh(position,emotion,action=blank,transition=blank):
+screen sigh(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -235,9 +236,9 @@ screen sigh(position,emotion,action=blank,transition=blank):
         add "emoji sigh" at emoji_sigh
     on ("show","replace") action Play("sound","audio/emotion/sigh.wav")
 
-screen steam(position,emotion,action=blank,transition=blank):
+screen steam(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -251,9 +252,9 @@ screen steam(position,emotion,action=blank,transition=blank):
         add "emoji steam" at emoji_steam
     on ("show","replace") action Play("sound","audio/emotion/steam.wav")
 
-screen surprise(position,emotion,action=blank,transition=blank):
+screen surprise(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754        
         ysize 1351
         pos position_map[position]
@@ -268,9 +269,9 @@ screen surprise(position,emotion,action=blank,transition=blank):
         add "emoji surprise2" at emoji_surprise2
     on ("show","replace") action Play("sound","audio/emotion/surprise.wav")
 
-screen sweat(position,emotion,action=blank,transition=blank):
+screen sweat(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -284,9 +285,9 @@ screen sweat(position,emotion,action=blank,transition=blank):
         add "emoji sweat" at emoji_sweat
     on ("show","replace") action Play("sound","audio/emotion/sweat.wav")
 
-screen tear(position,emotion,action=blank,transition=blank):
+screen tear(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -305,9 +306,9 @@ screen tear(position,emotion,action=blank,transition=blank):
 #         renpy.random_num = renpy.random.randint(a, b)
 # default random_num = 1
 
-screen think(position,emotion,action=blank,transition=blank):
+screen think(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -329,9 +330,9 @@ screen think(position,emotion,action=blank,transition=blank):
             add "emoji think1" at ice
     on ("show","replace") action Play("sound","audio/emotion/think.wav")
 
-screen twinkle(position,emotion,action=blank,transition=blank):
+screen twinkle(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -347,9 +348,9 @@ screen twinkle(position,emotion,action=blank,transition=blank):
         add "emoji twinkle" at emoji_twinkle3
     on ("show","replace") action Play("sound","audio/emotion/twinkle.wav")
 
-screen upset(position,emotion,action=blank,transition=blank):
+screen upset(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -364,9 +365,9 @@ screen upset(position,emotion,action=blank,transition=blank):
         add "emoji upset" at emoji_upset
     on ("show","replace") action Play("sound","audio/emotion/upset.wav")
 
-screen zzz(position,emotion,action=blank,transition=blank):
+screen zzz(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
@@ -380,9 +381,9 @@ screen zzz(position,emotion,action=blank,transition=blank):
         add "emoji zzz"
     on ("show","replace") action Play("sound","audio/emotion/zzz.wav")
 
-screen noa_base(position,emotion,action=blank,transition=blank):
+screen noa_base(position,emotion,action=blank,transition=blank,scaleup=blank):
     tag emoji
-    frame at action:
+    frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
