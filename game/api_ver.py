@@ -38,11 +38,15 @@ class ChatGLM:
             response = client.post(url, json=playload)
             if response.status_code == 200:
                 result = response.json()
-                print(result)
+                # print(result)
                 content = result["choices"][0]["message"]
-                if content.get("content"):
-                    self.history.append({"role": content.get(
-                        "role"), "content": content.get("content")})
+                if content.get("content") or content.get("tool_calls"):
+                    if content.get("tool_calls"):
+                        self.history.append({"role": content.get(
+                            "role"), "tool_calls": content.get("tool_calls")})
+                    else:
+                        self.history.append({"role": content.get(
+                            "role"), "content": content.get("content")})
                 return content
             else:
                 return response.status_code, response.json()
@@ -93,49 +97,76 @@ class ChatGLM:
         else:
             return False
 
+    def tokenizer(self, text: str):
+        url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
+        playload = {"model": self.model, "messages": [
+            {"role": "user", "content": text}]}
+        with self.client as client:
+            response = client.post(url, json=playload)
+            if response.status_code == 200:
+                result = response.json()
+                return result["usage"]
+            else:
+                return response.status_code, response.json()
+
 
 if __name__ == "__main__":
-    api_key = "937041ab8a8913329177a408cc96fd4b.lC8CldSAjskjGtgS"
+    api_key = "3c82d2b319fc300ad8ea63a3d90f7350.Rgje8i6T9jDOetD4"
     tools = [
         {
             "type": "function",
-            "function": {
-                "name": "query_train_info",
-                "description": "根据用户提供的信息，查询对应的车次",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "departure": {
-                            "type": "string",
-                            "description": "出发城市或车站",
-                        },
-                        "destination": {
-                            "type": "string",
-                            "description": "目的地城市或车站",
-                        },
-                        "date": {
-                            "type": "string",
-                            "description": "要查询的车次日期",
-                        },
-                    },
-                    "required": ["departure", "destination", "date"],
-                },
-            }
+                    "function": {
+                        "name": "control_character",
+                        "description": "控制角色的立绘，表情，动作，特效",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "string",
+                                    "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
+                                },
+                                "emotion": {
+                                    "type": "string",
+                                    "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
+                                },
+                                "emoji": {
+                                    "type": "string",
+                                    "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
+                                },
+                                "action": {
+                                    "type": "string",
+                                    "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
+                                },
+                                "effect": {
+                                    "type": "string",
+                                    "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
+                                }
+                            },
+                            "required": ["position", "emotion"]
+                        }
+                    }
         }
     ]
-    with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"),"r",encoding="utf-8") as file:
-        prompt=file.read()
+
+    with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"), "r", encoding="utf-8") as file:
+        complex_prompt = file.read()
     chatglm = ChatGLM(
         api_key, storage="C:\\Users\\water\\Desktop\\bot\\noa\\data\\chatglm",
-        model="glm-4-flash",tools=tools,system_prompt=prompt)
+        model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
+    print(chatglm.tokenizer(complex_prompt))
+    while True:
+        messages = {
+            "role": "user",
+            "content": input("请输入：")
+        }
+        reply = chatglm.send(messages=messages)
+        print(reply)
+        # print(chatglm.history)
+        if reply.get("tool_calls"):
+            reply = chatglm.send(
+                messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
+            print(reply)
 
-    messages = {
-        "role": "user",
-        "content": "你好"
-    }
-
-    reply = chatglm.send(messages=messages)
-    print(reply)
     # id = chatglm.save()
     # print(id)
     # chatglm.load(id)

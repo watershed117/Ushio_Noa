@@ -44,23 +44,23 @@ default position_map={
 }
 
 label start:
-    scene bg
+    scene 
     stop music fadeout 1.0
     show screen noa_base("3","joy") as stander
-    show screen angry("3","joy",down)
-    show screen angry("4","joy",down,scaleup=scaleup) as tmp
+    show screen angry("3","joy",sightly_down)
+    show screen angry("4","joy",sightly_down,scaleup=scaleup) as tmp
     pause
-    show screen angry("3","joy",left_down)
-    show screen angry("4","joy",left_down,scaleup=scaleup) as tmp
+    show screen angry("3","joy",fall_left)
+    show screen angry("4","joy",fall_left,scaleup=scaleup) as tmp
     pause
-    show screen angry("3","joy",right_down)
-    show screen angry("4","joy",right_down,scaleup=scaleup) as tmp
+    show screen angry("3","joy",fall_right)
+    show screen angry("4","joy",fall_right,scaleup=scaleup) as tmp
     pause
-    show screen angry("3","joy",up_up)
-    show screen angry("4","joy",up_up,scaleup=scaleup) as tmp
+    show screen angry("3","joy",jump_more)
+    show screen angry("4","joy",jump_more,scaleup=scaleup) as tmp
     pause
-    show screen angry("3","joy",up)
-    show screen angry("4","joy",up,scaleup=scaleup) as tmp
+    show screen angry("3","joy",jump)
+    show screen angry("4","joy",jump,scaleup=scaleup) as tmp
     pause
     show screen angry("3","joy",shake)
     show screen angry("4","joy",shake,scaleup=scaleup) as tmp
@@ -68,11 +68,11 @@ label start:
     show screen angry("3","joy",shake_more)
     show screen angry("4","joy",shake_more,scaleup=scaleup) as tmp
     pause
-    show screen noa_base("3","joy",transition="holo")
-    show screen noa_base("4","joy",transition="holo",scaleup=scaleup) as tmp
+    show screen noa_base("3","joy",effect="holography")
+    show screen noa_base("4","joy",effect="holography",scaleup=scaleup) as tmp
     pause
-    show screen noa_base("3","joy",transition="hide")
-    show screen noa_base("4","joy",transition="hide",scaleup=scaleup) as tmp
+    show screen noa_base("3","joy",effect="hide")
+    show screen noa_base("4","joy",effect="hide",scaleup=scaleup) as tmp
     pause
     pause
     return

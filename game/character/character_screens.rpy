@@ -40,16 +40,16 @@ screen noa_blink(position):
 #     show screen emoji(position,emotion,emoji,emoji_action,frame_action)
 #     play sound "audio/emotion/[emoji].wav"
 
-screen angry(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen angry(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]":
@@ -57,48 +57,48 @@ screen angry(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji angry" at emoji_angry
     on ("show","replace") action Play("sound","audio/emotion/angry.wav")
 
-screen bulb(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen bulb(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji bulb" at emoji_bulb
     on ("show","replace") action Play("sound","audio/emotion/bulb.wav")
 
-screen chat(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen chat(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji chat" at emoji_chat
     on ("show","replace") action Play("sound","audio/emotion/chat.wav")
 
-screen dot(noa_position,emotion,action=blank,transition=blank,scaleup=blank):
+screen dot(noa_position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[noa_position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -106,32 +106,32 @@ screen dot(noa_position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji dot"
     on ("show","replace") action Play("sound","audio/emotion/dot.wav")
 
-screen exclaim(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen exclaim(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji exclaim" at emoji_exclaim
     on ("show","replace") action Play("sound","audio/emotion/exclaim.wav")
 
-screen heart(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen heart(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -139,80 +139,80 @@ screen heart(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji heart" at emoji_heart
     on ("show","replace") action Play("sound","audio/emotion/heart.wav")
 
-screen music(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen music(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji music" at emoji_music
     on ("show","replace") action Play("sound","audio/emotion/music.wav")
 
-screen question(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen question(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji question" at emoji_question
     on ("show","replace") action Play("sound","audio/emotion/question.wav")
 
-screen respond(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen respond(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji respond" at emoji_respond
     on ("show","replace") action Play("sound","audio/emotion/respond.wav")
 
-screen sad(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen sad(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji sad" at emoji_sad
     on ("show","replace") action Play("sound","audio/emotion/sad.wav")
 
-screen shy(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen shy(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 1351        
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -220,48 +220,48 @@ screen shy(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji shy" at emoji_shy
     on ("show","replace") action Play("sound","audio/emotion/shy.wav")
 
-screen sigh(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen sigh(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji sigh" at emoji_sigh
     on ("show","replace") action Play("sound","audio/emotion/sigh.wav")
 
-screen steam(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen steam(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji steam" at emoji_steam
     on ("show","replace") action Play("sound","audio/emotion/steam.wav")
 
-screen surprise(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen surprise(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754        
         ysize 1351
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -269,32 +269,32 @@ screen surprise(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji surprise2" at emoji_surprise2
     on ("show","replace") action Play("sound","audio/emotion/surprise.wav")
 
-screen sweat(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen sweat(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji sweat" at emoji_sweat
     on ("show","replace") action Play("sound","audio/emotion/sweat.wav")
 
-screen tear(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen tear(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -306,16 +306,16 @@ screen tear(position,emotion,action=blank,transition=blank,scaleup=blank):
 #         renpy.random_num = renpy.random.randint(a, b)
 # default random_num = 1
 
-screen think(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen think(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -330,16 +330,16 @@ screen think(position,emotion,action=blank,transition=blank,scaleup=blank):
             add "emoji think1" at ice
     on ("show","replace") action Play("sound","audio/emotion/think.wav")
 
-screen twinkle(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen twinkle(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -348,16 +348,16 @@ screen twinkle(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji twinkle" at emoji_twinkle3
     on ("show","replace") action Play("sound","audio/emotion/twinkle.wav")
 
-screen upset(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen upset(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
@@ -365,32 +365,32 @@ screen upset(position,emotion,action=blank,transition=blank,scaleup=blank):
         add "emoji upset" at emoji_upset
     on ("show","replace") action Play("sound","audio/emotion/upset.wav")
 
-screen zzz(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen zzz(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
         add "emoji zzz"
     on ("show","replace") action Play("sound","audio/emotion/zzz.wav")
 
-screen noa_base(position,emotion,action=blank,transition=blank,scaleup=blank):
+screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
         pos position_map[position]
         background None
-        if transition=="hide":
+        if effect=="hide":
             add "ushio_noa black"
-        elif transition=="holo":
+        elif effect=="holography":
             add holo(f"ushio_noa {emotion}")
         else:
             add "ushio_noa [emotion]"
