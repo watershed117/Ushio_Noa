@@ -4,5 +4,6 @@
         "**/*.rpa": true,
         "**/*.rpymc": true,
         "**/cache/": true
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }

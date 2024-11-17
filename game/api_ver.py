@@ -5,18 +5,27 @@ import requests
 
 
 class ChatGLM:
-    def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = None):
+    def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = "", limit: str = "128k"):
         self.model = model
         self.client = requests.Session()
         self.client.headers.update({"Authorization": f"Bearer {api_key}"})
         self.history = []
+        self.history_storage = []
         self.storage = storage
         self.tools = tools
-        self.system_prompt = system_prompt
+        self.len_map = {"8k": 8000, "16k": 16000,
+                        "32k": 32000, "64k": 64000, "128k": 128000}
+        self.max_len = self.len_map.get(limit,128000)
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
         if system_prompt:
             self.history.append({"role": "system", "content": system_prompt})
+            self.history_storage.append(
+                {"role": "system", "content": system_prompt})
+
+        print(self.history)
+        print(self.history_storage)
+        print(self.max_len)
 
     def is_valid_path(self, path_str: str):
         try:
@@ -39,14 +48,22 @@ class ChatGLM:
             if response.status_code == 200:
                 result = response.json()
                 # print(result)
+                total_tokens = result.get("usage").get("total_tokens")
+                print(total_tokens)
+                if total_tokens >= self.max_len:
+                    self.limiter()
                 content = result["choices"][0]["message"]
                 if content.get("content") or content.get("tool_calls"):
                     if content.get("tool_calls"):
                         self.history.append({"role": content.get(
                             "role"), "tool_calls": content.get("tool_calls")})
+                        self.history_storage.append(
+                            {"role": content.get("role"), "tool_calls": content.get("tool_calls")})
                     else:
                         self.history.append({"role": content.get(
                             "role"), "content": content.get("content")})
+                        self.history_storage.append(
+                            {"role": content.get("role"), "content": content.get("content")})
                 return content
             else:
                 return response.status_code, response.json()
@@ -97,17 +114,23 @@ class ChatGLM:
         else:
             return False
 
-    def tokenizer(self, text: str):
+    def tokenizer(self, data:list[dict[str,str]])->int|tuple:
         url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
-        playload = {"model": self.model, "messages": [
-            {"role": "user", "content": text}]}
         with self.client as client:
-            response = client.post(url, json=playload)
+            response = client.post(url, json=data)
             if response.status_code == 200:
                 result = response.json()
-                return result["usage"]
+                return result["usage"].get("prompt_tokens")
             else:
                 return response.status_code, response.json()
+
+    def limiter(self):
+            self.history = self.history[:1] + self.history[3:]
+            print("remoed history[1:3]")
+            tokens = self.tokenizer(self.history)
+            if isinstance(tokens, int):
+                if tokens>=self.max_len:
+                    self.limiter()
 
 
 if __name__ == "__main__":
@@ -148,12 +171,19 @@ if __name__ == "__main__":
         }
     ]
 
-    with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"), "r", encoding="utf-8") as file:
+    # with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"), "r", encoding="utf-8") as file:
+    #     complex_prompt = file.read()
+    # with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt"), "r", encoding="utf-8") as file:
+    #     complex_prompt = file.read()
+    with open(os.path.join(r"C:\Users\water\Desktop\tmp.txt"), "r", encoding="utf-8") as file:
         complex_prompt = file.read()
+        
+    # chatglm = ChatGLM(
+    #     api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+    #     model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
     chatglm = ChatGLM(
-        api_key, storage="C:\\Users\\water\\Desktop\\bot\\noa\\data\\chatglm",
-        model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
-    print(chatglm.tokenizer(complex_prompt))
+        api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+        model="glm-4-flash", system_prompt=complex_prompt,limit="8k")
     while True:
         messages = {
             "role": "user",
@@ -161,18 +191,7 @@ if __name__ == "__main__":
         }
         reply = chatglm.send(messages=messages)
         print(reply)
-        # print(chatglm.history)
-        if reply.get("tool_calls"):
-            reply = chatglm.send(
-                messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
-            print(reply)
-
-    # id = chatglm.save()
-    # print(id)
-    # chatglm.load(id)
-    # print(chatglm.history)
-    # conversations = chatglm.get_conversations()
-    # print(conversations)
-    # chatglm.delete_conversation(id)
-    # conversations = chatglm.get_conversations()
-    # print(conversations)
+        # if reply.get("tool_calls"):
+        #     reply = chatglm.send(
+        #         messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
+        #     print(reply)
