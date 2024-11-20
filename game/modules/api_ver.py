@@ -2,6 +2,7 @@ import os
 from uuid import uuid4
 import json
 import requests
+import queue
 
 
 class ChatGLM:
@@ -15,17 +16,15 @@ class ChatGLM:
         self.tools = tools
         self.len_map = {"8k": 8000, "16k": 16000,
                         "32k": 32000, "64k": 64000, "128k": 128000}
-        self.max_len = self.len_map.get(limit,128000)
+        self.max_len = self.len_map.get(limit, 128000)
+        self.event = queue.Queue()
+
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
         if system_prompt:
             self.history.append({"role": "system", "content": system_prompt})
             self.history_storage.append(
                 {"role": "system", "content": system_prompt})
-
-        print(self.history)
-        print(self.history_storage)
-        print(self.max_len)
 
     def is_valid_path(self, path_str: str):
         try:
@@ -47,9 +46,7 @@ class ChatGLM:
             response = client.post(url, json=playload)
             if response.status_code == 200:
                 result = response.json()
-                # print(result)
                 total_tokens = result.get("usage").get("total_tokens")
-                print(total_tokens)
                 if total_tokens >= self.max_len:
                     self.limiter()
                 content = result["choices"][0]["message"]
@@ -114,7 +111,7 @@ class ChatGLM:
         else:
             return False
 
-    def tokenizer(self, data:list[dict[str,str]])->int|tuple:
+    def tokenizer(self, data: list[dict[str, str]]) -> int | tuple:
         url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
         with self.client as client:
             response = client.post(url, json=data)
@@ -125,12 +122,62 @@ class ChatGLM:
                 return response.status_code, response.json()
 
     def limiter(self):
-            self.history = self.history[:1] + self.history[3:]
-            print("remoed history[1:3]")
-            tokens = self.tokenizer(self.history)
-            if isinstance(tokens, int):
-                if tokens>=self.max_len:
-                    self.limiter()
+        self.history = self.history[:1] + self.history[3:]
+        tokens = self.tokenizer(self.history)
+        if isinstance(tokens, int):
+            if tokens >= self.max_len:
+                self.limiter()
+
+    def call_method(self, method_name: str, *args, **kwargs):
+        if hasattr(self, method_name):
+            method = getattr(self, method_name)
+            if callable(method):
+                print( f"call method {method_name}")
+                return method(*args, **kwargs)
+            else:
+                print(f"{method_name} not callable")
+                return None
+        else:
+            print(f"{method_name} not found")
+            return None
+
+    def run(self):
+        while True:
+            event = self.event.get()
+            if not event:
+                continue
+            if isinstance(event, str):
+                method_name = event
+                result = self.call_method(method_name)
+                print(result)
+                continue
+            elif isinstance(event, tuple):
+                method_name = event[0]
+                if len(event) == 1:
+                    result = self.call_method(method_name)
+                    print(result)
+                    continue
+                elif len(event) == 2:
+                    if isinstance(event[1], tuple):
+                        args = event[1]
+                        result = self.call_method(method_name, *args)
+                        print(result)
+                    elif isinstance(event[1], dict):
+                        kwargs = event[1]
+                        result = self.call_method(method_name, **kwargs)
+                        print(result)
+                    else:
+                        continue
+                elif len(event) == 3:
+                    args = event[1]
+                    kwargs = event[2]
+                    result = self.call_method(method_name, *args, **kwargs)
+                    print(result)
+                else:
+                    continue
+            else:
+                continue
+
 
 
 if __name__ == "__main__":
@@ -173,25 +220,30 @@ if __name__ == "__main__":
 
     # with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\promot.txt"), "r", encoding="utf-8") as file:
     #     complex_prompt = file.read()
-    # with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt"), "r", encoding="utf-8") as file:
-    #     complex_prompt = file.read()
-    with open(os.path.join(r"C:\Users\water\Desktop\tmp.txt"), "r", encoding="utf-8") as file:
+    with open(os.path.join(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt"), "r", encoding="utf-8") as file:
         complex_prompt = file.read()
-        
+
     # chatglm = ChatGLM(
     #     api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
     #     model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
     chatglm = ChatGLM(
         api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-        model="glm-4-flash", system_prompt=complex_prompt,limit="8k")
-    while True:
-        messages = {
-            "role": "user",
-            "content": input("请输入：")
-        }
-        reply = chatglm.send(messages=messages)
-        print(reply)
-        # if reply.get("tool_calls"):
-        #     reply = chatglm.send(
-        #         messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
-        #     print(reply)
+        model="glm-4-flash", system_prompt="", limit="8k")
+    # while True:
+    #     messages = {
+    #         "role": "user",
+    #         "content": input("请输入：")
+    #     }
+    #     reply = chatglm.send(messages=messages)
+    #     print(reply)
+    # if reply.get("tool_calls"):
+    #     reply = chatglm.send(
+    #         messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
+    #     print(reply)
+
+    import threading
+    t = threading.Thread(target=chatglm.run)
+    t.start()
+    chatglm.event.put(("send",({"role": "user", "content": "你好"},)))
+    chatglm.event.put(("send",{"messages":{"role": "user", "content": "你好"}}))
+
