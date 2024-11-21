@@ -44,36 +44,10 @@ default position_map={
 }
 
 label start:
-    scene 
+    image default_background="images/background/office/mainoffice.jpg"
+    scene default_background
     stop music fadeout 1.0
-    show screen noa_base("3","joy") as stander
-    show screen angry("3","joy",sightly_down)
-    show screen angry("4","joy",sightly_down,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",fall_left)
-    show screen angry("4","joy",fall_left,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",fall_right)
-    show screen angry("4","joy",fall_right,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",jump_more)
-    show screen angry("4","joy",jump_more,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",jump)
-    show screen angry("4","joy",jump,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",shake)
-    show screen angry("4","joy",shake,scaleup=scaleup) as tmp
-    pause
-    show screen angry("3","joy",shake_more)
-    show screen angry("4","joy",shake_more,scaleup=scaleup) as tmp
-    pause
-    show screen noa_base("3","joy",effect="holography")
-    show screen noa_base("4","joy",effect="holography",scaleup=scaleup) as tmp
-    pause
-    show screen noa_base("3","joy",effect="hide")
-    show screen noa_base("4","joy",effect="hide",scaleup=scaleup) as tmp
-    pause
+    $ tools.control_character("3","joy","zzz",effect="holography")
     pause
     return
     # scene ui

@@ -132,7 +132,7 @@ class ChatGLM:
         if hasattr(self, method_name):
             method = getattr(self, method_name)
             if callable(method):
-                print( f"call method {method_name}")
+                print(f"call method {method_name}")
                 return method(*args, **kwargs)
             else:
                 print(f"{method_name} not callable")
@@ -179,42 +179,78 @@ class ChatGLM:
                 continue
 
 
-
 if __name__ == "__main__":
+    from tools import Tools
+    tools = Tools()
+    dirs=tools.get_dirs(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\images\background")
     api_key = "3c82d2b319fc300ad8ea63a3d90f7350.Rgje8i6T9jDOetD4"
     tools = [
         {
             "type": "function",
-                    "function": {
-                        "name": "control_character",
-                        "description": "控制角色的立绘，表情，动作，特效",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "position": {
-                                    "type": "string",
-                                    "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
-                                },
-                                "emotion": {
-                                    "type": "string",
-                                    "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
-                                },
-                                "emoji": {
-                                    "type": "string",
-                                    "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
-                                },
-                                "action": {
-                                    "type": "string",
-                                    "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
-                                },
-                                "effect": {
-                                    "type": "string",
-                                    "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
-                                }
-                            },
-                            "required": ["position", "emotion"]
+            "function": {
+                "name": "control_character",
+                "description": "控制角色的立绘，表情，动作，特效，在人物情绪变化时调用",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "position": {
+                            "type": "string",
+                            "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
+                        },
+                        "emotion": {
+                            "type": "string",
+                            "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
+                        },
+                        "emoji": {
+                            "type": "string",
+                            "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
+                        },
+                        "action": {
+                            "type": "string",
+                            "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
+                        },
+                        "effect": {
+                            "type": "string",
+                            "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
                         }
-                    }
+                    },
+                    "required": ["position", "emotion"]
+                }
+            }
+        },
+        {   
+            "type": "function",
+            "function": {
+                "name": "dir_walker",
+                "description": "获取目录下的所有文件名",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "dir": {
+                            "type": "string",
+                            "description": f"文件夹名，可选{dirs}",
+                        }
+                    },
+                    "required": ["dir"],
+                },
+            }
+        },
+        {   
+            "type": "function",
+            "function": {
+                "name": "bg_changer",
+                "description": "背景图片切换，在调用前应当通过dir_walker获取文件名",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": f"格式要求：文件夹名/文件名，例如park/park.jpg",
+                        }
+                    },
+                    "required": ["name"],
+                },
+            }
         }
     ]
 
@@ -228,22 +264,22 @@ if __name__ == "__main__":
     #     model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
     chatglm = ChatGLM(
         api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-        model="glm-4-flash", system_prompt="", limit="8k")
-    # while True:
-    #     messages = {
-    #         "role": "user",
-    #         "content": input("请输入：")
-    #     }
-    #     reply = chatglm.send(messages=messages)
-    #     print(reply)
+        model="glm-4-plus", system_prompt=complex_prompt, tools=tools, limit="16k")
+    while True:
+        messages = {
+            "role": input("role:"),
+            "content": input("content:")
+        }
+        reply = chatglm.send(messages=messages)
+        print(reply)
     # if reply.get("tool_calls"):
     #     reply = chatglm.send(
     #         messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
     #     print(reply)
 
-    import threading
-    t = threading.Thread(target=chatglm.run)
-    t.start()
-    chatglm.event.put(("send",({"role": "user", "content": "你好"},)))
-    chatglm.event.put(("send",{"messages":{"role": "user", "content": "你好"}}))
-
+    # import threading
+    # t = threading.Thread(target=chatglm.run)
+    # t.start()
+    # chatglm.event.put(("send", ({"role": "user", "content": "你好"},)))
+    # chatglm.event.put(
+    #     ("send", {"messages": {"role": "user", "content": "你好"}}))

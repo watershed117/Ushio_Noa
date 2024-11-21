@@ -375,9 +375,9 @@ screen zzz(position,emotion,action=blank,effect=blank,scaleup=blank):
         if effect=="hide":
             add "ushio_noa black"
         elif effect=="holography":
-            add holo(f"ushio_noa {emotion}")
+            add holo(f"ushio_noa normal_close")
         else:
-            add "ushio_noa [emotion]"
+            add "ushio_noa normal_close"
         add "emoji zzz"
     on ("show","replace") action Play("sound","audio/emotion/zzz.wav")
 

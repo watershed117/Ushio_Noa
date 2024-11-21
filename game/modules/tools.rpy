@@ -27,7 +27,10 @@ init python:
                         dir_names.append(entry.name)
             return dir_names
 
-    background_dir=os.path.join(renpy.config.gamedir,"images/background")
-    tools=Tools()
-    result=tools.dir_walker(os.path.join(background_dir,"beach"))
-    print(result)
+        def control_character(self,position,emotion,emoji:str="",action=blank,effect=blank,scaleup=blank):
+            if emoji:
+                renpy.show_screen(emoji,position=position,emotion=emotion,action=action,effect=effect,scaleup=scaleup)
+            else:
+                renpy.show_screen("noa_base",position=position,emotion=emotion,action=action,effect=effect,scaleup=scaleup)
+
+    tools = Tools()
