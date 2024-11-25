@@ -339,7 +339,7 @@ style navigation_button_text:
 ## https://www.renpy.cn/doc/screen_special.html#main-menu
 image movie = Movie(play="images/main.webm")
 screen main_menu():
-
+    $ change_title("Ushio_Noa")
     ## 此语句可确保替换掉任何其他菜单屏幕。
     tag menu
     add "movie"

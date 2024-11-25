@@ -1,45 +1,31 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 187, in script
-    call screen entry()
-  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
-  File "game/script.rpy", line 107, in execute
-    screen entry():
-  File "game/script.rpy", line 107, in execute
-    screen entry():
-  File "game/script.rpy", line 118, in execute
-    viewport:
-  File "game/script.rpy", line 137, in execute
-    if conversation_number:
-  File "game/script.rpy", line 158, in execute
-    vbox:
-  File "game/script.rpy", line 161, in execute
-    for n in range(0,conversation_number):
-  File "game/script.rpy", line 162, in execute
-    button:
-  File "game/script.rpy", line 162, in keywords
-    button:
-  File "game/script.rpy", line 167, in <module>
-    Function(changer_title,conversation_list[n].get("id")),
-NameError: name 'changer_title' is not defined
+  File "game/screens.rpy", line 341, in execute
+    screen main_menu():
+  File "game/screens.rpy", line 341, in execute
+    screen main_menu():
+  File "game/screens.rpy", line 342, in execute
+    $ change_title("Ushio_Noa")
+  File "game/screens.rpy", line 342, in <module>
+    $ change_title("Ushio_Noa")
+  File "game/script.rpy", line 101, in change_title
+    hwnd=title_changer.get_current_process_window_handles()
+AttributeError: module 'title_changer' has no attribute 'get_current_process_window_handles'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 187, in script
-    call screen entry()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1974, in execute
-    self.call("execute")
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1953, in call
-    return renpy.statements.call(method, parsed, *args, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\statements.py", line 374, in call
-    return method(parsed, *args, **kwargs)
-  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\statementexports.py", line 345, in call_screen
-    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in script
+    python hide:
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in <module>
+    python hide:
+  File "renpy/common/_layout/screen_main_menu.rpym", line 35, in _execute_python_hide
+    ui.interact()
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
     rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2215, in interact
@@ -60,27 +46,19 @@ Full traceback:
     self.update()
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
     self.screen.function(**self.scope)
-  File "game/script.rpy", line 107, in execute
-    screen entry():
-  File "game/script.rpy", line 107, in execute
-    screen entry():
-  File "game/script.rpy", line 118, in execute
-    viewport:
-  File "game/script.rpy", line 137, in execute
-    if conversation_number:
-  File "game/script.rpy", line 158, in execute
-    vbox:
-  File "game/script.rpy", line 161, in execute
-    for n in range(0,conversation_number):
-  File "game/script.rpy", line 162, in execute
-    button:
-  File "game/script.rpy", line 162, in keywords
-    button:
-  File "game/script.rpy", line 167, in <module>
-    Function(changer_title,conversation_list[n].get("id")),
-NameError: name 'changer_title' is not defined
+  File "game/screens.rpy", line 341, in execute
+    screen main_menu():
+  File "game/screens.rpy", line 341, in execute
+    screen main_menu():
+  File "game/screens.rpy", line 342, in execute
+    $ change_title("Ushio_Noa")
+  File "game/screens.rpy", line 342, in <module>
+    $ change_title("Ushio_Noa")
+  File "game/script.rpy", line 101, in change_title
+    hwnd=title_changer.get_current_process_window_handles()
+AttributeError: module 'title_changer' has no attribute 'get_current_process_window_handles'
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Mon Nov 25 18:52:08 2024
+Tue Nov 26 00:13:08 2024

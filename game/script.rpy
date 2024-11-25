@@ -87,13 +87,19 @@ init 2 python:
                     limit=game_config.limit)
 
 init 3 python:
+    info_path=os.path.join(renpy.config.gamedir, "info.json")
     def change_title(name:str):
-        print("before")
-        print(persistent.window_title)
-        title_changer.set_window_title(persistent.hwnd, name)
-        persistent.window_title=name
-        print("after")
-        print(persistent.window_title)
+        hwnd=title_changer.get_all_current_process_window_handles()
+        # if len(hwnd)==1:
+        #     title=title_changer.get_window_title(hwnd[0])
+        #     title_changer.set_window_title(hwnd[0], name)
+        # else:
+        #     print("Error: Multiple windows are open.")
+        #     title=title_changer.get_window_title(hwnd[0])
+        #     title_changer.set_window_title(hwnd[0], name)
+        title=title_changer.get_window_title(hwnd[0])
+        title_changer.set_window_title(hwnd[0], name)
+
 
 init 4 python:
     renpy.invoke_in_thread(chatglm.run)
@@ -106,8 +112,6 @@ init 5 python:
 
 screen entry():
     python:
-        change_title("Ushio_Noa")
-
         chatglm.event.put("get_conversations")
         while not chatglm.ready:
             time.sleep(0.1)
@@ -176,14 +180,15 @@ default position_map={
     "5": (1200, 200)
 }
 
-default persistent.window_title="Ushio_Noa"
-default persistent.hwnd=0000000
-
 label start:
     stop music fadeout 1.0
-    python:
-        persistent.hwnd=title_changer.get_hwnd(persistent.window_title)
-
+    # python:
+    #     change_title("Ushio_Noa")
+    #     hwnd=title_changer.get_current_process_window_handles()
+    #     if len(hwnd)==1:
+    #         title=title_changer.get_window_title(hwnd[0])
+    #     else:
+    #         print("Error: Multiple windows are open.")
     call screen entry()
     
 label main:
