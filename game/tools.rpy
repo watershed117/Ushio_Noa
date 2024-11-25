@@ -1,4 +1,4 @@
-init python:
+init 0 python:
     import os
 
     class Tools:
@@ -30,7 +30,17 @@ init python:
         def control_character(self,position,emotion,emoji:str="",action=blank,effect=blank,scaleup=blank):
             if emoji:
                 renpy.show_screen(emoji,position=position,emotion=emotion,action=action,effect=effect,scaleup=scaleup)
+                return "success"
             else:
                 renpy.show_screen("noa_base",position=position,emotion=emotion,action=action,effect=effect,scaleup=scaleup)
+                return "success"
+        
+        def bg_changer(self,file_name:str):
+            # renpy.scene()
+            # renpy.show(file_name,layer="master")
+            renpy.call("bg_changer",file_name)
+            return "success"
+    tools_caller = Tools()
 
-    tools = Tools()
+label bg_changer(file_name):
+    scene expression "images/background/"+file_name with dissolve

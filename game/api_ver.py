@@ -4,7 +4,6 @@ import json
 import requests
 import queue
 
-
 class ChatGLM:
     def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = "", limit: str = "128k"):
         self.model = model
@@ -18,6 +17,8 @@ class ChatGLM:
                         "32k": 32000, "64k": 64000, "128k": 128000}
         self.max_len = self.len_map.get(limit, 128000)
         self.event = queue.Queue()
+        self.result = queue.Queue(1)
+        self.ready= False
 
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
@@ -25,6 +26,14 @@ class ChatGLM:
             self.history.append({"role": "system", "content": system_prompt})
             self.history_storage.append(
                 {"role": "system", "content": system_prompt})
+
+    def result_appender(func): # type: ignore
+        def wrapper(self,*args, **kwargs):
+            result = func(self,*args, **kwargs) # type: ignore
+            self.result.put(result)
+            self.ready = True
+            return result
+        return wrapper
 
     def is_valid_path(self, path_str: str):
         try:
@@ -36,14 +45,20 @@ class ChatGLM:
     def get_creation_time(self, file_path):
         return os.path.getctime(file_path)
 
+    def clear_history(self):
+        self.history = []
+        self.history_storage = []
+
+    @result_appender # type: ignore
     def send(self, messages: dict):
         url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         with self.client as client:
             self.history.append(messages)
-            playload = {"model": self.model, "messages": self.history}
+            self.history_storage.append(messages)
+            payload = {"model": self.model, "messages": self.history}
             if self.tools:
-                playload.update({"tools": self.tools})
-            response = client.post(url, json=playload)
+                payload.update({"tools": self.tools})
+            response = client.post(url, json=payload)
             if response.status_code == 200:
                 result = response.json()
                 total_tokens = result.get("usage").get("total_tokens")
@@ -65,16 +80,26 @@ class ChatGLM:
             else:
                 return response.status_code, response.json()
 
+    @result_appender # type: ignore
     def save(self):
         id = str(uuid4())
         print(os.path.join(self.storage, f"{id}.json"))
         with open(os.path.join(self.storage, f"{id}.json"), "w", encoding="utf-8") as f:
-            json.dump(self.history, f, ensure_ascii=False, indent=4)
+            json.dump(self.history_storage, f, ensure_ascii=False, indent=4)
         return id
 
+    @result_appender # type: ignore
     def load(self, id: str):
         with open(os.path.join(self.storage, f"{id}.json"), "r", encoding="utf-8") as f:
-            self.history = json.load(f)
+            data = json.load(f)
+            self.history = data
+            self.history_storage = data
+            tokens = self.tokenizer(data)
+            if isinstance(tokens, int):
+                if tokens >= self.max_len:
+                    self.limiter()
+            return id
+
 
     def sort_files(self, folder_path):
         # 获取文件夹下的所有文件
@@ -85,6 +110,7 @@ class ChatGLM:
         files.sort(key=self.get_creation_time, reverse=True)
         return files
 
+    @result_appender # type: ignore
     def get_conversations(self):
         files = self.sort_files(self.storage)
         conversations = []
@@ -103,6 +129,7 @@ class ChatGLM:
                         {"title": None, "id": os.path.basename(file_path)[:-5]})
         return conversations
 
+    @result_appender # type: ignore
     def delete_conversation(self, id: str):
         file_path = os.path.join(self.storage, f"{id}.json")
         if os.path.exists(file_path):
@@ -110,8 +137,8 @@ class ChatGLM:
             return True
         else:
             return False
-
-    def tokenizer(self, data: list[dict[str, str]]) -> int | tuple:
+  
+    def tokenizer(self, data: list[dict[str, str]]):
         url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
         with self.client as client:
             response = client.post(url, json=data)
@@ -122,11 +149,12 @@ class ChatGLM:
                 return response.status_code, response.json()
 
     def limiter(self):
-        self.history = self.history[:1] + self.history[3:]
-        tokens = self.tokenizer(self.history)
-        if isinstance(tokens, int):
-            if tokens >= self.max_len:
-                self.limiter()
+        while True:
+            tokens = self.tokenizer(self.history)
+            if isinstance(tokens, int) and tokens >= self.max_len:
+                self.history = self.history[:1] + self.history[3:]
+            else:
+                break
 
     def call_method(self, method_name: str, *args, **kwargs):
         if hasattr(self, method_name):
@@ -141,48 +169,45 @@ class ChatGLM:
             print(f"{method_name} not found")
             return None
 
+    def process_event(self, event):
+        """
+        处理事件，根据事件类型调用相应的方法。
+
+        参数:
+            event: 可以是字符串（方法名）或元组 (method_name, args, kwargs)。
+
+        返回:
+            方法调用的结果或 None。
+        """
+        if isinstance(event, str):  # 事件是一个方法名字符串
+            return self.call_method(event)
+        elif isinstance(event, tuple) and len(event) > 0:  # 事件是一个元组
+            method_name = event[0]  # 第一个元素是方法名
+            if len(event) == 1:  # 只有方法名，无参数
+                return self.call_method(method_name)
+            elif len(event) == 2:  # 方法名和参数
+                if isinstance(event[1], dict):  # 第二个元素是字典，作为 kwargs 处理
+                    return self.call_method(method_name, **event[1])
+                elif isinstance(event[1], tuple):  # 第二个元素是元组，作为 args 处理
+                    return self.call_method(method_name, *event[1])
+            elif len(event) == 3:  # 方法名、args 和 kwargs
+                args = event[1] if isinstance(event[1], tuple) else ()
+                kwargs = event[2] if isinstance(event[2], dict) else {}
+                return self.call_method(method_name, *args, **kwargs)
+        return None
+
+
     def run(self):
         while True:
             event = self.event.get()
-            if not event:
-                continue
-            if isinstance(event, str):
-                method_name = event
-                result = self.call_method(method_name)
-                print(result)
-                continue
-            elif isinstance(event, tuple):
-                method_name = event[0]
-                if len(event) == 1:
-                    result = self.call_method(method_name)
-                    print(result)
-                    continue
-                elif len(event) == 2:
-                    if isinstance(event[1], tuple):
-                        args = event[1]
-                        result = self.call_method(method_name, *args)
-                        print(result)
-                    elif isinstance(event[1], dict):
-                        kwargs = event[1]
-                        result = self.call_method(method_name, **kwargs)
-                        print(result)
-                    else:
-                        continue
-                elif len(event) == 3:
-                    args = event[1]
-                    kwargs = event[2]
-                    result = self.call_method(method_name, *args, **kwargs)
-                    print(result)
-                else:
-                    continue
-            else:
-                continue
-
+            if event:
+                self.process_event(event)
 
 if __name__ == "__main__":
     from tools import Tools
     tools = Tools()
-    dirs=tools.get_dirs(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\images\background")
+    dirs = tools.get_dirs(
+        r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\images\background")
     api_key = "3c82d2b319fc300ad8ea63a3d90f7350.Rgje8i6T9jDOetD4"
     tools = [
         {
@@ -218,7 +243,7 @@ if __name__ == "__main__":
                 }
             }
         },
-        {   
+        {
             "type": "function",
             "function": {
                 "name": "dir_walker",
@@ -235,7 +260,7 @@ if __name__ == "__main__":
                 },
             }
         },
-        {   
+        {
             "type": "function",
             "function": {
                 "name": "bg_changer",
@@ -264,22 +289,25 @@ if __name__ == "__main__":
     #     model="glm-4-plus", system_prompt=complex_prompt, tools=tools)
     chatglm = ChatGLM(
         api_key, storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-        model="glm-4-plus", system_prompt=complex_prompt, tools=tools, limit="16k")
-    while True:
-        messages = {
-            "role": input("role:"),
-            "content": input("content:")
-        }
-        reply = chatglm.send(messages=messages)
-        print(reply)
+        model="glm-4-flash", system_prompt=complex_prompt, tools=tools, limit="16k")
+
+    # while True:
+    #     messages = {
+    #         "role": input("role:"),
+    #         "content": input("content:")
+    #     }
+    #     reply = chatglm.send(messages=messages)
+    #     print(reply)
+
     # if reply.get("tool_calls"):
     #     reply = chatglm.send(
     #         messages={"role": "tool", "content": "[{'control_character': 'success'}]", "tool_call_id": reply.get("tool_calls")[0].get("id")})
     #     print(reply)
 
-    # import threading
-    # t = threading.Thread(target=chatglm.run)
-    # t.start()
-    # chatglm.event.put(("send", ({"role": "user", "content": "你好"},)))
-    # chatglm.event.put(
-    #     ("send", {"messages": {"role": "user", "content": "你好"}}))
+    import threading
+    t = threading.Thread(target=chatglm.run)
+    t.start()
+    chatglm.event.put(("send", ({"role": "user", "content": "你好"},)))
+    print(f"result: {chatglm.result.get()}")
+    chatglm.event.put("save")
+    print(f"result: {chatglm.result.get()}")

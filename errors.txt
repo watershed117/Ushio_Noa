@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 47: expected '=' not found.
-    image default_background "images/background/office/mainoffice.jpg"
-                             ^
+File "game/script.rpy", line 90: python block expects a non-empty block.
+    init 3 python:
+                  ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Thu Nov 21 20:56:14 2024
+Mon Nov 25 18:32:21 2024

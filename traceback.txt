@@ -1,28 +1,86 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 48, in script
-    scene default_background with fit
-  File "game/script.rpy", line 48, in <module>
-    scene default_background with fit
-NameError: name 'fit' is not defined
+  File "game/script.rpy", line 187, in script
+    call screen entry()
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "game/script.rpy", line 107, in execute
+    screen entry():
+  File "game/script.rpy", line 107, in execute
+    screen entry():
+  File "game/script.rpy", line 118, in execute
+    viewport:
+  File "game/script.rpy", line 137, in execute
+    if conversation_number:
+  File "game/script.rpy", line 158, in execute
+    vbox:
+  File "game/script.rpy", line 161, in execute
+    for n in range(0,conversation_number):
+  File "game/script.rpy", line 162, in execute
+    button:
+  File "game/script.rpy", line 162, in keywords
+    button:
+  File "game/script.rpy", line 167, in <module>
+    Function(changer_title,conversation_list[n].get("id")),
+NameError: name 'changer_title' is not defined
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 48, in script
-    scene default_background with fit
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1357, in execute
-    paired = renpy.python.py_eval(self.paired)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1209, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1202, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "game/script.rpy", line 48, in <module>
-    scene default_background with fit
-NameError: name 'fit' is not defined
+  File "game/script.rpy", line 187, in script
+    call screen entry()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1974, in execute
+    self.call("execute")
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 1953, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\statements.py", line 374, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\statementexports.py", line 345, in call_screen
+    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2215, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
+    self.screen.function(**self.scope)
+  File "game/script.rpy", line 107, in execute
+    screen entry():
+  File "game/script.rpy", line 107, in execute
+    screen entry():
+  File "game/script.rpy", line 118, in execute
+    viewport:
+  File "game/script.rpy", line 137, in execute
+    if conversation_number:
+  File "game/script.rpy", line 158, in execute
+    vbox:
+  File "game/script.rpy", line 161, in execute
+    for n in range(0,conversation_number):
+  File "game/script.rpy", line 162, in execute
+    button:
+  File "game/script.rpy", line 162, in keywords
+    button:
+  File "game/script.rpy", line 167, in <module>
+    Function(changer_title,conversation_list[n].get("id")),
+NameError: name 'changer_title' is not defined
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Thu Nov 21 21:38:16 2024
+Mon Nov 25 18:52:08 2024
