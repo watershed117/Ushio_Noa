@@ -1,64 +1,30 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/screens.rpy", line 341, in execute
-    screen main_menu():
-  File "game/screens.rpy", line 341, in execute
-    screen main_menu():
-  File "game/screens.rpy", line 342, in execute
-    $ change_title("Ushio_Noa")
-  File "game/screens.rpy", line 342, in <module>
-    $ change_title("Ushio_Noa")
-  File "game/script.rpy", line 101, in change_title
-    hwnd=title_changer.get_current_process_window_handles()
-AttributeError: module 'title_changer' has no attribute 'get_current_process_window_handles'
+  File "game/script.rpy", line 196, in script
+    noa "乃愛"
+Exception: The say screen (or show_function) must return a Text object.
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in script
-    python hide:
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in <module>
-    python hide:
-  File "renpy/common/_layout/screen_main_menu.rpym", line 35, in _execute_python_hide
-    ui.interact()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2215, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
-    self.screen.function(**self.scope)
-  File "game/screens.rpy", line 341, in execute
-    screen main_menu():
-  File "game/screens.rpy", line 341, in execute
-    screen main_menu():
-  File "game/screens.rpy", line 342, in execute
-    $ change_title("Ushio_Noa")
-  File "game/screens.rpy", line 342, in <module>
-    $ change_title("Ushio_Noa")
-  File "game/script.rpy", line 101, in change_title
-    hwnd=title_changer.get_current_process_window_handles()
-AttributeError: module 'title_changer' has no attribute 'get_current_process_window_handles'
+  File "game/script.rpy", line 196, in script
+    noa "乃愛"
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 2573, in execute
+    Say.execute(self)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 615, in execute
+    renpy.exports.say(who, what, *args, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\sayexports.py", line 132, in say
+    who(what, *args, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 1455, in __call__
+    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 1106, in do_display
+    display_say(who,
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 759, in display_say
+    raise Exception("The say screen (or show_function) must return a Text object.")
+Exception: The say screen (or show_function) must return a Text object.
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Tue Nov 26 00:13:08 2024
+Fri Dec 13 12:06:17 2024

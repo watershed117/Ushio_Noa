@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 90: python block expects a non-empty block.
-    init 3 python:
-                  ^
+File "game/script.rpy", line 194: invalid syntax
+                            window_yoffset=-100)
+                        ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Mon Nov 25 18:32:21 2024
+Fri Dec 13 15:53:55 2024

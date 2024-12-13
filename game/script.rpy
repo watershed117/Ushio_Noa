@@ -97,7 +97,6 @@ init 3 python:
         #     print("Error: Multiple windows are open.")
         #     title=title_changer.get_window_title(hwnd[0])
         #     title_changer.set_window_title(hwnd[0], name)
-        title=title_changer.get_window_title(hwnd[0])
         title_changer.set_window_title(hwnd[0], name)
 
 
@@ -137,6 +136,7 @@ screen entry():
             add "images/ui/button.png"
             # action Function(print, "新建会话")
             action [Function(chatglm.clear_history),
+                    SetVariable("new_conversation",True),
                     Jump("main")]
         if conversation_number:
             #frame
@@ -179,26 +179,61 @@ default position_map={
     "4": (900, 200),
     "5": (1200, 200)
 }
-
+default new_conversation=False
+# define noa = Character(name="{font=MPLUS1p-Bold.ttf}{color=#ffffff}{size=64}乃愛{/size}{/color}{/font}{font=MPLUS1p-Bold.ttf}{color=#7cd0ff}{size=32}研討會{/size}{/color}{/font}") 
+define noa = Character(name="乃愛 研討會",
+                        # who_size=40,
+                        # who_outlines=[ (1, "#284058", 0, 0 ) ],
+                        # who_color="#ffffff",
+                        # who_font="fonts/MPLUS1p-Bold.ttf",
+                        what_size=32,
+                        what_color="#ffffff",
+                        what_outlines=[ (2, "#284058", 0, 0 ) ],
+                        what_font="fonts/MPLUS1p-Bold.ttf",
+                        what_yoffset=65,
+                        what_xoffset=-37,
+                        window_background="images/ui/say.png",
+                        window_yoffset=-100) 
 label start:
     stop music fadeout 1.0
-    # python:
-    #     change_title("Ushio_Noa")
-    #     hwnd=title_changer.get_current_process_window_handles()
-    #     if len(hwnd)==1:
-    #         title=title_changer.get_window_title(hwnd[0])
-    #     else:
-    #         print("Error: Multiple windows are open.")
-    call screen entry()
-    
+    call bg_changer("office/mainoffice.jpg")
+    $ tools_caller.control_character("3","joy",scaleup=scaleup)
+    noa "乃愛"
+    pause
+    return
+
+
+# label start:
+#     stop music fadeout 1.0
+#     call screen entry()
+
+label ready:
+    show ready with CropMove(1.0, "wipedown")
+    hide loading
+
 label main:
     hide screen entry
+    show loading
     python:
-        while not chatglm.ready:
-            renpy.pause(0.1)
-        chatglm.ready=False
-        chatglm.result.get()
-        print(len(chatglm.history))
-    scene expression "images/background/office/mainoffice.jpg"
-    $ tools_caller.control_character("3","joy")
-    pause
+        if not new_conversation:
+            while not chatglm.ready:
+                renpy.pause(0.1)
+            chatglm.ready=False
+            chatglm.result.get()
+            latset_tools_data=chatglm.latest_tool_recall(chatglm.history)
+            if latset_tools_data:
+                renpy.call("ready")
+                tools_caller.caller(latset_tools_data)
+            else:
+                renpy.call("bg_changer", "office/mainoffice.jpg")
+                tools_caller.control_character("3","joy")
+            latest_message=chatglm.get_latest_message(chatglm.history)
+            renpy.say("")
+            renpy.input()
+
+    python:
+        renpy.input()
+
+    # pause
+    # call bg_changer("park/park.jpg")
+    # pause

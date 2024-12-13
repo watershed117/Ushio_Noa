@@ -103,9 +103,19 @@ screen say(who, what):
             window:
                 id "namebox"
                 style "namebox"
-                text who id "who"
+                if who=="乃愛 研討會":
+                    text "乃愛 " style "name":
+                        yoffset 50
+                    text "研討會" style "club":
+                        xpos 120
+                        ypos 22
+                        yoffset 50
 
-        text what id "what"
+                else:
+                    text who id "who"
+
+        text what id "what":
+            yoffset 10
 
 
     ## 如果有对话框头像，会将其显示在文本之上。请不要在手机界面下显示这个，因为

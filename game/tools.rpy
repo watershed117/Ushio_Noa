@@ -40,6 +40,19 @@ init 0 python:
             # renpy.show(file_name,layer="master")
             renpy.call("bg_changer",file_name)
             return "success"
+
+        def caller(self,function_data:list[dict]):
+            for function in function_data:
+                name=function.get("name")
+                kwargs=function.get("arguments")
+                if hasattr(self, name):
+                    executor=getattr(self,name)
+                    if args:
+                        executor(**kwargs)
+                    else:
+                        executor()
+                else:
+                    continue
     tools_caller = Tools()
 
 label bg_changer(file_name):
