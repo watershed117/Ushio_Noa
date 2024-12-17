@@ -1,30 +1,26 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 196, in script
-    noa "乃愛"
-Exception: The say screen (or show_function) must return a Text object.
+  File "game/script.rpy", line 228, in script
+    python:
+  File "game/script.rpy", line 231, in <module>
+    renpy.say(latest_message)
+TypeError: say() missing 1 required positional argument: 'what'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 196, in script
-    noa "乃愛"
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 2573, in execute
-    Say.execute(self)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 615, in execute
-    renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 1455, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 1106, in do_display
-    display_say(who,
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\character.py", line 759, in display_say
-    raise Exception("The say screen (or show_function) must return a Text object.")
-Exception: The say screen (or show_function) must return a Text object.
+  File "game/script.rpy", line 228, in script
+    python:
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 231, in <module>
+    renpy.say(latest_message)
+TypeError: say() missing 1 required positional argument: 'what'
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Fri Dec 13 12:06:17 2024
+Wed Dec 18 04:16:25 2024

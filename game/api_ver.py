@@ -4,6 +4,7 @@ import json
 import requests
 import queue
 
+
 class ChatGLM:
     def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = "", limit: str = "128k"):
         self.model = model
@@ -18,7 +19,7 @@ class ChatGLM:
         self.max_len = self.len_map.get(limit, 128000)
         self.event = queue.Queue()
         self.result = queue.Queue(1)
-        self.ready= False
+        self.ready = False
 
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
@@ -27,9 +28,9 @@ class ChatGLM:
             self.history_storage.append(
                 {"role": "system", "content": system_prompt})
 
-    def result_appender(func): # type: ignore
-        def wrapper(self,*args, **kwargs):
-            result = func(self,*args, **kwargs) # type: ignore
+    def result_appender(func):  # type: ignore
+        def wrapper(self, *args, **kwargs):
+            result = func(self, *args, **kwargs)  # type: ignore
             self.result.put(result)
             self.ready = True
             return result
@@ -46,10 +47,10 @@ class ChatGLM:
         return os.path.getctime(file_path)
 
     def clear_history(self):
-        self.history = []
-        self.history_storage = []
+        self.history = [self.history[0]]
+        self.history_storage = [self.history_storage[0]]
 
-    @result_appender # type: ignore
+    @result_appender  # type: ignore
     def send(self, messages: dict):
         url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         with self.client as client:
@@ -61,6 +62,7 @@ class ChatGLM:
             response = client.post(url, json=payload)
             if response.status_code == 200:
                 result = response.json()
+                print(result)
                 total_tokens = result.get("usage").get("total_tokens")
                 if total_tokens >= self.max_len:
                     self.limiter()
@@ -80,7 +82,7 @@ class ChatGLM:
             else:
                 return response.status_code, response.json()
 
-    @result_appender # type: ignore
+    @result_appender  # type: ignore
     def save(self):
         id = str(uuid4())
         print(os.path.join(self.storage, f"{id}.json"))
@@ -88,7 +90,7 @@ class ChatGLM:
             json.dump(self.history_storage, f, ensure_ascii=False, indent=4)
         return id
 
-    @result_appender # type: ignore
+    @result_appender  # type: ignore
     def load(self, id: str):
         with open(os.path.join(self.storage, f"{id}.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -100,7 +102,6 @@ class ChatGLM:
                     self.limiter()
             return id
 
-
     def sort_files(self, folder_path):
         # 获取文件夹下的所有文件
         files = [os.path.join(folder_path, f) for f in os.listdir(
@@ -110,7 +111,7 @@ class ChatGLM:
         files.sort(key=self.get_creation_time, reverse=True)
         return files
 
-    @result_appender # type: ignore
+    @result_appender  # type: ignore
     def get_conversations(self):
         files = self.sort_files(self.storage)
         conversations = []
@@ -129,7 +130,7 @@ class ChatGLM:
                         {"title": None, "id": os.path.basename(file_path)[:-5]})
         return conversations
 
-    @result_appender # type: ignore
+    @result_appender  # type: ignore
     def delete_conversation(self, id: str):
         file_path = os.path.join(self.storage, f"{id}.json")
         if os.path.exists(file_path):
@@ -137,11 +138,12 @@ class ChatGLM:
             return True
         else:
             return False
-  
+
     def tokenizer(self, data: list[dict[str, str]]):
         url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
         with self.client as client:
-            response = client.post(url, json=data)
+            payload = {"model": self.model, "messages": data}
+            response = client.post(url, json=payload)
             if response.status_code == 200:
                 result = response.json()
                 return result["usage"].get("prompt_tokens")
@@ -196,26 +198,73 @@ class ChatGLM:
                 return self.call_method(method_name, *args, **kwargs)
         return None
 
-
     def run(self):
         while True:
             event = self.event.get()
             if event:
                 self.process_event(event)
 
-    def latest_tool_recall(self,messages: list[dict[str,str]]):
+    def latest_tool_recall(self, messages: list[dict[str, str]]):
         for message in reversed(messages):
             if message.get("role") == "assistant":
                 if message.get("tool_calls"):
-                    tools=[]
-                    for tool in message.get("tool_calls"): # type: ignore
-                        if tool.get("function"): # type: ignore
-                            tools.append(tool.get("function")) # type: ignore
+                    tools = []
+                    for tool in message.get("tool_calls"):  # type: ignore
+                        if tool.get("function"):  # type: ignore
+                            tools.append(tool.get("function"))  # type: ignore
                     return tools
 
-    def get_latest_message(self,messages: list[dict[str,str]]):
+    def get_latest_message(self, messages: list[dict[str, str]]):
         for message in reversed(messages):
-            if message.get("role") == "asssistant":
+            if message.get("role") == "assistant":
                 if message.get("content"):
                     return message.get("content")
         return None
+
+
+if __name__ == "__main__":
+    tools = [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "control_character",
+                        "description": "控制角色的立绘，表情，动作，特效，在人物情绪变化时调用",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "string",
+                                    "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
+                                },
+                                "emotion": {
+                                    "type": "string",
+                                    "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
+                                },
+                                "emoji": {
+                                    "type": "string",
+                                    "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
+                                },
+                                "action": {
+                                    "type": "string",
+                                    "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
+                                },
+                                "effect": {
+                                    "type": "string",
+                                    "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
+                                }
+                            },
+                            "required": ["position", "emotion"]
+                        }
+                    }
+                }
+            ]
+    with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt", "r", encoding="utf-8") as f:
+        prompt = f.read()
+    chat = ChatGLM(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
+                   model="glm-4-flash",
+                   system_prompt=prompt,
+                   storage="your_storage_path",
+                   tools=tools)
+
+    print(chat.tokenizer([{"role": "user", "content": prompt}]))
+    chat.send({"role": "user", "content": "你好"})

@@ -14,7 +14,7 @@ style speak:
     outlines [ (2, "#284058", 0, 0 ) ]
     size 32
     color "#ffffff"
-    font "fonts/MPLUS1p-Bold.ttf"
+    font "fonts/SourceHanSansCN-Bold.otf"
 
 style tmp:
     color "#ff0000"

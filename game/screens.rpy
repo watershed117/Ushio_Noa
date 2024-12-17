@@ -181,15 +181,23 @@ screen input(prompt):
     style_prefix "input"
 
     window:
-
+        yoffset -100
+        background "images/ui/say.png"
         vbox:
             xanchor gui.dialogue_text_xalign
             xpos gui.dialogue_xpos
             xsize gui.dialogue_width
             ypos gui.dialogue_ypos
 
-            text prompt style "input_prompt"
-            input id "input"
+            text prompt style "input_prompt":
+                yoffset -15
+                xoffset -35
+            text "夏莱" style "club":
+                xoffset 150
+                yoffset -75
+            input id "input":
+                xoffset -35
+                yoffset -65
 
 style input_prompt is default
 
@@ -197,9 +205,19 @@ style input_prompt:
     xalign gui.dialogue_text_xalign
     properties gui.text_properties("input_prompt")
 
+    outlines [ (2, "#284058", 0, 0 ) ]
+    size 54
+    color "#ffffff"
+    font "fonts/MPLUS1p-Bold.ttf"
+
 style input:
     xalign gui.dialogue_text_xalign
     xmaximum gui.dialogue_width
+
+    outlines [ (2, "#284058", 0, 0 ) ]
+    size 32
+    color "#ffffff"
+    font "fonts/SourceHanSansCN-Bold.otf"
 
 
 ## 选择屏幕 ########################################################################

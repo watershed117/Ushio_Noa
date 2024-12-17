@@ -1,3 +1,3 @@
-api_key="3c82d2b319fc300ad8ea63a3d90f7350.Rgje8i6T9jDOetD4"
-model="glm-4-plus"
-limit="16k"
+api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE"
+model="glm-4-flash"
+limit="8k"

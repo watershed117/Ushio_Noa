@@ -189,27 +189,20 @@ define noa = Character(name="乃愛 研討會",
                         what_size=32,
                         what_color="#ffffff",
                         what_outlines=[ (2, "#284058", 0, 0 ) ],
-                        what_font="fonts/MPLUS1p-Bold.ttf",
+                        what_font="fonts/SourceHanSansCN-Bold.otf",
                         what_yoffset=65,
                         what_xoffset=-37,
                         window_background="images/ui/say.png",
                         window_yoffset=-100) 
+
 label start:
     stop music fadeout 1.0
-    call bg_changer("office/mainoffice.jpg")
-    $ tools_caller.control_character("3","joy",scaleup=scaleup)
-    noa "乃愛"
-    pause
-    return
-
-
-# label start:
-#     stop music fadeout 1.0
-#     call screen entry()
+    call screen entry()
 
 label ready:
     show ready with CropMove(1.0, "wipedown")
     hide loading
+    return
 
 label main:
     hide screen entry
@@ -221,19 +214,54 @@ label main:
             chatglm.ready=False
             chatglm.result.get()
             latset_tools_data=chatglm.latest_tool_recall(chatglm.history)
+            latest_message=chatglm.get_latest_message(chatglm.history)
+            # print(latset_tools_data)
+            # print(latest_message)
+            renpy.call("ready")
+    python:
+        if not new_conversation:
             if latset_tools_data:
-                renpy.call("ready")
                 tools_caller.caller(latset_tools_data)
             else:
-                renpy.call("bg_changer", "office/mainoffice.jpg")
                 tools_caller.control_character("3","joy")
-            latest_message=chatglm.get_latest_message(chatglm.history)
-            renpy.say("")
-            renpy.input()
-
+                renpy.call("bg_changer", "office/mainoffice.jpg")
     python:
-        renpy.input()
+        if not new_conversation:
+            if latest_message:
+                renpy.say(noa,latest_message)
+    python:
+        if new_conversation:
+            new_conversation=False
+            tools_caller.control_character("3","joy")
+            renpy.call("bg_changer", "office/mainoffice.jpg")
+            
+    jump main_loop
+    return
 
-    # pause
-    # call bg_changer("park/park.jpg")
-    # pause
+label main_loop:
+    python:
+        renpy.hide("ready")
+        while True:
+            message=renpy.input("sensei")
+            if message:
+                chatglm.event.put(("send",({"role":"user","content":message},)))
+                while not chatglm.ready:
+                    renpy.pause(0.1)
+                chatglm.ready=False
+                reply=chatglm.result.get()
+                print(reply)
+                while True:
+                    if reply:
+                        if reply.get("content"):
+                            renpy.say(noa,reply.get("content"))
+                            break
+                        if reply.get("tool_callas"):
+                            result=tools_caller.caller(reply.get("tool_callas"))
+                            chatglm.event.put(("send",({"role":"tool","content":result},)))
+                            while not chatglm.ready:
+                                renpy.pause(0.1)
+                            chatglm.ready=False
+                            reply=chatglm.result.get()
+                    else:
+                        raise Exception("No reply")
+    return

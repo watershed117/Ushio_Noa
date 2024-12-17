@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 194: invalid syntax
-                            window_yoffset=-100)
-                        ^
+File "game/tools.rpy", line 70: expected ',' not found.
+    label control_character(position,emotion,emoji:str="",action=blank,effect=blank,scaleup=blank):
+                                                  ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Fri Dec 13 15:53:55 2024
+Wed Dec 18 02:13:39 2024
