@@ -4,6 +4,7 @@
     import os
     import game_config
     import time
+    import queue
 
 init 2 python:
     dirs=tools_caller.get_dirs(os.path.join(renpy.config.gamedir, "images/background"))
@@ -99,7 +100,6 @@ init 3 python:
         #     title_changer.set_window_title(hwnd[0], name)
         title_changer.set_window_title(hwnd[0], name)
 
-
 init 4 python:
     renpy.invoke_in_thread(chatglm.run)
 
@@ -179,7 +179,8 @@ default position_map={
     "4": (900, 200),
     "5": (1200, 200)
 }
-default new_conversation=False
+
+
 # define noa = Character(name="{font=MPLUS1p-Bold.ttf}{color=#ffffff}{size=64}乃愛{/size}{/color}{/font}{font=MPLUS1p-Bold.ttf}{color=#7cd0ff}{size=32}研討會{/size}{/color}{/font}") 
 define noa = Character(name="乃愛 研討會",
                         # who_size=40,
@@ -195,6 +196,11 @@ define noa = Character(name="乃愛 研討會",
                         window_background="images/ui/say.png",
                         window_yoffset=-100) 
 
+# label start:
+#     $ result=tools_caller.control_character("3","joy")
+#     noa "[result]"
+#     pause
+
 label start:
     stop music fadeout 1.0
     call screen entry()
@@ -204,6 +210,7 @@ label ready:
     hide loading
     return
 
+default new_conversation=False
 label main:
     hide screen entry
     show loading
@@ -218,17 +225,23 @@ label main:
             # print(latset_tools_data)
             # print(latest_message)
             renpy.call("ready")
+
+    if not new_conversation:
+        if latset_tools_data:
+            while not latset_tools_data.empty():
+                $ tools_caller.caller(latset_tools_data.get())
+                    
     python:
         if not new_conversation:
-            if latset_tools_data:
-                tools_caller.caller(latset_tools_data)
-            else:
+            if not latset_tools_data:
                 tools_caller.control_character("3","joy")
                 renpy.call("bg_changer", "office/mainoffice.jpg")
+
     python:
         if not new_conversation:
             if latest_message:
                 renpy.say(noa,latest_message)
+
     python:
         if new_conversation:
             new_conversation=False
@@ -238,10 +251,65 @@ label main:
     jump main_loop
     return
 
-label main_loop:
+default tool_statue=False
+default tool_data=queue.Queue()
+default result_statue=False
+default tool_result=queue.Queue()
+default reply=""
+default reply_ready=False
+label message_processor(reply):
+    $ print(reply)
     python:
-        renpy.hide("ready")
-        while True:
+        while not renpy.store.tool_data.empty():
+            renpy.store.tool_data.get()
+        while not renpy.store.tool_result.empty():
+            renpy.store.tool_result.get()
+        print("清空tool数据")
+
+    python:
+        if reply.get("tool_calls"):
+            print("获取tool参数")
+            renpy.store.tool_data=queue.Queue()
+            for tool in reply.get("tool_calls"):
+                function=tool.get("function")
+                renpy.store.tool_data.put(function)
+            renpy.store.tool_statue=True
+
+    python:
+        if renpy.store.tool_statue:
+            print("调用tool")
+            renpy.store.tool_statue=False
+            renpy.store.result_statue=True
+            while not renpy.store.tool_data.empty():
+                tools_caller.caller(renpy.store.tool_data.get())
+
+    python:
+        if renpy.store.result_statue:
+            print("获取tool结果")
+            renpy.store.result_statue=False
+            result=[]
+            while not renpy.store.tool_result.empty():
+                result.append(renpy.store.tool_result.get())
+            chatglm.event.put(("send",({"role":"tool","content":str(result)},)))
+            while not chatglm.ready:
+                renpy.pause(0.1)
+            chatglm.ready=False
+            renpy.store.reply=chatglm.result.get()
+            renpy.store.reply_ready=True
+
+    python:
+        if reply.get("content"):
+            renpy.say(noa,reply.get("content"))
+
+    return
+
+label main_loop:
+    hide ready
+    while True:
+        python:
+            if renpy.store.reply_ready:
+                renpy.store.reply_ready=False
+                renpy.call("message_processor",renpy.store.reply)
             message=renpy.input("sensei")
             if message:
                 chatglm.event.put(("send",({"role":"user","content":message},)))
@@ -249,19 +317,7 @@ label main_loop:
                     renpy.pause(0.1)
                 chatglm.ready=False
                 reply=chatglm.result.get()
-                print(reply)
-                while True:
-                    if reply:
-                        if reply.get("content"):
-                            renpy.say(noa,reply.get("content"))
-                            break
-                        if reply.get("tool_callas"):
-                            result=tools_caller.caller(reply.get("tool_callas"))
-                            chatglm.event.put(("send",({"role":"tool","content":result},)))
-                            while not chatglm.ready:
-                                renpy.pause(0.1)
-                            chatglm.ready=False
-                            reply=chatglm.result.get()
-                    else:
-                        raise Exception("No reply")
+                renpy.call("message_processor",reply)
+            else:
+                renpy.say(noa,"输入不能为空，请重新输入。")
     return

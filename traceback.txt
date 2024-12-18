@@ -1,26 +1,36 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 228, in script
+  File "game/script.rpy", line 309, in script call
     python:
-  File "game/script.rpy", line 231, in <module>
-    renpy.say(latest_message)
-TypeError: say() missing 1 required positional argument: 'what'
+  File "game/script.rpy", line 278, in script
+    python:
+  File "game/script.rpy", line 284, in <module>
+    tools_caller.caller(renpy.store.tool_data.get())
+  File "game/tools.rpy", line 50, in caller
+    kwargs=dict(function_data.get("arguments"))
+ValueError: dictionary update sequence element #0 has length 1; 2 is required
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 228, in script
+  File "game/script.rpy", line 309, in script call
+    python:
+  File "game/script.rpy", line 278, in script
     python:
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "game/script.rpy", line 231, in <module>
-    renpy.say(latest_message)
-TypeError: say() missing 1 required positional argument: 'what'
+  File "game/script.rpy", line 284, in <module>
+    tools_caller.caller(renpy.store.tool_data.get())
+  File "game/tools.rpy", line 50, in caller
+    kwargs=dict(function_data.get("arguments"))
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\revertable.py", line 281, in __init__
+    dict.__init__(self, *args, **kwargs)
+ValueError: dictionary update sequence element #0 has length 1; 2 is required
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Wed Dec 18 04:16:25 2024
+Thu Dec 19 02:57:52 2024

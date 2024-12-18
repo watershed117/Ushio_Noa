@@ -1,37 +1,37 @@
-2024-12-17 20:18:16 UTC
+2024-12-18 19:00:32 UTC
 Windows-10-10.0.19041
 Ren'Py 8.3.2.24090902
 
 Early init took 0.16s
 Loading error handling took 0.03s
-Loading script took 0.16s
+Loading script took 0.15s
 Loading save slot metadata took 0.03s
 Loading persistent took 0.00s
-Running init code took 0.20s
+Running init code took 0.21s
 Loading analysis data took 0.01s
 Analyze and compile ATL took 0.00s
 Reloading save slot metadata took 0.02s
 Index archives took 0.00s
 Backing up script files to 'C:\\Users\\water\\AppData\\Roaming/RenPy/backups\\Ushio_Noa':
-Dump and make backups took 0.05s
+Dump and make backups took 0.06s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
-Initial gc took 0.04s
+Initial gc took 0.03s
 DPI scale factor: 1.000000
 nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
 Creating interface object took 0.24s
 Cleaning stores took 0.00s
-Init translation took 0.03s
+Init translation took 0.04s
 Build styles took 0.00s
 Load screen analysis took 0.00s
 Analyze screens took 0.01s
 Save screen analysis took 0.02s
-Prepare screens took 0.06s
+Prepare screens took 0.07s
 Save pyanalysis. took 0.00s
 Save bytecode. took 0.02s
 Running _start took 0.00s
-Interface start took 0.05s
+Interface start took 0.06s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 2560, 1440)
@@ -49,3 +49,32 @@ call method get_conversations
 call method get_conversations
 call method load
 窗口标题已更新为: 79d6451f-b447-4d6e-8e80-6d1486a5a2b7
+call method send
+{'choices': [{'finish_reason': 'tool_calls', 'index': 0, 'message': {'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}}], 'created': 1734548448, 'id': '20241219030044c4ff77451a0341fe', 'model': 'glm-4-flash', 'request_id': '20241219030044c4ff77451a0341fe', 'usage': {'completion_tokens': 17, 'prompt_tokens': 3539, 'total_tokens': 3556}}
+{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
+清空tool数据
+获取tool参数
+调用tool
+获取tool结果
+call method send
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，老师，您突然让我换个表情，我有点吃惊呢！不过，现在我的表情应该更符合这种惊讶的情绪了。呵呵，有什么事情让您觉得意外吗？', 'role': 'assistant'}}], 'created': 1734548458, 'id': '20241219030048b9850d76472f4a4f', 'model': 'glm-4-flash', 'request_id': '20241219030048b9850d76472f4a4f', 'usage': {'completion_tokens': 39, 'prompt_tokens': 3599, 'total_tokens': 3638}}
+{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
+清空tool数据
+获取tool参数
+调用tool
+获取tool结果
+call method send
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，看来我的表情调整得还不错呢！老师，有什么事情让我换换表情吗？或者，有什么事情需要我帮忙的吗？呵呵。', 'role': 'assistant'}}], 'created': 1734548468, 'id': '20241219030103cb4aad818ada4f71', 'model': 'glm-4-flash', 'request_id': '20241219030103cb4aad818ada4f71', 'usage': {'completion_tokens': 33, 'prompt_tokens': 3699, 'total_tokens': 3732}}
+{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
+清空tool数据
+获取tool参数
+调用tool
+获取tool结果
+call method send
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，老师，我的表情调整成功了呢！看起来我现在的表情更符合惊讶的情绪了。有什么事情让您觉得意外吗？或者，有什么我可以帮忙的地方吗？呵呵。', 'role': 'assistant'}}], 'created': 1734548529, 'id': '20241219030114746f6cf3d19b437d', 'model': 'glm-4-flash', 'request_id': '20241219030114746f6cf3d19b437d', 'usage': {'completion_tokens': 39, 'prompt_tokens': 3788, 'total_tokens': 3827}}
+{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
+清空tool数据
+获取tool参数
+调用tool
+获取tool结果
+call method send

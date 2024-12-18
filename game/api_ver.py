@@ -6,7 +6,17 @@ import queue
 
 
 class ChatGLM:
-    def __init__(self, api_key: str, model: str = "glm-4-flash", storage: str = "", tools: list = [], system_prompt: str = "", limit: str = "128k"):
+    def __init__(self, api_key: str,
+                 model: str = "glm-4-flash",
+                 storage: str = "",
+                 tools: list = [],
+                 system_prompt: str = "",
+                 limit: str = "128k",
+                 proxy: dict = {
+                     'http': 'http://127.0.0.1:7890',
+                     'https': 'http://127.0.0.1:7890',
+                 }
+                 ):
         self.model = model
         self.client = requests.Session()
         self.client.headers.update({"Authorization": f"Bearer {api_key}"})
@@ -17,6 +27,8 @@ class ChatGLM:
         self.len_map = {"8k": 8000, "16k": 16000,
                         "32k": 32000, "64k": 64000, "128k": 128000}
         self.max_len = self.len_map.get(limit, 128000)
+        self.proxy = proxy
+
         self.event = queue.Queue()
         self.result = queue.Queue(1)
         self.ready = False
@@ -59,7 +71,7 @@ class ChatGLM:
             payload = {"model": self.model, "messages": self.history}
             if self.tools:
                 payload.update({"tools": self.tools})
-            response = client.post(url, json=payload)
+            response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
                 result = response.json()
                 print(result)
@@ -143,7 +155,7 @@ class ChatGLM:
         url = "https://open.bigmodel.cn/api/paas/v4/tokenizer"
         with self.client as client:
             payload = {"model": self.model, "messages": data}
-            response = client.post(url, json=payload)
+            response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
                 result = response.json()
                 return result["usage"].get("prompt_tokens")
@@ -208,10 +220,10 @@ class ChatGLM:
         for message in reversed(messages):
             if message.get("role") == "assistant":
                 if message.get("tool_calls"):
-                    tools = []
+                    tools = queue.Queue()
                     for tool in message.get("tool_calls"):  # type: ignore
                         if tool.get("function"):  # type: ignore
-                            tools.append(tool.get("function"))  # type: ignore
+                            tools.put(tool.get("function"))  # type: ignore
                     return tools
 
     def get_latest_message(self, messages: list[dict[str, str]]):
@@ -224,8 +236,8 @@ class ChatGLM:
 
 if __name__ == "__main__":
     tools = [
-                {
-                    "type": "function",
+        {
+            "type": "function",
                     "function": {
                         "name": "control_character",
                         "description": "控制角色的立绘，表情，动作，特效，在人物情绪变化时调用",
@@ -256,8 +268,8 @@ if __name__ == "__main__":
                             "required": ["position", "emotion"]
                         }
                     }
-                }
-            ]
+        }
+    ]
     with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt", "r", encoding="utf-8") as f:
         prompt = f.read()
     chat = ChatGLM(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
