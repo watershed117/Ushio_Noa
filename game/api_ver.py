@@ -64,15 +64,16 @@ class ChatGLM:
 
     @result_appender  # type: ignore
     def send(self, messages: dict):
+        print(f"send args: {messages}")
         url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         with self.client as client:
-            self.history.append(messages)
-            self.history_storage.append(messages)
-            payload = {"model": self.model, "messages": self.history}
+            payload = {"model": self.model, "messages": self.history+[messages]}
             if self.tools:
                 payload.update({"tools": self.tools})
             response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
+                self.history.append(messages)
+                self.history_storage.append(messages)
                 result = response.json()
                 print(result)
                 total_tokens = result.get("usage").get("total_tokens")

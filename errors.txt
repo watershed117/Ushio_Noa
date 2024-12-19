@@ -2,9 +2,11 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 270: python block expects a non-empty block.
-    python:
-           ^
+The label start is defined twice, at File "game/script.rpy", line 200:
+label start:
+and File "game/script.rpy", line 205:
+label start:
+
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Thu Dec 19 02:07:14 2024
+Thu Dec 19 18:08:32 2024

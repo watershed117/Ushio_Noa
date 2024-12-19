@@ -1,10 +1,10 @@
-2024-12-18 19:00:32 UTC
+2024-12-19 13:57:31 UTC
 Windows-10-10.0.19041
 Ren'Py 8.3.2.24090902
 
 Early init took 0.16s
 Loading error handling took 0.03s
-Loading script took 0.15s
+Loading script took 0.13s
 Loading save slot metadata took 0.03s
 Loading persistent took 0.00s
 Running init code took 0.21s
@@ -12,24 +12,23 @@ Loading analysis data took 0.01s
 Analyze and compile ATL took 0.00s
 Reloading save slot metadata took 0.02s
 Index archives took 0.00s
-Backing up script files to 'C:\\Users\\water\\AppData\\Roaming/RenPy/backups\\Ushio_Noa':
-Dump and make backups took 0.06s
+Dump and make backups took 0.05s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
 Initial gc took 0.03s
 DPI scale factor: 1.000000
 nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
-Creating interface object took 0.24s
+Creating interface object took 0.23s
 Cleaning stores took 0.00s
-Init translation took 0.04s
+Init translation took 0.03s
 Build styles took 0.00s
-Load screen analysis took 0.00s
-Analyze screens took 0.01s
-Save screen analysis took 0.02s
-Prepare screens took 0.07s
+Load screen analysis took 0.03s
+Analyze screens took 0.00s
+Save screen analysis took 0.00s
+Prepare screens took 0.06s
 Save pyanalysis. took 0.00s
-Save bytecode. took 0.02s
+Save bytecode. took 0.00s
 Running _start took 0.00s
 Interface start took 0.06s
 
@@ -47,34 +46,68 @@ Maximum texture size: 4096x4096
 窗口标题已更新为: Ushio_Noa
 call method get_conversations
 call method get_conversations
-call method load
-窗口标题已更新为: 79d6451f-b447-4d6e-8e80-6d1486a5a2b7
 call method send
-{'choices': [{'finish_reason': 'tool_calls', 'index': 0, 'message': {'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}}], 'created': 1734548448, 'id': '20241219030044c4ff77451a0341fe', 'model': 'glm-4-flash', 'request_id': '20241219030044c4ff77451a0341fe', 'usage': {'completion_tokens': 17, 'prompt_tokens': 3539, 'total_tokens': 3556}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
+send args: {'role': 'user', 'content': '跳一下'}
+{'choices': [{'finish_reason': 'tool_calls', 'index': 0, 'message': {'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": {"name": "jump"}, "emotion": "joy", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9137816425095366173', 'index': 0, 'type': 'function'}]}}], 'created': 1734616664, 'id': '20241219215743a8b1e01372ec46dc', 'model': 'glm-4-flash', 'request_id': '20241219215743a8b1e01372ec46dc', 'usage': {'completion_tokens': 25, 'prompt_tokens': 2797, 'total_tokens': 2822}}
+{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": {"name": "jump"}, "emotion": "joy", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9137816425095366173', 'index': 0, 'type': 'function'}]}
 清空tool数据
 获取tool参数
 调用tool
 获取tool结果
 call method send
-{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，老师，您突然让我换个表情，我有点吃惊呢！不过，现在我的表情应该更符合这种惊讶的情绪了。呵呵，有什么事情让您觉得意外吗？', 'role': 'assistant'}}], 'created': 1734548458, 'id': '20241219030048b9850d76472f4a4f', 'model': 'glm-4-flash', 'request_id': '20241219030048b9850d76472f4a4f', 'usage': {'completion_tokens': 39, 'prompt_tokens': 3599, 'total_tokens': 3638}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
-清空tool数据
-获取tool参数
-调用tool
-获取tool结果
-call method send
-{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，看来我的表情调整得还不错呢！老师，有什么事情让我换换表情吗？或者，有什么事情需要我帮忙的吗？呵呵。', 'role': 'assistant'}}], 'created': 1734548468, 'id': '20241219030103cb4aad818ada4f71', 'model': 'glm-4-flash', 'request_id': '20241219030103cb4aad818ada4f71', 'usage': {'completion_tokens': 33, 'prompt_tokens': 3699, 'total_tokens': 3732}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
-清空tool数据
-获取tool参数
-调用tool
-获取tool结果
-call method send
-{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '哈哈，老师，我的表情调整成功了呢！看起来我现在的表情更符合惊讶的情绪了。有什么事情让您觉得意外吗？或者，有什么我可以帮忙的地方吗？呵呵。', 'role': 'assistant'}}], 'created': 1734548529, 'id': '20241219030114746f6cf3d19b437d', 'model': 'glm-4-flash', 'request_id': '20241219030114746f6cf3d19b437d', 'usage': {'completion_tokens': 39, 'prompt_tokens': 3788, 'total_tokens': 3827}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"position": "1", "emotion": "surprise"}', 'name': 'control_character'}, 'id': 'call_-9140746073830649680', 'index': 0, 'type': 'function'}]}
-清空tool数据
-获取tool参数
-调用tool
-获取tool结果
-call method send
+send args: {'role': 'tool', 'content': "[{'control_character': 'success'}]"}
+
+Full traceback:
+  File "game/script.rpy", line 311, in script call
+    python:
+  File "game/script.rpy", line 287, in script
+    python:
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 296, in <module>
+    renpy.pause(0.1)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\statementexports.py", line 194, in pause
+    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay, pause_modal=modal)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2215, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
+    self.screen.function(**self.scope)
+  File "game/character/character_screens.rpy", line 384, in execute
+    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
+  File "game/character/character_screens.rpy", line 384, in execute
+    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\sl2\slast.py", line 1226, in execute
+    d = t(d)
+TypeError: 'dict' object is not callable
+
+While running game code:
+  File "game/script.rpy", line 311, in script call
+    python:
+  File "game/script.rpy", line 287, in script
+    python:
+  File "game/script.rpy", line 296, in <module>
+    renpy.pause(0.1)
+  File "game/character/character_screens.rpy", line 384, in execute
+    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
+  File "game/character/character_screens.rpy", line 384, in execute
+    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
+TypeError: 'dict' object is not callable
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '嗨，老师！看我的，像小鹿一样跳跃一下！哈哈，感觉好像回到了学生时代呢。😄', 'role': 'assistant'}}], 'created': 1734616666, 'id': '202412192157457cb2c7e2dabd4f19', 'model': 'glm-4-flash', 'request_id': '202412192157457cb2c7e2dabd4f19', 'usage': {'completion_tokens': 27, 'prompt_tokens': 2833, 'total_tokens': 2860}}

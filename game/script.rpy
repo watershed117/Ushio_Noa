@@ -19,23 +19,23 @@ init 2 python:
                     "properties": {
                         "position": {
                             "type": "string",
-                            "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
+                            "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为1~5"
                         },
                         "emotion": {
                             "type": "string",
-                            "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
+                            "description": "要显示的立绘的表情，可选joy,sadness,anger,surprise,fear,disgust,normal,embarrassed"
                         },
                         "emoji": {
                             "type": "string",
-                            "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
+                            "description": "要显示的表情符号动画，可选angry,bulb,chat,dot,exclaim,heart,music,question,respond,sad,shy,sigh,steam,surprise,sweat,tear,think,twinkle,upset,zzz"
                         },
                         "action": {
                             "type": "string",
-                            "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
+                            "description": "要播放的动作，可选sightly_down,fall_left,fall_right,jump,jump_more"
                         },
                         "effect": {
                             "type": "string",
-                            "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
+                            "description": "要附加在立绘上的特效，可选scaleup,hide,holography"
                         }
                     },
                     "required": ["position", "emotion"]
@@ -85,7 +85,8 @@ init 2 python:
                     model=game_config.model, 
                     system_prompt=complex_prompt, 
                     tools=tools, 
-                    limit=game_config.limit)
+                    limit=game_config.limit,
+                    proxy=game_config.proxy)
 
 init 3 python:
     info_path=os.path.join(renpy.config.gamedir, "info.json")
@@ -197,7 +198,7 @@ define noa = Character(name="乃愛 研討會",
                         window_yoffset=-100) 
 
 # label start:
-#     $ result=tools_caller.control_character("3","joy")
+#     $ result=tools_caller.control_character("3","joy",action=jump)
 #     noa "[result]"
 #     pause
 
@@ -247,7 +248,8 @@ label main:
             new_conversation=False
             tools_caller.control_character("3","joy")
             renpy.call("bg_changer", "office/mainoffice.jpg")
-            
+
+    hide ready
     jump main_loop
     return
 
@@ -296,15 +298,15 @@ label message_processor(reply):
             chatglm.ready=False
             renpy.store.reply=chatglm.result.get()
             renpy.store.reply_ready=True
-
+            renpy.jump("main_loop")
     python:
         if reply.get("content"):
             renpy.say(noa,reply.get("content"))
+        renpy.jump("main_loop")
 
     return
 
 label main_loop:
-    hide ready
     while True:
         python:
             if renpy.store.reply_ready:
