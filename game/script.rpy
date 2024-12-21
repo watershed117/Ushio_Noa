@@ -13,29 +13,33 @@ init 2 python:
             "type": "function",
             "function": {
                 "name": "control_character",
-                "description": "控制角色的立绘，表情，动作，特效，在人物情绪变化时调用",
+                "description": "control the character's position, emotion, emoji, action,effect,and scaleup",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "position": {
                             "type": "string",
-                            "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为1~5"
+                            "description": "position of the character, choose from the following:1~5"
                         },
                         "emotion": {
                             "type": "string",
-                            "description": "要显示的立绘的表情，可选joy,sadness,anger,surprise,fear,disgust,normal,embarrassed"
+                            "description": "character's emotion, choose from the following:joy,sadness,anger,surprise,fear,disgust,normal,embarrassed"
                         },
                         "emoji": {
                             "type": "string",
-                            "description": "要显示的表情符号动画，可选angry,bulb,chat,dot,exclaim,heart,music,question,respond,sad,shy,sigh,steam,surprise,sweat,tear,think,twinkle,upset,zzz"
+                            "description": "display an emoji above a character's head or in a chat bubble,choose from the following:angry,bulb,chat,dot,exclaim,heart,music,question,respond,sad,shy,sigh,steam,surprise,sweat,tear,think,twinkle,upset,zzz"
                         },
                         "action": {
                             "type": "string",
-                            "description": "要播放的动作，可选sightly_down,fall_left,fall_right,jump,jump_more"
+                            "description": "character's action, choose from the following:sightly_down,fall_left,fall_right,jump,jump_more"
                         },
                         "effect": {
                             "type": "string",
-                            "description": "要附加在立绘上的特效，可选scaleup,hide,holography"
+                            "description": "character's effect, choose from the following:hide(use hide to hide the character),holography(use when chat through phone)"
+                        },
+                        "scaleup":{
+                            "type": "string",
+                            "description": "scale up the character when approaching the speaker, choose from the following:scaleup"
                         }
                     },
                     "required": ["position", "emotion"]
@@ -46,13 +50,13 @@ init 2 python:
             "type": "function",
             "function": {
                 "name": "dir_walker",
-                "description": "获取目录下的所有文件名",
+                "description": "get file names in a directory",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "dir": {
                             "type": "string",
-                            "description": f"文件夹名，可选{dirs}",
+                            "description": f"directory name, choose from the following:{dirs}",
                         }
                     },
                     "required": ["dir"],
@@ -63,13 +67,13 @@ init 2 python:
             "type": "function",
             "function": {
                 "name": "bg_changer",
-                "description": "背景图片切换，在调用前应当通过dir_walker获取文件名",
+                "description": "chane the background image,use dir_walker to get the file names",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "name": {
                             "type": "string",
-                            "description": f"格式要求：文件夹名/文件名,例如park/park.jpg",
+                            "description": f"directory/file,example:park/park.jpg",
                         }
                     },
                     "required": ["name"],
@@ -235,7 +239,7 @@ label main:
     python:
         if not new_conversation:
             if not latset_tools_data:
-                tools_caller.control_character("3","joy")
+                renpy.show_screen("noa_base","3","joy")
                 renpy.call("bg_changer", "office/mainoffice.jpg")
 
     python:
@@ -246,7 +250,7 @@ label main:
     python:
         if new_conversation:
             new_conversation=False
-            tools_caller.control_character("3","joy")
+            renpy.show_screen("noa_base","3","joy")
             renpy.call("bg_changer", "office/mainoffice.jpg")
 
     hide ready

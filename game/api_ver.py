@@ -277,7 +277,8 @@ if __name__ == "__main__":
                    model="glm-4-flash",
                    system_prompt=prompt,
                    storage="your_storage_path",
-                   tools=tools)
+                   tools=tools,
+                   proxy=None)
 
     print(chat.tokenizer([{"role": "user", "content": prompt}]))
     chat.send({"role": "user", "content": "你好"})
