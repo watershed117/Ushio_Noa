@@ -1,62 +1,34 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 311, in script call
+  File "game/script.rpy", line 365, in script call
     python:
-  File "game/script.rpy", line 287, in script
+  File "game/script.rpy", line 365, in script call
     python:
-  File "game/script.rpy", line 296, in <module>
-    renpy.pause(0.1)
-  File "game/character/character_screens.rpy", line 384, in execute
-    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
-  File "game/character/character_screens.rpy", line 384, in execute
-    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
-TypeError: 'dict' object is not callable
+  File "game/script.rpy", line 322, in script
+    python:
+  File "game/script.rpy", line 348, in <module>
+    while not tts.ready:
+AttributeError: 'Audio_generator' object has no attribute 'ready'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 311, in script call
+  File "game/script.rpy", line 365, in script call
     python:
-  File "game/script.rpy", line 287, in script
+  File "game/script.rpy", line 365, in script call
+    python:
+  File "game/script.rpy", line 322, in script
     python:
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "game/script.rpy", line 296, in <module>
-    renpy.pause(0.1)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\exports\statementexports.py", line 194, in pause
-    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay, pause_modal=modal)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2215, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\core.py", line 2745, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
-    self.screen.function(**self.scope)
-  File "game/character/character_screens.rpy", line 384, in execute
-    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
-  File "game/character/character_screens.rpy", line 384, in execute
-    screen noa_base(position,emotion,action=blank,effect=blank,scaleup=blank):
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\sl2\slast.py", line 1226, in execute
-    d = t(d)
-TypeError: 'dict' object is not callable
+  File "game/script.rpy", line 348, in <module>
+    while not tts.ready:
+AttributeError: 'Audio_generator' object has no attribute 'ready'
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Thu Dec 19 21:57:44 2024
+Thu Dec 26 03:16:03 2024

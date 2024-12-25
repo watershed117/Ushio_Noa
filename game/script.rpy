@@ -5,6 +5,9 @@
     import game_config
     import time
     import queue
+    import json
+    import audio_generator
+    from io import BytesIO
 
 init 2 python:
     dirs=tools_caller.get_dirs(os.path.join(renpy.config.gamedir, "images/background"))
@@ -91,6 +94,19 @@ init 2 python:
                     tools=tools, 
                     limit=game_config.limit,
                     proxy=game_config.proxy)
+    
+    with open(os.path.join(renpy.config.gamedir,"translator.txt"), "r", encoding="utf-8") as file:
+        translator_prompt = file.read()
+    translator = api_ver.ChatGLM(api_key=game_config.api_key, 
+                    storage="",
+                    model="glm-4-flash", 
+                    system_prompt=translator_prompt, 
+                    limit=game_config.limit,
+                    proxy=game_config.proxy)
+
+    if game_config.tts:
+        tts=audio_generator.Audio_generator()
+        renpy.invoke_in_thread(tts.run)
 
 init 3 python:
     info_path=os.path.join(renpy.config.gamedir, "info.json")
@@ -107,6 +123,7 @@ init 3 python:
 
 init 4 python:
     renpy.invoke_in_thread(chatglm.run)
+    renpy.invoke_in_thread(translator.run)
 
 init 5 python:
     config.keymap['rollback'].remove('anyrepeat_K_PAGEUP')
@@ -305,7 +322,50 @@ label message_processor(reply):
             renpy.jump("main_loop")
     python:
         if reply.get("content"):
+            translator.event.put(("send",({"role":"user","content":reply.get("content")},)))
+            print("翻译中")
+            while not translator.ready:
+                renpy.pause(0.1)
+            translator.ready=False
+            ja_reply=translator.result.get()
+            translator.clear_history()
+            print("翻译完成")
+            try:
+                ja_reply=json.loads(ja_reply.get("content"))
+                ja_load=True
+            except:
+                print("failed to load json")
+                ja_load=False
+            if ja_load:
+                ja=ja_reply.get("text")
+                emotion=ja_reply.get("emotion")
+                print(ja)
+                print(emotion)
+                refer_data = {"refer_wav_path": r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\output\noa\noa_153.wav",
+                            "prompt_text": "それならゆうかちゃんの声が流れる目覚まし時計とかいいかもしれませんね",
+                            "prompt_language": "ja"}
+                tts.event.put(
+                    ("gen", {"text": ja, "language": "ja", "refer_data": refer_data}))
+                while not tts.ready:
+                    renpy.pause(0.1)
+                tts.ready=False
+                audio=tts.result.get()
+                if isinstance(audio,BytesIO):
+                    audio=audio.getvalue()
+                    print("tts success")
+                else:
+                    print(audio)
+                    audio=None
+            else:
+                print("转换json失败")
+                print(ja_reply)
+                audio=None
+            if audio:
+                print("播放音频")
+                audio=AudioData(audio,"wav")
+                renpy.play(audio)
             renpy.say(noa,reply.get("content"))
+
         renpy.jump("main_loop")
 
     return

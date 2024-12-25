@@ -1,10 +1,10 @@
-2024-12-21 06:23:48 UTC
+2024-12-25 19:39:30 UTC
 Windows-10-10.0.19041
 Ren'Py 8.3.2.24090902
 
-Early init took 0.16s
+Early init took 0.15s
 Loading error handling took 0.03s
-Loading script took 0.25s
+Loading script took 0.13s
 Loading save slot metadata took 0.03s
 Loading persistent took 0.00s
 Running init code took 0.21s
@@ -21,16 +21,16 @@ nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
 Creating interface object took 0.24s
 Cleaning stores took 0.00s
-Init translation took 0.03s
+Init translation took 0.05s
 Build styles took 0.00s
 Load screen analysis took 0.03s
 Analyze screens took 0.00s
 Save screen analysis took 0.00s
 Prepare screens took 0.08s
 Save pyanalysis. took 0.00s
-Save bytecode. took 0.03s
+Save bytecode. took 0.00s
 Running _start took 0.00s
-Interface start took 0.05s
+Interface start took 0.08s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 2560, 1440)
@@ -46,23 +46,17 @@ Maximum texture size: 4096x4096
 call method get_conversations
 call method get_conversations
 call method send
-send args: {'role': 'user', 'content': '跳一下'}
-{'choices': [{'finish_reason': 'tool_calls', 'index': 0, 'message': {'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": "jump", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9134572316018932006', 'index': 0, 'type': 'function'}]}}], 'created': 1734762236, 'id': '202412211423555819e37b0d1147ed', 'model': 'glm-4-flash', 'request_id': '202412211423555819e37b0d1147ed', 'usage': {'completion_tokens': 16, 'prompt_tokens': 2836, 'total_tokens': 2852}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": "jump", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9134572316018932006', 'index': 0, 'type': 'function'}]}
+send args: {'role': 'user', 'content': '你好'}
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '嗨，sensei！我是诺亚。今天的天气真好呢，心情也很不错呢。有什么我可以帮您的吗？', 'role': 'assistant'}}], 'created': 1735155581, 'id': '20241226033940f02813cacaf842b7', 'model': 'glm-4-flash', 'request_id': '20241226033940f02813cacaf842b7', 'usage': {'completion_tokens': 27, 'prompt_tokens': 2835, 'total_tokens': 2862}}
+{'content': '嗨，sensei！我是诺亚。今天的天气真好呢，心情也很不错呢。有什么我可以帮您的吗？', 'role': 'assistant'}
 清空tool数据
-获取tool参数
-调用tool
-获取tool结果
-call method send
-send args: {'role': 'tool', 'content': '[{\'control_character\': "missing required arguments: [\'emotion\']"}]'}
-{'choices': [{'finish_reason': 'tool_calls', 'index': 0, 'message': {'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": "jump", "emotion": "joy", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9134579394128042560', 'index': 0, 'type': 'function'}]}}], 'created': 1734762237, 'id': '2024122114235661a31633a48a4257', 'model': 'glm-4-flash', 'request_id': '2024122114235661a31633a48a4257', 'usage': {'completion_tokens': 22, 'prompt_tokens': 2869, 'total_tokens': 2891}}
-{'role': 'assistant', 'tool_calls': [{'function': {'arguments': '{"action": "jump", "emotion": "joy", "position": "3"}', 'name': 'control_character'}, 'id': 'call_-9134579394128042560', 'index': 0, 'type': 'function'}]}
-清空tool数据
-获取tool参数
-调用tool
-获取tool结果
-call method send
-send args: {'role': 'tool', 'content': "[{'control_character': 'success'}]"}
-{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '嘿嘿，老师，我跳一下给你看！诺亚可是很活泼的呢~ 😄', 'role': 'assistant'}}], 'created': 1734762238, 'id': '2024122114235705deb9803a014f84', 'model': 'glm-4-flash', 'request_id': '2024122114235705deb9803a014f84', 'usage': {'completion_tokens': 21, 'prompt_tokens': 2902, 'total_tokens': 2923}}
-{'content': '嘿嘿，老师，我跳一下给你看！诺亚可是很活泼的呢~ 😄', 'role': 'assistant'}
-清空tool数据
+翻译中call method send
+
+send args: {'role': 'user', 'content': '嗨，sensei！我是诺亚。今天的天气真好呢，心情也很不错呢。有什么我可以帮您的吗？'}
+{'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': '{"text":"こんにちは、sensei！私はノアです。今日の天気はとても良いですよ、気分もとても良いです。何か私にできることがありますか？","emotion":"joy"}', 'role': 'assistant'}}], 'created': 1735155584, 'id': '202412260339425a9a512d67794f4f', 'model': 'glm-4-flash', 'request_id': '202412260339425a9a512d67794f4f', 'usage': {'completion_tokens': 47, 'prompt_tokens': 140, 'total_tokens': 187}}
+翻译完成
+こんにちは、sensei！私はノアです。今日の天気はとても良いですよ、気分もとても良いです。何か私にできることがありますか？
+joy
+call method gen
+tts success
+播放音频
