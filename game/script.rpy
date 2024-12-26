@@ -271,6 +271,7 @@ label main:
             renpy.call("bg_changer", "office/mainoffice.jpg")
 
     hide ready
+    show screen main_ui
     jump main_loop
     return
 
@@ -280,6 +281,9 @@ default result_statue=False
 default tool_result=queue.Queue()
 default reply=""
 default reply_ready=False
+default tts_audio=None
+default tts_ready=False
+default tts_filename=""
 label message_processor(reply):
     $ print(reply)
     python:
@@ -323,13 +327,13 @@ label message_processor(reply):
     python:
         if reply.get("content"):
             translator.event.put(("send",({"role":"user","content":reply.get("content")},)))
-            print("翻译中")
+            renpy.notify("翻译中")
             while not translator.ready:
                 renpy.pause(0.1)
             translator.ready=False
             ja_reply=translator.result.get()
             translator.clear_history()
-            print("翻译完成")
+            renpy.notify("翻译完成")
             try:
                 ja_reply=json.loads(ja_reply.get("content"))
                 ja_load=True
@@ -339,11 +343,16 @@ label message_processor(reply):
             if ja_load:
                 ja=ja_reply.get("text")
                 emotion=ja_reply.get("emotion")
-                print(ja)
-                print(emotion)
+                print(f"ja:{ja}")
+                print(f"emotion:{emotion}")
+
+
                 refer_data = {"refer_wav_path": r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\output\noa\noa_153.wav",
                             "prompt_text": "それならゆうかちゃんの声が流れる目覚まし時計とかいいかもしれませんね",
                             "prompt_language": "ja"}
+
+
+                renpy.notify("合成语音中")
                 tts.event.put(
                     ("gen", {"text": ja, "language": "ja", "refer_data": refer_data}))
                 while not tts.ready:
@@ -351,19 +360,19 @@ label message_processor(reply):
                 tts.ready=False
                 audio=tts.result.get()
                 if isinstance(audio,BytesIO):
-                    audio=audio.getvalue()
-                    print("tts success")
+                    renpy.store.tts_audio=audio.getvalue()
+                    renpy.store.tts_ready=True
+                    renpy.notify("合成语音成功")
                 else:
-                    print(audio)
-                    audio=None
+                    renpy.store.tts_ready=False
+                    print(f"语音合成失败: {audio}")
             else:
-                print("转换json失败")
-                print(ja_reply)
-                audio=None
-            if audio:
-                print("播放音频")
-                audio=AudioData(audio,"wav")
-                renpy.play(audio)
+                renpy.notify("翻译格式转换失败")
+                print(f"failed to load json: {ja_reply}")
+                renpy.store.tts_ready=False
+            if renpy.store.tts_ready:
+                renpy.play(AudioData(renpy.store.tts_audio,"wav"))
+                renpy.store.tts_filename=reply.get("content")[:10]
             renpy.say(noa,reply.get("content"))
 
         renpy.jump("main_loop")

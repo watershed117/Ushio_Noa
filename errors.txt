@@ -2,17 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/tools.rpy", line 205: expected statement.
-    <<<<<<< HEAD
-                ^
-
-File "game/tools.rpy", line 206: expected statement.
-    =======
-          ^
-
-File "game/tools.rpy", line 275: expected statement.
-    >>>>>>> 766c722e6b1268f85af434a9ab6b6cff6e0d6e27
-                                                    ^
+File "game/ui.rpy", line 10: is not terminated with a newline. (Check strings and parenthesis.)
+(Perhaps you left out a " at the end of the first line.)
+                print(os.path.join(renpy.config.gamedir,r"\tts\"+f"{renpy.random.randint(1000, 9999)}.wav"))
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Sat Dec 21 14:22:28 2024
+Thu Dec 26 22:54:31 2024

@@ -153,7 +153,7 @@ if __name__ == "__main__":
                   "prompt_text": "それならゆうかちゃんの声が流れる目覚まし時計とかいいかもしれませんね",
                   "prompt_language": "ja"}
     generator.event.put(
-        ("gen", {"text": "こんにちは、どういたしまして？", "language": "ja", "refer_data": refer_data}))
+        ("gen", {"text": "こんにちは、😀どういたしまして？", "language": "ja", "refer_data": refer_data}))
     while not generator.ready:
         time.sleep(0.1)
     generator.ready = False

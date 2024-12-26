@@ -278,7 +278,7 @@ if __name__ == "__main__":
                    system_prompt=prompt,
                    storage="your_storage_path",
                    tools=tools,
-                   proxy=None)
+                   proxy=None) # type: ignore
 
     print(chat.tokenizer([{"role": "user", "content": prompt}]))
     chat.send({"role": "user", "content": "你好"})
