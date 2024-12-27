@@ -1,8 +1,8 @@
-2024-12-26 15:25:27 UTC
+2024-12-27 15:21:00 UTC
 Windows-10-10.0.19041
 Ren'Py 8.3.2.24090902
 
-Early init took 0.16s
+Early init took 0.15s
 Loading error handling took 0.03s
 Loading script took 0.13s
 Loading save slot metadata took 0.03s
@@ -15,18 +15,18 @@ Index archives took 0.00s
 Dump and make backups took 0.05s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
-Initial gc took 0.03s
+Initial gc took 0.04s
 DPI scale factor: 1.000000
 nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
-Creating interface object took 0.22s
+Creating interface object took 0.23s
 Cleaning stores took 0.00s
 Init translation took 0.04s
 Build styles took 0.00s
 Load screen analysis took 0.03s
 Analyze screens took 0.00s
 Save screen analysis took 0.00s
-Prepare screens took 0.06s
+Prepare screens took 0.07s
 Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
@@ -47,4 +47,22 @@ Maximum texture size: 4096x4096
 call method get_conversations
 call method get_conversations
 call method load
-窗口标题已更新为: a5b8bee6-8d5e-4227-8363-5774ed3adefd
+窗口标题已更新为: 5190b9ef-a95e-40f1-9d84-cd3d43faf9bd
+recalling...
+recalling...
+{'control_character': 1, 'bg_changer': 1}
+Cleaning stores took 0.00s
+Init translation took 0.00s
+Build styles took 0.00s
+Load screen analysis took 0.02s
+Analyze screens took 0.00s
+Prepare screens took 0.00s
+Running _start took 0.00s
+窗口标题已更新为: Ushio_Noa
+call method get_conversations
+call method get_conversations
+call method load
+窗口标题已更新为: 5190b9ef-a95e-40f1-9d84-cd3d43faf9bd
+recalling...
+recalling...
+{'control_character': 1, 'bg_changer': 1}

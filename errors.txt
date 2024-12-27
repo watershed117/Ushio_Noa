@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/ui.rpy", line 10: is not terminated with a newline. (Check strings and parenthesis.)
-(Perhaps you left out a " at the end of the first line.)
-                print(os.path.join(renpy.config.gamedir,r"\tts\"+f"{renpy.random.randint(1000, 9999)}.wav"))
+File "game/script.rpy", line 261: invalid syntax
+            else:
+             ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Thu Dec 26 22:54:31 2024
+Fri Dec 27 23:04:16 2024

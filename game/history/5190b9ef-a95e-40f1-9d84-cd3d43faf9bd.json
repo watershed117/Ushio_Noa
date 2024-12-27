@@ -5,28 +5,37 @@
     },
     {
         "role": "user",
-        "content": "你好"
+        "content": "陪我去公园吧"
     },
     {
         "role": "assistant",
         "tool_calls": [
             {
                 "function": {
-                    "arguments": "{\"position\": \"3\", \"emotion\": \"joy\"}",
+                    "arguments": "{\"action\": \"jump\", \"position\": \"3\", \"emotion\": \"joy\"}",
                     "name": "control_character"
                 },
-                "id": "call_-9116561903181452329",
+                "id": "call_-9116556646139634825",
                 "index": 0,
+                "type": "function"
+            },
+            {
+                "function": {
+                    "arguments": "{\"name\": \"park/park.jpg\"}",
+                    "name": "bg_changer"
+                },
+                "id": "call_-9116556646139634824",
+                "index": 1,
                 "type": "function"
             }
         ]
     },
     {
         "role": "tool",
-        "content": "[{'control_character': 'success'}]"
+        "content": "[{'control_character': 'success'}, {'name': 'bg_changer', 'result': 'success'}]"
     },
     {
         "role": "assistant",
-        "content": "嗨，老师！好久不见呢，今天有什么特别的事情要记录吗？😊"
+        "content": "好的，老师！一起去公园吧！🌳🌼 公园里的风景一定很美，也许还能遇到一些有趣的事情呢。呵呵，走吧！"
     }
 ]

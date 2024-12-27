@@ -217,15 +217,47 @@ class ChatGLM:
             if event:
                 self.process_event(event)
 
-    def latest_tool_recall(self, messages: list[dict[str, str]]):
-        for message in reversed(messages):
-            if message.get("role") == "assistant":
-                if message.get("tool_calls"):
-                    tools = queue.Queue()
-                    for tool in message.get("tool_calls"):  # type: ignore
-                        if tool.get("function"):  # type: ignore
-                            tools.put(tool.get("function"))  # type: ignore
-                    return tools
+    def latest_tool_recall(self, messages: list[dict[str, str]],function_name:str=""):
+        tools = queue.Queue()
+        if function_name:
+            for message in reversed(messages):
+                if message.get("role") == "assistant":
+                    if message.get("tool_calls"):
+                        for tool in message.get("tool_calls"):  # type: ignore
+                            if tool.get("function"):  # type: ignore
+                                if tool.get("function").get("name") == function_name:  # type: ignore
+                                    tools.put(tool.get("function"))  # type: ignore
+                                    return tools
+                                else:
+                                    continue
+                            else:
+                                continue
+                        if tools.empty():
+                            continue
+                    else:
+                        continue
+                else:
+                    continue
+            if tools.empty():
+                return None
+        else:
+            for message in reversed(messages):
+                if message.get("role") == "assistant":
+                    if message.get("tool_calls"):
+                        for tool in message.get("tool_calls"):  # type: ignore
+                            if tool.get("function"):  # type: ignore
+                                tools.put(tool.get("function"))  # type: ignore
+                            else:
+                                continue
+                        if not tools.empty():
+                            return tools
+                        else:
+                            return None
+                    else:
+                        continue
+                else:
+                    continue
+
 
     def get_latest_message(self, messages: list[dict[str, str]]):
         for message in reversed(messages):
@@ -276,9 +308,15 @@ if __name__ == "__main__":
     chat = ChatGLM(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
                    model="glm-4-flash",
                    system_prompt=prompt,
-                   storage="your_storage_path",
+                   storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                    tools=tools,
                    proxy=None) # type: ignore
 
-    print(chat.tokenizer([{"role": "user", "content": prompt}]))
-    chat.send({"role": "user", "content": "你好"})
+    # print(chat.tokenizer([{"role": "user", "content": prompt}]))
+    # chat.send({"role": "user", "content": "你好"})
+    chat.load("77960e69-e511-4099-be09-8c2515d5d329")
+    result=chat.latest_tool_recall(chat.history, "bg_changer")
+    if result:
+        while not result.empty():
+            data=result.get()
+            print(data)

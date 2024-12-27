@@ -233,6 +233,7 @@ label ready:
     return
 
 default new_conversation=False
+default tool_call_counts={"control_character":0,"bg_changer":0}
 label main:
     hide screen entry
     show loading
@@ -242,21 +243,45 @@ label main:
                 renpy.pause(0.1)
             chatglm.ready=False
             chatglm.result.get()
-            latset_tools_data=chatglm.latest_tool_recall(chatglm.history)
+
             latest_message=chatglm.get_latest_message(chatglm.history)
-            # print(latset_tools_data)
-            # print(latest_message)
+            control_recall=chatglm.latest_tool_recall(chatglm.history,"control_character")
+            bg_recall=chatglm.latest_tool_recall(chatglm.history,"bg_changer")
+
+            recall_data=queue.Queue()
+            if control_recall and not control_recall.empty():
+                while not control_recall.empty():
+                    recall_data.put(control_recall.get())
+            if bg_recall and not bg_recall.empty():
+                while not bg_recall.empty():
+                    recall_data.put(bg_recall.get())
+
+            if recall_data.empty():
+                recall_statue=False
+            else:
+                recall_statue=True
+
             renpy.call("ready")
 
+        else:
+            recall_statue=False
+            
     if not new_conversation:
-        if latset_tools_data:
-            while not latset_tools_data.empty():
-                $ tools_caller.caller(latset_tools_data.get())
+        if recall_statue:
+            while not recall_data.empty():
+                python:
+                    print("recalling...")
+                    data=recall_data.get()
+                    if data.get("name") in tool_call_counts:
+                        renpy.store.tool_call_counts[data.get("name")]+=1
+                    tools_caller.caller(data)
                     
     python:
-        if not new_conversation:
-            if not latset_tools_data:
+        if recall_statue:
+            print(renpy.store.tool_call_counts)
+            if renpy.store.tool_call_counts.get("control_character")==0:
                 renpy.show_screen("noa_base","3","joy")
+            if renpy.store.tool_call_counts.get("bg_changer")==0:
                 renpy.call("bg_changer", "office/mainoffice.jpg")
 
     python:
