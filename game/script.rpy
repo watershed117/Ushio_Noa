@@ -92,7 +92,7 @@ init 2 python:
     storage_dir=os.path.join(renpy.config.gamedir, "history")
     with open(os.path.join(renpy.config.gamedir,"test.txt"), "r", encoding="utf-8") as file:
         complex_prompt = file.read()
-    chatglm = DeepSeek(api_key=game_config.deepseek_api_key, 
+    llm = DeepSeek(api_key=game_config.deepseek_api_key, 
                     storage=storage_dir,
                     system_prompt=complex_prompt, 
                     tools=tools, 
@@ -126,7 +126,7 @@ init 3 python:
         title_changer.set_window_title(hwnd[0], name)
 
 init 4 python:
-    renpy.invoke_in_thread(chatglm.run)
+    renpy.invoke_in_thread(llm.run)
     renpy.invoke_in_thread(translator.run)
 
 init 5 python:
@@ -135,13 +135,23 @@ init 5 python:
     config.keymap['rollback'].remove('K_AC_BACK')
     config.keymap['rollback'].remove('mousedown_4')
 
+init 6 python:
+    def load(conversation_id:str):
+        llm.event.put(("load",(conversation_id,)))
+        while not llm.ready:
+            renpy.pause(0.1)
+        llm.ready=False
+        conversation_id=llm.result.get()
+        change_title(conversation_id)
+        renpy.store.conversation_id=conversation_id
+        
 screen entry():
     python:
-        chatglm.event.put("get_conversations")
-        while not chatglm.ready:
+        llm.event.put("get_conversations")
+        while not llm.ready:
             time.sleep(0.1)
-        chatglm.ready=False
-        conversation_list=chatglm.result.get()
+        llm.ready=False
+        conversation_list=llm.result.get()
     add "images/ui/ui.png"
     default conversation_number=len(conversation_list)
     viewport:
@@ -161,7 +171,7 @@ screen entry():
             pos(582, 8)
             add "images/ui/button.png"
             # action Function(print, "新建会话")
-            action [Function(chatglm.clear_history),
+            action [Function(llm.clear_history),
                     SetVariable("new_conversation",True),
                     Jump("main")]
         if conversation_number:
@@ -191,10 +201,7 @@ screen entry():
                 for n in range(0,conversation_number):
                     button:
                         add "images/ui/button.png"
-                        action [Function(chatglm.event.put, 
-                                        ("load",
-                                        (conversation_list[n].get("id"),))),
-                                Function(change_title,conversation_list[n].get("id")),
+                        action [Function(load),
                                 Jump("main")]
                         
 
@@ -237,20 +244,21 @@ label ready:
     return
 
 default new_conversation=False
+default conversation_id=""
 default tool_call_counts={"control_character":0,"bg_changer":0}
 label main:
     hide screen entry
     show loading
     python:
         if not new_conversation:
-            while not chatglm.ready:
+            while not llm.ready:
                 renpy.pause(0.1)
-            chatglm.ready=False
-            chatglm.result.get()
+            llm.ready=False
+            llm.result.get()
 
-            latest_message=chatglm.get_latest_message(chatglm.history)
-            control_recall=chatglm.latest_tool_recall(chatglm.history,"control_character")
-            bg_recall=chatglm.latest_tool_recall(chatglm.history,"bg_changer")
+            latest_message=llm.get_latest_message(llm.history)
+            control_recall=llm.latest_tool_recall(llm.history,"control_character")
+            bg_recall=llm.latest_tool_recall(llm.history,"bg_changer")
 
             recall_data=queue.Queue()
             if control_recall and not control_recall.empty():
@@ -304,63 +312,58 @@ label main:
     jump main_loop
     return
 
-default tool_statue=False
-default tool_data=queue.Queue()
-default result_statue=False
-default tool_result=queue.Queue()
-default tool_id=queue.Queue()
-default reply=""
 default reply_ready=False
 default tts_audio=None
-default tts_ready=False
 default tts_filename=""
 label message_processor(reply):
-    $ print(reply)
     python:
-        while not renpy.store.tool_data.empty():
-            renpy.store.tool_data.get()
-        while not renpy.store.tool_result.empty():
-            renpy.store.tool_result.get()
-        while not renpy.store.tool_id.empty():
-            renpy.store.tool_id.get()
+        print(reply)
+        tool_statue=False
+        tool_data=queue.Queue()
+        result_statue=False
+        renpy.store.tool_result=queue.Queue()
+        tool_id=queue.Queue()
+        tts_ready=False
         print("清空tool数据")
 
     python:
         if reply.get("tool_calls"):
             print("获取tool参数")
-            renpy.store.tool_data=queue.Queue()
             for tool in reply.get("tool_calls"):
-                renpy.store.tool_id.put(tool.get("id"))
+                tool_id.put(tool.get("id"))
                 function=tool.get("function")
-                renpy.store.tool_data.put(function)
-            renpy.store.tool_statue=True
+                print(tool.get("id"))
+                print(function)
+                tool_data.put(function)
+            tool_statue=True            
+            
+    if tool_statue:
+        $ print("调用tool")
+        while not tool_data.empty():
+            python:
+                data=tool_data.get()
+                print(data)
+                tools_caller.caller(data)
+        $ result_statue=True
 
     python:
-        if renpy.store.tool_statue:
-            print("调用tool")
-            renpy.store.tool_statue=False
-            renpy.store.result_statue=True
-            while not renpy.store.tool_data.empty():
-                tools_caller.caller(renpy.store.tool_data.get())
-
-    python:
-        if renpy.store.result_statue:
+        if result_statue:
             print("获取tool结果")
-            renpy.store.result_statue=False
+            result_statue=False
             messages=[]
             while not renpy.store.tool_result.empty():
                 payload = {
                     "role": "tool",
                     "content": str(renpy.store.tool_result.get()),
-                    "tool_call_id": renpy.store.tool_id.get()
+                    "tool_call_id": tool_id.get()
                 }
                 messages.append(payload)
                 
-            chatglm.event.put(("send",(messages,)))
-            while not chatglm.ready:
+            llm.event.put(("send",(messages,)))
+            while not llm.ready:
                 renpy.pause(0.1)
-            chatglm.ready=False
-            renpy.store.reply=chatglm.result.get()
+            llm.ready=False
+            reply=llm.result.get()
             renpy.store.reply_ready=True
             renpy.jump("main_loop")
     python:
@@ -401,17 +404,17 @@ label message_processor(reply):
                     audio=tts.result.get()
                     if isinstance(audio,BytesIO):
                         renpy.store.tts_audio=audio.getvalue()
-                        renpy.store.tts_ready=True
+                        tts_ready=True
                         renpy.notify("合成语音成功")
                     else:
-                        renpy.store.tts_ready=False
+                        tts_ready=False
                         print(f"语音合成失败: {audio}")
                 else:
                     renpy.notify("翻译格式转换失败")
                     print(f"failed to load json: {ja_reply}")
-                    renpy.store.tts_ready=False
+                    tts_ready=False
 
-            if renpy.store.tts_ready:
+            if tts_ready:
                 renpy.play(AudioData(renpy.store.tts_audio,"wav"))
                 renpy.store.tts_filename=reply.get("content")[:10]
             renpy.say(noa,reply.get("content"))
@@ -428,11 +431,11 @@ label main_loop:
                 renpy.call("message_processor",renpy.store.reply)
             message=renpy.input("sensei")
             if message:
-                chatglm.event.put(("send",({"role":"user","content":message},)))
-                while not chatglm.ready:
+                llm.event.put(("send",({"role":"user","content":message},)))
+                while not llm.ready:
                     renpy.pause(0.1)
-                chatglm.ready=False
-                reply=chatglm.result.get()
+                llm.ready=False
+                reply=llm.result.get()
                 renpy.call("message_processor",reply)
             else:
                 renpy.say(noa,"输入不能为空，请重新输入。")

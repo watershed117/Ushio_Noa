@@ -15,10 +15,14 @@ init 6 python:
             renpy.notify("暂无语音")
 
     def save():
-        chatglm.event.put(("save"))
-        while not chatglm.ready:
+        if renpy.store.conversation_id:
+            llm.event.put(("save",(renpy.store.conversation_id,)))
+        else:
+            llm.event.put(("save"))
+        while not llm.ready:
             time.sleep(0.1)
-        chatglm.result.get()
+        renpy.store.conversation_id=llm.result.get()
+        change_title(renpy.store.conversation_id)
         renpy.notify("保存成功")
 
 screen main_ui:
@@ -55,5 +59,5 @@ screen main_ui:
         button:
             pos (1780,10)
             add "images/ui/refresh1.png"
-            action [Function(chatglm.clear_history),
+            action [Function(llm.clear_history),
                     Notify("历史记录已清除")]

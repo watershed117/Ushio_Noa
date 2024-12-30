@@ -164,10 +164,10 @@ init 0 python:
                     if args_check is True:
                         executor=getattr(self,name)
                         if kwargs:
-                            print(f"calling {name} with {kwargs}")
+                            # print(f"calling {name} with {kwargs}")
                             result=executor(**kwargs)
                         else:
-                            print(f"calling {name}")
+                            # print(f"calling {name}")
                             result=executor()
                     else:
                         renpy.store.tool_result.put({name:args_check})

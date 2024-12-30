@@ -1,38 +1,38 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 328, in script
+  File "game/script.rpy", line 336, in script
     python:
-  File "game/script.rpy", line 329, in <module>
+  File "game/script.rpy", line 337, in <module>
     if reply.get("tool_calls"):
 AttributeError: 'tuple' object has no attribute 'get'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 425, in script call
+  File "game/script.rpy", line 433, in script call
     python:
-  File "game/script.rpy", line 328, in script
+  File "game/script.rpy", line 336, in script
     python:
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "game/script.rpy", line 329, in <module>
+  File "game/script.rpy", line 337, in <module>
     if reply.get("tool_calls"):
 AttributeError: 'tuple' object has no attribute 'get'
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Mon Dec 30 17:15:27 2024
+Tue Dec 31 02:56:11 2024

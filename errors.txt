@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 3: invalid syntax
-    from llm.deepseek importDeepSeek
-                       ^
+File "game/script.rpy", line 359: expected statement.
+    for n in range:
+          ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Mon Dec 30 05:02:02 2024
+Tue Dec 31 03:03:37 2024

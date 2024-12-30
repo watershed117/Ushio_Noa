@@ -86,9 +86,9 @@ class Base_llm:
                 else:
                     self.history+=messages
                     self.history_storage+=messages
-                    
+
                 result = response.json()
-                print(result)
+                # print(result)
                 total_tokens = result.get("usage").get("total_tokens")
                 if total_tokens >= self.max_len:
                     self.limiter()
@@ -110,8 +110,9 @@ class Base_llm:
                 return response.status_code, response.text
 
     @result_appender  # type: ignore
-    def save(self):
-        id = str(uuid4())
+    def save(self,id: str=""):
+        if not id:
+            id = str(uuid4())
         print(os.path.join(self.storage, f"{id}.json"))
         with open(os.path.join(self.storage, f"{id}.json"), "w", encoding="utf-8") as f:
             json.dump(self.history_storage, f, ensure_ascii=False, indent=4)
