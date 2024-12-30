@@ -18,7 +18,7 @@ class Audio_generator:
         self.result = queue.Queue()
         self.ready = False
 
-    def gen(self, text: str, language: str = "ja", refer_data: dict = {}, cut_method: str = "cut5"):
+    def gen(self, text: str, language: str = "ja", refer_data: dict = {}, cut_method: str = "cut3"):
         """
         cut0: 不切
         cut1: 凑四句一切

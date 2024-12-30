@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 261: invalid syntax
-            else:
-             ^
+File "game/script.rpy", line 3: invalid syntax
+    from llm.deepseek importDeepSeek
+                       ^
 
 Ren'Py Version: Ren'Py 8.3.2.24090902
-Fri Dec 27 23:04:16 2024
+Mon Dec 30 05:02:02 2024

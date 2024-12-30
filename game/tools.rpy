@@ -7,7 +7,7 @@ init 0 python:
             self.function_args_data={}
             self.map_data={}
 
-            self.args_register("dir_walker", {"path": str}, ["path"])
+            self.args_register("dir_walker", {"dir": str}, ["dir"])
             self.args_register("control_character", {"position": str, "emotion": str, "emoji": str, "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
             self.args_register("bg_changer", {"name": str}, ["name"])
 
@@ -155,7 +155,7 @@ init 0 python:
             else:
                 return True
 
-        def caller(self,function_data:str):
+        def caller(self,function_data:dict):
             name=function_data.get("name")
             kwargs=json.loads(function_data.get("arguments"))
             if hasattr(self, name):
@@ -164,8 +164,10 @@ init 0 python:
                     if args_check is True:
                         executor=getattr(self,name)
                         if kwargs:
+                            print(f"calling {name} with {kwargs}")
                             result=executor(**kwargs)
                         else:
+                            print(f"calling {name}")
                             result=executor()
                     else:
                         renpy.store.tool_result.put({name:args_check})
@@ -174,10 +176,10 @@ init 0 python:
             else:
                 renpy.store.tool_result.put({name:"function not found"})
 
-        def dir_walker(self, path:str):
+        def dir_walker(self, dir:str):
             background_path=os.path.join(renpy.config.gamedir,"images/background")
             # C:\Users\water\Desktop\renpy\Ushio_Noa\game\images\background
-            path=os.path.join(background_path,path)
+            path=os.path.join(background_path,dir)
             if not os.path.exists(path):
                 renpy.store.tool_result.put({"dir_walker": "dir not found"})
             else:
@@ -186,10 +188,7 @@ init 0 python:
                 with os.scandir(path) as it:
                     for entry in it:
                         if entry.is_file():
-                            if entry.name == "desktop.ini":
-                                pass
-                            else:
-                                file_names.append(entry.name)
+                            file_names.append(entry.name)
                         elif entry.is_dir():
                             dir_names.append(entry.name)
                 renpy.store.tool_result.put({"dir_walker": file_names})

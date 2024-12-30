@@ -1,10 +1,10 @@
-2024-12-27 15:21:00 UTC
+2024-12-30 09:44:02 UTC
 Windows-10-10.0.19041
 Ren'Py 8.3.2.24090902
 
-Early init took 0.15s
+Early init took 0.16s
 Loading error handling took 0.03s
-Loading script took 0.13s
+Loading script took 0.14s
 Loading save slot metadata took 0.03s
 Loading persistent took 0.00s
 Running init code took 0.21s
@@ -15,13 +15,13 @@ Index archives took 0.00s
 Dump and make backups took 0.05s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
-Initial gc took 0.04s
+Initial gc took 0.03s
 DPI scale factor: 1.000000
 nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
-Creating interface object took 0.23s
+Creating interface object took 0.25s
 Cleaning stores took 0.00s
-Init translation took 0.04s
+Init translation took 0.03s
 Build styles took 0.00s
 Load screen analysis took 0.03s
 Analyze screens took 0.00s
@@ -46,23 +46,35 @@ Maximum texture size: 4096x4096
 窗口标题已更新为: Ushio_Noa
 call method get_conversations
 call method get_conversations
-call method load
-窗口标题已更新为: 5190b9ef-a95e-40f1-9d84-cd3d43faf9bd
-recalling...
-recalling...
-{'control_character': 1, 'bg_changer': 1}
-Cleaning stores took 0.00s
-Init translation took 0.00s
-Build styles took 0.00s
-Load screen analysis took 0.02s
-Analyze screens took 0.00s
-Prepare screens took 0.00s
-Running _start took 0.00s
-窗口标题已更新为: Ushio_Noa
-call method get_conversations
-call method get_conversations
-call method load
-窗口标题已更新为: 5190b9ef-a95e-40f1-9d84-cd3d43faf9bd
-recalling...
-recalling...
-{'control_character': 1, 'bg_changer': 1}
+call method send
+send args: {'role': 'user', 'content': '出去走走吧'}
+{'id': 'faa1aa26-bbf8-4b55-beee-0b6c71ed82d2', 'object': 'chat.completion', 'created': 1735551850, 'model': 'deepseek-chat', 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_17d888d2-66a1-4c0b-bb8f-6b25488652c0', 'type': 'function', 'function': {'name': 'dir_walker', 'arguments': '{"dir":"park"}'}}]}, 'logprobs': None, 'finish_reason': 'tool_calls'}], 'usage': {'prompt_tokens': 2714, 'completion_tokens': 20, 'total_tokens': 2734, 'prompt_cache_hit_tokens': 1856, 'prompt_cache_miss_tokens': 858}, 'system_fingerprint': 'fp_f1afce2943'}
+{'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_17d888d2-66a1-4c0b-bb8f-6b25488652c0', 'type': 'function', 'function': {'name': 'dir_walker', 'arguments': '{"dir":"park"}'}}]}
+清空tool数据
+获取tool参数
+调用tool
+calling dir_walker with {'dir': 'park'}
+获取tool结果
+call method send
+send args: [{'role': 'tool', 'content': "{'dir_walker': ['park.jpg', 'park_night.jpg', 'playground.jpg', 'playground_night.jpg', 'playground_sunset.jpg']}", 'tool_call_id': 'call_0_17d888d2-66a1-4c0b-bb8f-6b25488652c0'}]
+{'id': '5fda364c-dcb2-4255-a8de-195f5a6645c8', 'object': 'chat.completion', 'created': 1735551851, 'model': 'deepseek-chat', 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_224f63b0-4420-47f8-b075-853a36a08955', 'type': 'function', 'function': {'name': 'bg_changer', 'arguments': '{"name":"park/park.jpg"}'}}]}, 'logprobs': None, 'finish_reason': 'tool_calls'}], 'usage': {'prompt_tokens': 2774, 'completion_tokens': 21, 'total_tokens': 2795, 'prompt_cache_hit_tokens': 2688, 'prompt_cache_miss_tokens': 86}, 'system_fingerprint': 'fp_f1afce2943'}
+{'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_224f63b0-4420-47f8-b075-853a36a08955', 'type': 'function', 'function': {'name': 'bg_changer', 'arguments': '{"name":"park/park.jpg"}'}}]}
+清空tool数据
+获取tool参数
+调用tool
+calling bg_changer with {'name': 'park/park.jpg'}
+获取tool结果
+call method send
+send args: [{'role': 'tool', 'content': "{'name': 'bg_changer', 'result': 'success'}", 'tool_call_id': 'call_0_224f63b0-4420-47f8-b075-853a36a08955'}]
+{'id': '57d1c46c-040e-448c-8fb3-bcaa876e6711', 'object': 'chat.completion', 'created': 1735551853, 'model': 'deepseek-chat', 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_47f63077-a4a1-4572-8705-4fba016714de', 'type': 'function', 'function': {'name': 'control_character', 'arguments': '{"position":"3","emotion":"joy","action":"jump"}'}}]}, 'logprobs': None, 'finish_reason': 'tool_calls'}], 'usage': {'prompt_tokens': 2814, 'completion_tokens': 55, 'total_tokens': 2869, 'prompt_cache_hit_tokens': 2752, 'prompt_cache_miss_tokens': 62}, 'system_fingerprint': 'fp_f1afce2943'}
+{'role': 'assistant', 'content': '', 'tool_calls': [{'index': 0, 'id': 'call_0_47f63077-a4a1-4572-8705-4fba016714de', 'type': 'function', 'function': {'name': 'control_character', 'arguments': '{"position":"3","emotion":"joy","action":"jump"}'}}]}
+清空tool数据
+获取tool参数
+调用tool
+calling control_character with {'position': '3', 'emotion': 'joy', 'action': 'jump'}
+获取tool结果
+call method send
+send args: [{'role': 'tool', 'content': "{'control_character': 'success'}", 'tool_call_id': 'call_0_47f63077-a4a1-4572-8705-4fba016714de'}]
+{'id': '42e45d73-430b-4b29-87ac-11e05e54a016', 'object': 'chat.completion', 'created': 1735551856, 'model': 'deepseek-chat', 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': '好的，我们一起去公园走走吧。公园的景色很美，阳光也很温暖。我们可以在那里散步，放松一下心情。准备好了吗，老师？'}, 'logprobs': None, 'finish_reason': 'stop'}], 'usage': {'prompt_tokens': 2855, 'completion_tokens': 31, 'total_tokens': 2886, 'prompt_cache_hit_tokens': 2752, 'prompt_cache_miss_tokens': 103}, 'system_fingerprint': 'fp_f1afce2943'}
+{'role': 'assistant', 'content': '好的，我们一起去公园走走吧。公园的景色很美，阳光也很温暖。我们可以在那里散步，放松一下心情。准备好了吗，老师？'}
+清空tool数据

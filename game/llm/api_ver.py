@@ -3,7 +3,7 @@ from uuid import uuid4
 import json
 import requests
 import queue
-from typing import Union
+
 
 class Base_llm:
     def __init__(self, 
@@ -66,27 +66,18 @@ class Base_llm:
         self.history_storage = [self.history_storage[0]]
 
     @result_appender  # type: ignore
-    def send(self, messages: Union[dict, list[dict]]):
+    def send(self, messages: dict):
         print(f"send args: {messages}")
         url = f"{self.base_url}/chat/completions"
         with self.client as client:
-            if isinstance(messages, dict):
-                payload = {"model": self.model,
-                        "messages": self.history+[messages]}
-            else:
-                payload = {"model": self.model,
-                        "messages": self.history+messages}
+            payload = {"model": self.model,
+                       "messages": self.history+[messages]}
             if self.tools:
                 payload.update({"tools": self.tools})
             response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
-                if isinstance(messages, dict):
-                    self.history.append(messages)
-                    self.history_storage.append(messages)
-                else:
-                    self.history+=messages
-                    self.history_storage+=messages
-                    
+                self.history.append(messages)
+                self.history_storage.append(messages)
                 result = response.json()
                 print(result)
                 total_tokens = result.get("usage").get("total_tokens")
@@ -106,8 +97,7 @@ class Base_llm:
                             {"role": content.get("role"), "content": content.get("content")})
                 return content
             else:
-                print(response.status_code, response.text)
-                return response.status_code, response.text
+                return response.status_code, response.json()
 
     @result_appender  # type: ignore
     def save(self):
