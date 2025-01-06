@@ -1,30 +1,3 @@
-init 6 python:
-    def play_tts_audio():
-        if renpy.store.tts_audio:
-            renpy.play(AudioData(renpy.store.tts_audio,"wav"),"voice")
-        else:
-            renpy.notify("暂无语音")
-
-    def save_tts_audio():
-        if renpy.store.tts_audio:
-            tts_dir=os.path.join(renpy.config.gamedir,"tts")
-            with open(os.path.join(tts_dir,f"{renpy.store.tts_filename}.wav"),"wb") as file:
-                file.write(renpy.store.tts_audio)
-            renpy.notify("语音已保存")
-        else:
-            renpy.notify("暂无语音")
-
-    def save():
-        if renpy.store.conversation_id:
-            llm.event.put(("save",(renpy.store.conversation_id,)))
-        else:
-            llm.event.put(("save"))
-        while not llm.ready:
-            time.sleep(0.1)
-        renpy.store.conversation_id=llm.result.get()
-        change_title(renpy.store.conversation_id)
-        renpy.notify("保存成功")
-
 screen main_ui:
     frame:
         background None
@@ -61,3 +34,16 @@ screen main_ui:
             add "images/ui/refresh1.png"
             action [Function(llm.clear_history),
                     Notify("历史记录已清除")]
+
+
+screen tts_info:
+    tag menu
+    use game_menu(_("TTS"), scroll="viewport"):
+        add DynamicDisplayable(show_gsv_output)
+
+screen log:
+    tag menu
+    use game_menu(_("日志"), scroll="viewport"):
+        add DynamicDisplayable(show_game_output)
+
+

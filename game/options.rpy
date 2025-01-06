@@ -21,7 +21,7 @@ define gui.show_name = True
 
 ## 游戏版本号。
 
-define config.version = "0.1.0_beta"
+define config.version = "1.0.0_beta"
 
 
 ## 放置在游戏内“关于”屏幕上的文本。将文本放在三个引号之间，并在段落之间留出空
@@ -172,12 +172,23 @@ init python:
     build.classify('**.rpy', None)
     ## 若要封装文件，需将其列为“archive”。
 
-    build.classify('game/**.png', 'archive')
-    build.classify('game/**.jpg', 'archive')
+    build.classify('game/images/emoji/**.png', 'archive')
+    build.classify('game/images/emoji/**.jpg', 'archive')
+    build.classify('game/images/face/**.png', 'archive')
+    build.classify('game/images/face/**.jpg', 'archive')
+    build.classify('game/images/layers/**.png', 'archive')
+    build.classify('game/images/layers/**.jpg', 'archive')
+    build.classify('game/images/ui/**.png', 'archive')
+    build.classify('game/images/ui/**.jpg', 'archive')
+
+    build.classify('game/audio/emotion/**.wav', 'archive')
+    build.classify('game/images/ui/**.jpg', 'archive')
+
     build.classify('**.py', "archive")
     build.classify('**.webm', "archive")
     build.classify('**.rpyc', "archive")
     build.classify('**.ttf', "archive")
+    build.classify('**.otf', "archive")
     ## 匹配为文档模式的文件会在 Mac 应用程序构建中被复制，因此它们同时出现在 APP
     ## 和 ZIP 文件中。
 

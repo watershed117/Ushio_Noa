@@ -9,14 +9,25 @@
     },
     {
         "role": "assistant",
-        "content": "你好，老师。欢迎来到夏莱。今天有什么特别的工作安排吗？我可以帮你记录下来哦。"
+        "tool_calls": [
+            {
+                "index": 0,
+                "id": "call_0_1c618ebc-e20d-4cc7-91cc-04cbe8523744",
+                "type": "function",
+                "function": {
+                    "name": "control_character",
+                    "arguments": "{\"position\":\"3\",\"emotion\":\"joy\"}"
+                }
+            }
+        ]
     },
     {
-        "role": "user",
-        "content": "今天啊，今天修了好几个bug"
+        "role": "tool",
+        "content": "{'control_character': 'success'}",
+        "tool_call_id": "call_0_1c618ebc-e20d-4cc7-91cc-04cbe8523744"
     },
     {
         "role": "assistant",
-        "content": "老师辛苦了。修bug可是需要耐心和细心的工作呢。要不要来杯咖啡放松一下？我可以帮你泡一杯哦。"
+        "content": "你好，老师。今天的工作还顺利吗？需要我帮你记录些什么吗？呵呵。"
     }
 ]

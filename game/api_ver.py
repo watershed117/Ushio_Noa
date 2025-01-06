@@ -4,11 +4,12 @@ import json
 import requests
 import queue
 from typing import Union
+import logging
 
 class Base_llm:
-    def __init__(self, 
+    def __init__(self,
                  api_key: str,
-                 base_url: str="https://open.bigmodel.cn/api/paas/v4",
+                 base_url: str = "https://open.bigmodel.cn/api/paas/v4",
                  model: str = "glm-4-flash",
                  storage: str = "",
                  tools: list = [],
@@ -67,15 +68,15 @@ class Base_llm:
 
     @result_appender  # type: ignore
     def send(self, messages: Union[dict, list[dict]]):
-        print(f"send args: {messages}")
+        logging.info(f"send args: {messages}")
         url = f"{self.base_url}/chat/completions"
         with self.client as client:
             if isinstance(messages, dict):
                 payload = {"model": self.model,
-                        "messages": self.history+[messages]}
+                           "messages": self.history+[messages]}
             else:
                 payload = {"model": self.model,
-                        "messages": self.history+messages}
+                           "messages": self.history+messages}
             if self.tools:
                 payload.update({"tools": self.tools})
             response = client.post(url, json=payload, proxies=self.proxy)
@@ -84,14 +85,14 @@ class Base_llm:
                     self.history.append(messages)
                     self.history_storage.append(messages)
                 else:
-                    self.history+=messages
-                    self.history_storage+=messages
+                    self.history += messages
+                    self.history_storage += messages
 
                 result = response.json()
-                # print(result)
+                # logging.info(result)
                 total_tokens = result.get("usage").get("total_tokens")
                 if total_tokens >= self.max_len:
-                    self.limiter()
+                    self.del_earliest_history()
                 content = result["choices"][0]["message"]
                 if content.get("content") or content.get("tool_calls"):
                     if content.get("tool_calls"):
@@ -106,14 +107,14 @@ class Base_llm:
                             {"role": content.get("role"), "content": content.get("content")})
                 return content
             else:
-                print(response.status_code, response.text)
+                logging.info(response.status_code, response.text)
                 return response.status_code, response.text
 
     @result_appender  # type: ignore
-    def save(self,id: str=""):
+    def save(self, id: str = ""):
         if not id:
             id = str(uuid4())
-        print(os.path.join(self.storage, f"{id}.json"))
+        logging.info(os.path.join(self.storage, f"{id}.json"))
         with open(os.path.join(self.storage, f"{id}.json"), "w", encoding="utf-8") as f:
             json.dump(self.history_storage, f, ensure_ascii=False, indent=4)
         return id
@@ -167,10 +168,13 @@ class Base_llm:
         else:
             return False
 
-    def tokenizer(self, data: list[dict[str, str]]):
-        url = f"{self.base_url}/v4/tokenizer"
+    def tokenizer(self, data: list[dict[str, str]], 
+                  url: str = "https://open.bigmodel.cn/api/paas/v4/tokenizer",
+                  model: str = "glm-4-plus"
+                  ):
+
         with self.client as client:
-            payload = {"model": self.model, "messages": data}
+            payload = {"model": model, "messages": data}
             response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
                 result = response.json()
@@ -178,11 +182,25 @@ class Base_llm:
             else:
                 return response.status_code, response.json()
 
+    def del_earliest_history(self):
+        user_index = -1
+        assistant_index = -1
+
+        for index, message in enumerate(self.history):
+            if message.get("role") == "user" and user_index == -1:
+                user_index = index
+            elif message.get("role") == "assistant" and assistant_index == -1:
+                assistant_index = index
+
+        if user_index != -1 and assistant_index != -1:
+            del self.history[user_index:assistant_index + 1]
+            logging.info("调用限制器")
+
     def limiter(self):
         while True:
             tokens = self.tokenizer(self.history)
             if isinstance(tokens, int) and tokens >= self.max_len:
-                self.history = self.history[:1] + self.history[3:]
+                self.del_earliest_history()
             else:
                 break
 
@@ -190,13 +208,13 @@ class Base_llm:
         if hasattr(self, method_name):
             method = getattr(self, method_name)
             if callable(method):
-                print(f"call method {method_name}")
+                logging.info(f"call method {method_name}")
                 return method(*args, **kwargs)
             else:
-                print(f"{method_name} not callable")
+                logging.info(f"{method_name} not callable")
                 return None
         else:
-            print(f"{method_name} not found")
+            logging.info(f"{method_name} not found")
             return None
 
     def process_event(self, event):
@@ -241,7 +259,7 @@ class Base_llm:
                         for tool in message.get("tool_calls"):  # type: ignore
                             if tool.get("function"):  # type: ignore
                                 if tool.get("function").get("name") == function_name:  # type: ignore
-                                    tools.put(tool.get("function")) # type: ignore
+                                    tools.put(tool.get("function"))# type: ignore
                                     return tools
                                 else:
                                     continue
@@ -279,48 +297,6 @@ class Base_llm:
                 if message.get("content"):
                     return message.get("content")
         return None
-
-
-class DeepSeek(Base_llm):
-    def __init__(self, api_key: str,
-                 model: str = "deepseek-chat",
-                 storage: str = "",
-                 tools: list = [],
-                 system_prompt: str = "",
-                 limit: str = "128k",
-                 proxy: dict = {
-                     'http': 'http://127.0.0.1:7890',
-                     'https': 'http://127.0.0.1:7890',
-                 }
-                 ):
-        super().__init__(base_url="https://api.deepseek.com", api_key=api_key, model=model, storage=storage,
-                         tools=tools, system_prompt=system_prompt, limit=limit, proxy=proxy)
-
-    @Base_llm.result_appender  # type: ignore
-    def list_models(self):
-        url = f"{self.base_url}/models"
-        response = self.client.get(url, proxies=self.proxy)
-        if response.status_code == 200:
-            result = response.json()
-            return result.get("data")
-        else:
-            return response.status_code, response.json()
-
-
-
-
-if __name__ == '__main__':
-    api_key = "sk-63bcccdd316243aeac4e8cc5fcf5d8a1"
-
-    deepseek=DeepSeek(api_key=api_key,
-                      limit="8k",
-                      proxy=None) # type: ignore
-
-    # result = deepseek.list_models()
-    # print(result)
-    result = deepseek.send({"role": "user", "content": "你好"})
-    print(result)
-
 
 if __name__ == "__main__":
     tools = [
@@ -360,12 +336,12 @@ if __name__ == "__main__":
     ]
     with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt", "r", encoding="utf-8") as f:
         prompt = f.read()
-    chat = Base_llm(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
-                   model="glm-4-flash",
-                #    system_prompt=prompt,
-                   storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-                #    tools=tools,
-                   proxy=None) # type: ignore
+    chat = Base_llm(api_key="",
+                    model="glm-4-flash",
+                    #    system_prompt=prompt,
+                    storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+                    #    tools=tools,
+                    proxy=None)  # type: ignore
 
     print(chat.tokenizer([{"role": "user", "content": prompt}]))
     chat.send({"role": "user", "content": "你好"})

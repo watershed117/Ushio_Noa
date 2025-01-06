@@ -1,6 +1,5 @@
 from api_ver import Base_llm
 
-
 class DeepSeek(Base_llm):
     def __init__(self, api_key: str,
                  model: str = "deepseek-chat",
@@ -25,7 +24,6 @@ class DeepSeek(Base_llm):
             return result.get("data")
         else:
             return response.status_code, response.json()
-
 
 if __name__ == '__main__':
     api_key = "sk-63bcccdd316243aeac4e8cc5fcf5d8a1"
@@ -105,25 +103,10 @@ if __name__ == '__main__':
     deepseek = DeepSeek(api_key=api_key,
                         limit="8k",
                         tools=tools,
-                        proxy=None)  # type: ignore
-    import queue
+                        proxy=None,# type: ignore
+                        system_prompt="默认使用中文回复用户")  
+
     # result = deepseek.list_models()
     # print(result)
-    result = deepseek.send({"role": "user", "content": "尝试调用一次两个外部api,在调用完告诉我结果"})
-    print(result)
-    tool_ids = queue.Queue()
-    for tool in result.get("tool_calls"): # type: ignore
-        tool_id = tool.get("id")
-        tool_ids.put(tool_id)
-
-    messages = []
-    while not tool_ids.empty():
-        payload = {
-            "role": "tool",
-            "content": "success",
-            "tool_call_id": tool_ids.get()
-        }
-        messages.append(payload)
-    print(messages)
-    result = deepseek.send(messages)
+    result = deepseek.send({"role":"user","content": "你是deepseek什么版本"})
     print(result)

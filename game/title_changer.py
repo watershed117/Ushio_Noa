@@ -1,5 +1,6 @@
 import ctypes
 from ctypes import wintypes
+import logging
 
 # 定义需要的Windows API函数
 user32 = ctypes.WinDLL('user32', use_last_error=True)
@@ -20,10 +21,10 @@ SetWindowText.restype = wintypes.BOOL
 def set_window_title(hwnd:int, new_title):
     # 设置新标题
     if SetWindowText(hwnd, new_title):
-        print(f"窗口标题已更新为: {new_title}")
+        logging.info(f"窗口标题已更新为: {new_title}")
         return True
     else:
-        print(f"无法更新窗口标题，错误代码: {ctypes.get_last_error()},hwnd:{hwnd}")
+        logging.info(f"无法更新窗口标题，错误代码: {ctypes.get_last_error()},hwnd:{hwnd}")
         return False
 
 

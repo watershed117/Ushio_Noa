@@ -1,20 +1,39 @@
-﻿init 1 python:
+﻿init -999 python:
+    import logging
+
+    class LogCaptureHandler(logging.Handler):
+        def __init__(self):
+            super().__init__()
+            self.logs = []
+
+        def emit(self, record):
+            if len(self.logs) > 1000:
+                self.logs=self.logs[100:]
+            self.logs.append(self.format(record))
+
+    # 创建自定义处理器
+    log_capture_handler = LogCaptureHandler()
+    log_capture_handler.setLevel(logging.DEBUG)  # 设置捕获所有级别的日志
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    log_capture_handler.setFormatter(formatter)
+
+    # 获取根日志记录器并添加处理器
+    root_logger = logging.getLogger("root")
+    root_logger.setLevel(logging.DEBUG)
+    root_logger.addHandler(log_capture_handler)
+
+init 2 python:
     import title_changer
-    # import deepseek
-    # import api_ver
-
-    from llm.api_ver import Base_llm
-    from llm.deepseek import DeepSeek
-
-    import os
-    import game_config
+    from deepseek import DeepSeek
+    from api_ver import Base_llm
+    # import os
     import time
     import queue
-    import json
+    # import json
     import audio_generator
     from io import BytesIO
 
-init 2 python:
+init 3 python:
     dirs=tools_caller.get_dirs(os.path.join(renpy.config.gamedir, "images/background"))
     tools = [
         {
@@ -89,42 +108,60 @@ init 2 python:
             }
         }
     ]
+
+    with open(os.path.join(renpy.config.gamedir,"config.json"), "r", encoding="utf-8") as file:
+        game_config=json.load(file)
+
     storage_dir=os.path.join(renpy.config.gamedir, "history")
-    with open(os.path.join(renpy.config.gamedir,"test.txt"), "r", encoding="utf-8") as file:
+    with open(os.path.join(renpy.config.gamedir,"promot.txt"), "r", encoding="utf-8") as file:
         complex_prompt = file.read()
-    llm = DeepSeek(api_key=game_config.deepseek_api_key, 
+    llm = DeepSeek(api_key=game_config.get("deepseek_api_key"), 
                     storage=storage_dir,
                     system_prompt=complex_prompt, 
                     tools=tools, 
-                    limit=game_config.limit,
-                    proxy=game_config.proxy)
+                    limit=game_config.get("limit"),
+                    proxy=game_config.get("proxy"))
     
     with open(os.path.join(renpy.config.gamedir,"translator.txt"), "r", encoding="utf-8") as file:
         translator_prompt = file.read()
-    translator = Base_llm(api_key=game_config.chatglm_api_key, 
+    translator = Base_llm(api_key=game_config.get("chatglm_api_key"), 
                     storage="",
                     model="glm-4-flash", 
                     system_prompt=translator_prompt, 
-                    limit=game_config.limit,
-                    proxy=game_config.proxy)
+                    limit=game_config.get("limit"),
+                    proxy=game_config.get("proxy"))
 
-    if game_config.tts:
+    if game_config.get("tts"):
+        import subprocess
+        tts_terminal_output=[]
+        def read_output(stream):
+            global tts_terminal_output
+            for line in stream:
+                if len(tts_terminal_output)>1000:
+                    tts_terminal_output=tts_terminal_output[-1000:]
+                tts_terminal_output.append(line.decode("gbk").strip())
+        
+        bat_file_path = os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821","api.bat")
+
+        process = subprocess.Popen(
+            bat_file_path,
+            cwd=os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=False,
+            shell=True,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+        
+        renpy.invoke_in_thread(read_output, process.stdout)
+        renpy.invoke_in_thread(read_output, process.stderr)
+
+        tts_refer=load_gsv_refer()
         tts=audio_generator.Audio_generator()
         renpy.invoke_in_thread(tts.run)
 
-init 3 python:
-    info_path=os.path.join(renpy.config.gamedir, "info.json")
-    def change_title(name:str):
-        hwnd=title_changer.get_all_current_process_window_handles()
-        # if len(hwnd)==1:
-        #     title=title_changer.get_window_title(hwnd[0])
-        #     title_changer.set_window_title(hwnd[0], name)
-        # else:
-        #     print("Error: Multiple windows are open.")
-        #     title=title_changer.get_window_title(hwnd[0])
-        #     title_changer.set_window_title(hwnd[0], name)
-        title_changer.set_window_title(hwnd[0], name)
-
+    else:
+        tts_terminal_output=[]
 init 4 python:
     renpy.invoke_in_thread(llm.run)
     renpy.invoke_in_thread(translator.run)
@@ -135,16 +172,16 @@ init 5 python:
     config.keymap['rollback'].remove('K_AC_BACK')
     config.keymap['rollback'].remove('mousedown_4')
 
-init 6 python:
-    def load(conversation_id:str):
-        llm.event.put(("load",(conversation_id,)))
-        while not llm.ready:
-            renpy.pause(0.1)
-        llm.ready=False
-        conversation_id=llm.result.get()
-        change_title(conversation_id)
-        renpy.store.conversation_id=conversation_id
-        
+    if game_config.get("tts"):
+        while  True:
+            if "INFO:     Uvicorn running on http://127.0.0.1:9880 (Press CTRL+C to quit)" in tts_terminal_output:
+                break
+            time.sleep(0.1)
+        pid=process.pid
+        def close_tts():
+            tts.exit()
+        config.quit_callbacks.append(close_tts)
+
 screen entry():
     python:
         llm.event.put("get_conversations")
@@ -153,14 +190,12 @@ screen entry():
         llm.ready=False
         conversation_list=llm.result.get()
     add "images/ui/ui.png"
-    default conversation_number=len(conversation_list)
     viewport:
         pos(1101,162)
         xsize 800
         ysize 854
         mousewheel True
         scrollbars("vertical")
-
         add "images/ui/frame.png":
             pos (0,0)
         text "{size=32}0{/size}":
@@ -170,11 +205,11 @@ screen entry():
         button:
             pos(582, 8)
             add "images/ui/button.png"
-            # action Function(print, "新建会话")
             action [Function(llm.clear_history),
                     SetVariable("new_conversation",True),
                     Jump("main")]
-        if conversation_number:
+        if conversation_list:
+            $ conversation_number=len(conversation_list)
             #frame
             vbox:
                 pos(0,144)
@@ -201,39 +236,9 @@ screen entry():
                 for n in range(0,conversation_number):
                     button:
                         add "images/ui/button.png"
-                        action [Function(load),
+                        action [Function(load,conversation_list[n].get("id")),
                                 Jump("main")]
                         
-
-default position_map={
-    "1": (0, 200),
-    "2": (300, 200),
-    "3": (600, 200),
-    "4": (900, 200),
-    "5": (1200, 200)
-}
-
-
-# define noa = Character(name="{font=MPLUS1p-Bold.ttf}{color=#ffffff}{size=64}乃愛{/size}{/color}{/font}{font=MPLUS1p-Bold.ttf}{color=#7cd0ff}{size=32}研討會{/size}{/color}{/font}") 
-define noa = Character(name="乃愛 研討會",
-                        # who_size=40,
-                        # who_outlines=[ (1, "#284058", 0, 0 ) ],
-                        # who_color="#ffffff",
-                        # who_font="fonts/MPLUS1p-Bold.ttf",
-                        what_size=32,
-                        what_color="#ffffff",
-                        what_outlines=[ (2, "#284058", 0, 0 ) ],
-                        what_font="fonts/SourceHanSansCN-Bold.otf",
-                        what_yoffset=65,
-                        what_xoffset=-37,
-                        window_background="images/ui/say.png",
-                        window_yoffset=-100) 
-
-# label start:
-#     $ result=tools_caller.control_character("3","joy",action=jump)
-#     noa "[result]"
-#     pause
-
 label start:
     stop music fadeout 1.0
     call screen entry()
@@ -243,19 +248,11 @@ label ready:
     hide loading
     return
 
-default new_conversation=False
-default conversation_id=""
-default tool_call_counts={"control_character":0,"bg_changer":0}
 label main:
     hide screen entry
     show loading
     python:
         if not new_conversation:
-            while not llm.ready:
-                renpy.pause(0.1)
-            llm.ready=False
-            llm.result.get()
-
             latest_message=llm.get_latest_message(llm.history)
             control_recall=llm.latest_tool_recall(llm.history,"control_character")
             bg_recall=llm.latest_tool_recall(llm.history,"bg_changer")
@@ -282,7 +279,7 @@ label main:
         if recall_statue:
             while not recall_data.empty():
                 python:
-                    print("recalling...")
+                    logging.info("recalling...")
                     data=recall_data.get()
                     if data.get("name") in tool_call_counts:
                         renpy.store.tool_call_counts[data.get("name")]+=1
@@ -290,7 +287,7 @@ label main:
                     
     python:
         if recall_statue:
-            print(renpy.store.tool_call_counts)
+            logging.info(renpy.store.tool_call_counts)
             if renpy.store.tool_call_counts.get("control_character")==0:
                 renpy.show_screen("noa_base","3","joy")
             if renpy.store.tool_call_counts.get("bg_changer")==0:
@@ -312,43 +309,37 @@ label main:
     jump main_loop
     return
 
-default reply_ready=False
-default tts_audio=None
-default tts_filename=""
 label message_processor(reply):
     python:
-        print(reply)
+        logging.info(reply)
         tool_statue=False
         tool_data=queue.Queue()
         result_statue=False
         renpy.store.tool_result=queue.Queue()
         tool_id=queue.Queue()
         tts_ready=False
-        print("清空tool数据")
+        logging.info("清空tool数据")
 
     python:
         if reply.get("tool_calls"):
-            print("获取tool参数")
+            logging.info("获取tool参数")
             for tool in reply.get("tool_calls"):
                 tool_id.put(tool.get("id"))
                 function=tool.get("function")
-                print(tool.get("id"))
-                print(function)
                 tool_data.put(function)
             tool_statue=True            
             
     if tool_statue:
-        $ print("调用tool")
         while not tool_data.empty():
             python:
                 data=tool_data.get()
-                print(data)
+                logging.info(f"调用tool:{data}")
                 tools_caller.caller(data)
         $ result_statue=True
 
     python:
         if result_statue:
-            print("获取tool结果")
+            logging.info("获取tool结果")
             result_statue=False
             messages=[]
             while not renpy.store.tool_result.empty():
@@ -366,9 +357,10 @@ label message_processor(reply):
             reply=llm.result.get()
             renpy.store.reply_ready=True
             renpy.jump("main_loop")
+
     python:
         if reply.get("content"):
-            if game_config.tts:
+            if game_config.get("tts"):
                 translator.event.put(("send",({"role":"user","content":reply.get("content")},)))
                 renpy.notify("翻译中")
                 while not translator.ready:
@@ -381,23 +373,24 @@ label message_processor(reply):
                     ja_reply=json.loads(ja_reply.get("content"))
                     ja_load=True
                 except:
-                    print("failed to load json")
+                    logging.info("failed to load json")
                     ja_load=False
                 if ja_load:
                     ja=ja_reply.get("text")
                     emotion=ja_reply.get("emotion")
-                    print(f"ja:{ja}")
-                    print(f"emotion:{emotion}")
+                    logging.info(f"ja:{ja}")
+                    logging.info(f"emotion:{emotion}")
 
-
-                    refer_data = {"refer_wav_path": r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\output\noa\noa_153.wav",
-                                "prompt_text": "それならゆうかちゃんの声が流れる目覚まし時計とかいいかもしれませんね",
-                                "prompt_language": "ja"}
-
-
-                    renpy.notify("合成语音中")
+                    refer = tts_refer.get(emotion)
+                    if not refer:
+                        refer = tts_refer.get("normal")
+                    refer_path=os.path.join(renpy.config.gamedir, "audio", "gsv",refer[0])
+                    refer_text=refer[1]
+                    refer_data={"refer_wav_path": refer_path, "prompt_text": refer_text, "prompt_language": "all_ja"}
+                   
                     tts.event.put(
                         ("gen", {"text": ja, "language": "ja", "refer_data": refer_data}))
+                    renpy.notify("合成语音中")
                     while not tts.ready:
                         renpy.pause(0.1)
                     tts.ready=False
@@ -408,18 +401,16 @@ label message_processor(reply):
                         renpy.notify("合成语音成功")
                     else:
                         tts_ready=False
-                        print(f"语音合成失败: {audio}")
+                        logging.info(f"语音合成失败: {audio}")
                 else:
                     renpy.notify("翻译格式转换失败")
-                    print(f"failed to load json: {ja_reply}")
+                    logging.info(f"failed to load json: {ja_reply}")
                     tts_ready=False
 
             if tts_ready:
                 renpy.play(AudioData(renpy.store.tts_audio,"wav"))
                 renpy.store.tts_filename=reply.get("content")[:10]
             renpy.say(noa,reply.get("content"))
-
-        renpy.jump("main_loop")
 
     return
 

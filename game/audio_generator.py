@@ -18,7 +18,7 @@ class Audio_generator:
         self.result = queue.Queue()
         self.ready = False
 
-    def gen(self, text: str, language: str = "ja", refer_data: dict = {}, cut_method: str = "cut3"):
+    def gen(self, text: str, language: str = "all_ja", refer_data: dict = {}, cut_method: str = "cut3"):
         """
         cut0: 不切
         cut1: 凑四句一切
@@ -139,6 +139,13 @@ class Audio_generator:
             if event:
                 self.process_event(event)
 
+    def exit(self):
+        try:
+            with requests.get(url=f"http://127.0.0.1:{self.port}/exit") as response:
+                pass
+        except:
+            pass
+
 
 if __name__ == "__main__":
     import sounddevice as sd
@@ -147,13 +154,14 @@ if __name__ == "__main__":
     import time
 
     generator = Audio_generator(port=9880)
+    # generator.exit()
     t = threading.Thread(target=generator.run)
     t.start()
-    refer_data = {"refer_wav_path": r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\output\noa\noa_153.wav",
-                  "prompt_text": "それならゆうかちゃんの声が流れる目覚まし時計とかいいかもしれませんね",
+    refer_data = {"refer_wav_path": r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\audio\gsv\434335.ogg",
+                  "prompt_text": "ふふ、この光景、ユウカちゃんにも見せてあげたいです。",
                   "prompt_language": "ja"}
     generator.event.put(
-        ("gen", {"text": "こんにちは、😀どういたしまして？", "language": "ja", "refer_data": refer_data}))
+        ("gen", {"text": "こんにちは、どういたしまして？", "language": "ja", "refer_data": refer_data}))
     while not generator.ready:
         time.sleep(0.1)
     generator.ready = False
@@ -161,3 +169,5 @@ if __name__ == "__main__":
     data, samplerate = sf.read(audio)
     sd.play(data, samplerate)
     sd.wait()
+
+

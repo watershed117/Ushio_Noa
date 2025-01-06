@@ -320,11 +320,15 @@ screen navigation():
 
         else:
 
-            textbutton _("历史") action ShowMenu("history")
+            # textbutton _("历史") action ShowMenu("history")
 
-            textbutton _("保存") action ShowMenu("save")
+            # textbutton _("保存") action ShowMenu("save")
 
-        textbutton _("读取游戏") action ShowMenu("load")
+            textbutton _("TTS") action ShowMenu("tts_info")
+
+            textbutton _("日志") action ShowMenu("log")
+
+        # textbutton _("读取游戏") action ShowMenu("load")
 
         textbutton _("设置") action ShowMenu("preferences")
 

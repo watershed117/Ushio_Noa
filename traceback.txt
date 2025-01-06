@@ -1,38 +1,22 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 336, in script
-    python:
-  File "game/script.rpy", line 337, in <module>
-    if reply.get("tool_calls"):
-AttributeError: 'tuple' object has no attribute 'get'
+  File "game/script.rpy", line 182, in close_tts
+    audio_generator.exit()
+AttributeError: module 'audio_generator' has no attribute 'exit'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 433, in script call
-    python:
-  File "game/script.rpy", line 336, in script
-    python:
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 821, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/script.rpy", line 337, in <module>
-    if reply.get("tool_calls"):
-AttributeError: 'tuple' object has no attribute 'get'
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\bootstrap.py", line 359, in bootstrap
+    renpy.main.main()
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\main.py", line 690, in main
+    i()
+  File "game/script.rpy", line 182, in close_tts
+    audio_generator.exit()
+AttributeError: module 'audio_generator' has no attribute 'exit'
 
 Windows-10-10.0.19041 AMD64
 Ren'Py 8.3.2.24090902
 Ushio_Noa 0.1.0_beta
-Tue Dec 31 02:56:11 2024
+Mon Jan  6 20:17:12 2025
