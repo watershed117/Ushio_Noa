@@ -94,7 +94,7 @@ init 3 python:
             "type": "function",
             "function": {
                 "name": "bg_changer",
-                "description": "chane the background image,use dir_walker to get the file names",
+                "description": "chane the background image,use api 'dir_walker' to get the file names",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -115,7 +115,9 @@ init 3 python:
     storage_dir=os.path.join(renpy.config.gamedir, "history")
     with open(os.path.join(renpy.config.gamedir,"promot.txt"), "r", encoding="utf-8") as file:
         complex_prompt = file.read()
-    llm = DeepSeek(api_key=game_config.get("deepseek_api_key"), 
+    llm = Base_llm( base_url="https://api.deepseek.com",
+                    model="deepseek-chat", 
+                    api_key=game_config.get("deepseek_api_key"), 
                     storage=storage_dir,
                     system_prompt=complex_prompt, 
                     tools=tools, 
@@ -238,10 +240,11 @@ screen entry():
                         add "images/ui/button.png"
                         action [Function(load,conversation_list[n].get("id")),
                                 Jump("main")]
-                        
+          
 label start:
     stop music fadeout 1.0
     call screen entry()
+    return
 
 label ready:
     show ready with CropMove(1.0, "wipedown")
@@ -253,9 +256,9 @@ label main:
     show loading
     python:
         if not new_conversation:
-            latest_message=llm.get_latest_message(llm.history)
-            control_recall=llm.latest_tool_recall(llm.history,"control_character")
-            bg_recall=llm.latest_tool_recall(llm.history,"bg_changer")
+            latest_message=llm.get_latest_message(llm.chat_history)
+            control_recall=llm.latest_tool_recall(llm.chat_history,"control_character")
+            bg_recall=llm.latest_tool_recall(llm.chat_history,"bg_changer")
 
             recall_data=queue.Queue()
             if control_recall and not control_recall.empty():
@@ -318,7 +321,7 @@ label message_processor(reply):
         renpy.store.tool_result=queue.Queue()
         tool_id=queue.Queue()
         tts_ready=False
-        logging.info("清空tool数据")
+        logging.info("开始处理消息")
 
     python:
         if reply.get("tool_calls"):

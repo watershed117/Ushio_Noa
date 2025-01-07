@@ -1,22 +1,37 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 182, in close_tts
-    audio_generator.exit()
-AttributeError: module 'audio_generator' has no attribute 'exit'
+  File "renpy/common/00keymap.rpy", line 504, in script
+    python hide:
+  File "renpy/common/00keymap.rpy", line 504, in <module>
+    python hide:
+  File "renpy/common/00keymap.rpy", line 528, in _execute_python_hide
+    renpy.save("_reload-1", "reload save game")
+TypeError: cannot pickle '_thread.lock' object (perhaps store.tool_result.mutex = <unlocked _thread.lock object at 0x00000000050a3a80>)
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\bootstrap.py", line 359, in bootstrap
-    renpy.main.main()
-  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\main.py", line 690, in main
-    i()
-  File "game/script.rpy", line 182, in close_tts
-    audio_generator.exit()
-AttributeError: module 'audio_generator' has no attribute 'exit'
+  File "renpy/common/00keymap.rpy", line 504, in script
+    python hide:
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\ast.py", line 827, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "renpy/common/00keymap.rpy", line 504, in <module>
+    python hide:
+  File "renpy/common/00keymap.rpy", line 528, in _execute_python_hide
+    renpy.save("_reload-1", "reload save game")
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\loadsave.py", line 436, in save
+    reraise(t, e, tb)
+  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\loadsave.py", line 417, in save
+    dump((roots, renpy.game.log), logf)
+  File "C:\Users\water\Desktop\renpy-8.2.1-sdk\renpy\compat\pickle.py", line 107, in dump
+    pickle.dump(o, f, pickle.HIGHEST_PROTOCOL if highest else PROTOCOL)
+TypeError: cannot pickle '_thread.lock' object (perhaps store.tool_result.mutex = <unlocked _thread.lock object at 0x00000000050a3a80>)
 
 Windows-10-10.0.19041 AMD64
-Ren'Py 8.3.2.24090902
-Ushio_Noa 0.1.0_beta
-Mon Jan  6 20:17:12 2025
+Ren'Py 8.3.4.24120703
+Ushio_Noa 1.0.0_beta
+Tue Jan  7 18:06:49 2025

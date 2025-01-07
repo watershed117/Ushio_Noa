@@ -113,9 +113,13 @@ screen say(who, what):
 
                 else:
                     text who id "who"
-
-        text what id "what":
-            yoffset 10
+        viewport:
+            pos (365, 150)
+            mousewheel True
+            draggable True
+            scrollbars("vertical")
+            text what id "what":
+                yoffset 10
 
 
     ## 如果有对话框头像，会将其显示在文本之上。请不要在手机界面下显示这个，因为

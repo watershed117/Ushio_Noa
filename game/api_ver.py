@@ -5,6 +5,8 @@ import requests
 import queue
 from typing import Union
 import logging
+from requests import RequestException
+
 
 class Base_llm:
     def __init__(self,
@@ -24,8 +26,8 @@ class Base_llm:
         self.model = model
         self.client = requests.Session()
         self.client.headers.update({"Authorization": f"Bearer {api_key}"})
-        self.history = []
-        self.history_storage = []
+        self.chat_history = []
+        self.store_history = []
         self.storage = storage
         self.tools = tools
         self.len_map = {"8k": 8000, "16k": 16000,
@@ -40,8 +42,9 @@ class Base_llm:
         if not self.is_valid_path(storage):
             raise ValueError("storage path is not valid")
         if system_prompt:
-            self.history.append({"role": "system", "content": system_prompt})
-            self.history_storage.append(
+            self.chat_history.append(
+                {"role": "system", "content": system_prompt})
+            self.store_history.append(
                 {"role": "system", "content": system_prompt})
 
     def result_appender(func):  # type: ignore
@@ -63,8 +66,8 @@ class Base_llm:
         return os.path.getctime(file_path)
 
     def clear_history(self):
-        self.history = [self.history[0]]
-        self.history_storage = [self.history_storage[0]]
+        self.chat_history = [self.chat_history[0]]
+        self.store_history = [self.store_history[0]]
 
     @result_appender  # type: ignore
     def send(self, messages: Union[dict, list[dict]]):
@@ -73,42 +76,32 @@ class Base_llm:
         with self.client as client:
             if isinstance(messages, dict):
                 payload = {"model": self.model,
-                           "messages": self.history+[messages]}
+                           "messages": self.chat_history+[messages]}
             else:
                 payload = {"model": self.model,
-                           "messages": self.history+messages}
+                           "messages": self.chat_history+messages}
             if self.tools:
                 payload.update({"tools": self.tools})
             response = client.post(url, json=payload, proxies=self.proxy)
             if response.status_code == 200:
                 if isinstance(messages, dict):
-                    self.history.append(messages)
-                    self.history_storage.append(messages)
+                    self.chat_history.append(messages)
+                    self.store_history.append(messages)
                 else:
-                    self.history += messages
-                    self.history_storage += messages
-
+                    self.chat_history+=messages
+                    self.store_history+=messages
                 result = response.json()
-                # logging.info(result)
                 total_tokens = result.get("usage").get("total_tokens")
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
-                content = result["choices"][0]["message"]
-                if content.get("content") or content.get("tool_calls"):
-                    if content.get("tool_calls"):
-                        self.history.append({"role": content.get(
-                            "role"), "tool_calls": content.get("tool_calls")})
-                        self.history_storage.append(
-                            {"role": content.get("role"), "tool_calls": content.get("tool_calls")})
-                    else:
-                        self.history.append({"role": content.get(
-                            "role"), "content": content.get("content")})
-                        self.history_storage.append(
-                            {"role": content.get("role"), "content": content.get("content")})
-                return content
+                message = result["choices"][0]["message"]
+                self.chat_history.append(message)
+                self.store_history.append(message)
+                return message
             else:
-                logging.info(response.status_code, response.text)
-                return response.status_code, response.text
+                logging.info(f"{response.status_code} {response.text}")
+                print(response.status_code, response.text)
+                return None
 
     @result_appender  # type: ignore
     def save(self, id: str = ""):
@@ -116,15 +109,15 @@ class Base_llm:
             id = str(uuid4())
         logging.info(os.path.join(self.storage, f"{id}.json"))
         with open(os.path.join(self.storage, f"{id}.json"), "w", encoding="utf-8") as f:
-            json.dump(self.history_storage, f, ensure_ascii=False, indent=4)
+            json.dump(self.store_history, f, ensure_ascii=False, indent=4)
         return id
 
     @result_appender  # type: ignore
     def load(self, id: str):
         with open(os.path.join(self.storage, f"{id}.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
-            self.history = data
-            self.history_storage = data
+            self.chat_history = data.copy()
+            self.store_history = data.copy()
             tokens = self.tokenizer(data)
             if isinstance(tokens, int):
                 if tokens >= self.max_len:
@@ -168,7 +161,7 @@ class Base_llm:
         else:
             return False
 
-    def tokenizer(self, data: list[dict[str, str]], 
+    def tokenizer(self, data: list[dict[str, str]],
                   url: str = "https://open.bigmodel.cn/api/paas/v4/tokenizer",
                   model: str = "glm-4-plus"
                   ):
@@ -186,19 +179,19 @@ class Base_llm:
         user_index = -1
         assistant_index = -1
 
-        for index, message in enumerate(self.history):
+        for index, message in enumerate(self.chat_history):
             if message.get("role") == "user" and user_index == -1:
                 user_index = index
             elif message.get("role") == "assistant" and assistant_index == -1:
                 assistant_index = index
 
         if user_index != -1 and assistant_index != -1:
-            del self.history[user_index:assistant_index + 1]
+            del self.chat_history[user_index:assistant_index + 1]
             logging.info("调用限制器")
 
     def limiter(self):
         while True:
-            tokens = self.tokenizer(self.history)
+            tokens = self.tokenizer(self.chat_history)
             if isinstance(tokens, int) and tokens >= self.max_len:
                 self.del_earliest_history()
             else:
@@ -258,7 +251,7 @@ class Base_llm:
                     if message.get("tool_calls"):
                         for tool in message.get("tool_calls"):  # type: ignore
                             if tool.get("function"):  # type: ignore
-                                if tool.get("function").get("name") == function_name:  # type: ignore
+                                if tool.get("function").get("name") == function_name:  # type: ignore                               
                                     tools.put(tool.get("function"))# type: ignore
                                     return tools
                                 else:
@@ -298,56 +291,12 @@ class Base_llm:
                     return message.get("content")
         return None
 
+
 if __name__ == "__main__":
-    tools = [
-        {
-            "type": "function",
-                    "function": {
-                        "name": "control_character",
-                        "description": "控制角色的立绘，表情，动作，特效，在人物情绪变化时调用",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "position": {
-                                    "type": "string",
-                                    "description": "显示立绘的位置，将屏幕水平分为五等份，从左向右位置分别命名为'1'~'5'"
-                                },
-                                "emotion": {
-                                    "type": "string",
-                                    "description": "要显示的立绘的表情，可选'joy','sadness','anger','surprise','fear','disgust','normal','embarrassed'"
-                                },
-                                "emoji": {
-                                    "type": "string",
-                                    "description": "要显示的表情符号动画，可选'angry','bulb','chat','dot','exclaim','heart','music','question','respond','sad','shy','sigh','steam','surprise','sweat','tear','think','twinkle','upset','zzz'"
-                                },
-                                "action": {
-                                    "type": "string",
-                                    "description": "要播放的动作，可选'sightly_down','fall_left','fall_right','jump','jump_more'"
-                                },
-                                "effect": {
-                                    "type": "string",
-                                    "description": "要附加在立绘上的特效，可选'scaleup','hide','holography'"
-                                }
-                            },
-                            "required": ["position", "emotion"]
-                        }
-                    }
-        }
-    ]
-    with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\test.txt", "r", encoding="utf-8") as f:
-        prompt = f.read()
-    chat = Base_llm(api_key="",
-                    model="glm-4-flash",
-                    #    system_prompt=prompt,
+    chat = Base_llm(base_url="https://api.deepseek.com",
+                    model="deepseek-chat",
+                    api_key="",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-                    #    tools=tools,
                     proxy=None)  # type: ignore
 
-    print(chat.tokenizer([{"role": "user", "content": prompt}]))
     chat.send({"role": "user", "content": "你好"})
-    # chat.load("77960e69-e511-4099-be09-8c2515d5d329")
-    # result=chat.latest_tool_recall(chat.history, "bg_changer")
-    # if result:
-    #     while not result.empty():
-    #         data=result.get()
-    #         print(data)
