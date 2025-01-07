@@ -1,6 +1,6 @@
 {
-  "chatglm_api_key": "",
-  "deepseek_api_key": "",
+  "chatglm_api_key": "6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
+  "deepseek_api_key": "sk-63bcccdd316243aeac4e8cc5fcf5d8a1",
   "model": "glm-4-flash",
   "tts": false,
   "limit": "8k",
