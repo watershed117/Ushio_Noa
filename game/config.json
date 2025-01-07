@@ -1,0 +1,11 @@
+{
+  "chatglm_api_key": "",
+  "deepseek_api_key": "",
+  "model": "glm-4-flash",
+  "tts": false,
+  "limit": "8k",
+  "proxy": {
+    "http": null,
+    "https": null
+  }
+}
