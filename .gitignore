@@ -1,10 +1,11 @@
-game/config.json
+/game/config.json
 
-.vscode
-.rpyc
-.rpymc
-game/cache
-game/saves
-errors.txt
-traceback.txt
-log.txt
+/.vscode
+*.rpyc
+*.rpymc
+/game/cache
+/game/saves
+/game/history
+/errors.txt
+/traceback.txt
+/log.txt
