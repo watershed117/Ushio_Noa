@@ -1,1 +1,4 @@
 game/config.json
+.vscode
+.rpyc
+game/saves
