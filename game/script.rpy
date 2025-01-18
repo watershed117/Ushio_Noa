@@ -22,14 +22,31 @@
     root_logger.setLevel(logging.DEBUG)
     root_logger.addHandler(log_capture_handler)
 
+    import os
+    if not os.path.exists(os.path.join(renpy.config.gamedir, "history")):
+        os.makedirs(history_dir)
+    if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")):
+        with open(os.path.join(renpy.config.gamedir,"config.json"), "w", encoding="utf-8") as file:
+            data = {
+                    "chatglm_api_key": "",
+                    "deepseek_api_key": "",
+                    "siliconflow_api_key":"",
+                    "model": "glm-4-flash",
+                    "tts": true,
+                    "limit": "8k",
+                    "proxy": {
+                        "http": null,
+                        "https": null
+                    }
+                }
+            json.dump(data, file, indent=4, ensure_ascii=False)
+            
 init 2 python:
     import title_changer
     from deepseek import DeepSeek
     from api_ver import Base_llm
-    # import os
     import time
     import queue
-    # import json
     import audio_generator
     from io import BytesIO
 
