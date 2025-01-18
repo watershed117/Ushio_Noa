@@ -49,7 +49,6 @@ init 1 python:
 
     def load_gsv_refer():
         refer_path=os.path.join(renpy.config.gamedir,"audio","gsv")
-        print(refer_path)
         with open(os.path.join(refer_path,"config.json"),"r",encoding="utf-8") as file:
             config=json.load(file)
         return config

@@ -21,7 +21,7 @@
 ## 使用说明  
 
 ### 1. 配置 API Key  
-进入 `game` 文件夹，修改配置文件以设置 API Key。  
+进入 `game` 文件夹，修改config.json 配置文件以设置 API Key。  
 
 示例配置文件：  
 ```json
@@ -51,6 +51,39 @@ proxy为代理设置：<br>
 ```
 
 ---
+### 2. 配置 tts 语音合成 
+1.前往<br>
+https://pan.baidu.com/s/1OE5qL0KreO-ASHwm6Zl9gA?pwd=mqpi（度盘要氪超级会员才能满速下载）<br>
+或<br>
+https://drive.uc.cn/s/a1fd91ae0a4f4（uc无需氪金不限速下载）
+下载gpt-sovits整合包<br>
+解压后的文件夹放置于game目录下<br>
+
+2.前往<br>
+https://github.com/watershed117/gsv_files/tree/model<br>
+下载api.bat以及api_v2.py放置于<br>
+例：<br>
+game\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821<br>
+文件夹下
+
+3.前往https://github.com/watershed117/gsv_files/releases/download/model/noa_v2.zip下载noa_v2.zip
+解压后将文件夹放于gpt-sovits包中的对应文件夹
+
+4.配置好后目录结构应为：<br>
+例：<br>
+```plaintext
+game/
+└── GPT-SoVITS-v2-240821/
+    └── GPT-SoVITS-v2-240821/
+        ├── GPT_weights_v2/
+        │   └── noa-e25.ckpt
+        ├── SoVITS_weights_v2/
+        │   └── noa_e25_s950.pth
+        ├── api.bat
+        └── api_v2.py
+```
+
+5.前往game/config.json，将tts设置为true
 
 ## 使用的开源项目  
 本项目基于以下开源项目构建：  

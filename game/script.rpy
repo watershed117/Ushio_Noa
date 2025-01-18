@@ -132,6 +132,14 @@ init 3 python:
                     system_prompt=translator_prompt, 
                     limit=game_config.get("limit"),
                     proxy=game_config.get("proxy"))
+    # translator = Base_llm(base_url="https://api.siliconflow.cn/v1", 
+    #                     # model="Qwen/Qwen2.5-7B-Instruct",
+    #                     model="THUDM/glm-4-9b-chat",
+    #                     api_key=game_config.get("siliconflow_api_key"),
+    #                     limit=game_config.get("limit"),
+    #                     system_prompt=translator_prompt, 
+    #                     storage="",
+    #                     proxy=game_config.get("proxy"))  # type: ignore
 
     if game_config.get("tts"):
         import subprocess
@@ -143,11 +151,13 @@ init 3 python:
                     tts_terminal_output=tts_terminal_output[-1000:]
                 tts_terminal_output.append(line.decode("gbk").strip())
         
-        bat_file_path = os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821","api.bat")
+        # bat_file_path = os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821","api.bat")
+        bat_file_path = r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\api.bat"
 
         process = subprocess.Popen(
             bat_file_path,
-            cwd=os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821"),
+            # cwd=os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821"),
+            cwd=r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=False,
@@ -179,7 +189,6 @@ init 5 python:
             if "INFO:     Uvicorn running on http://127.0.0.1:9880 (Press CTRL+C to quit)" in tts_terminal_output:
                 break
             time.sleep(0.1)
-        pid=process.pid
         def close_tts():
             tts.exit()
         config.quit_callbacks.append(close_tts)
