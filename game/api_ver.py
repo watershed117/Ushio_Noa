@@ -404,7 +404,7 @@ class MessageGenerator:
 if __name__ == "__main__":
     # chat = Base_llm(base_url="https://api.deepseek.com",
     #                 model="deepseek-chat",
-    #                 api_key="sk-63bcccdd316243aeac4e8cc5fcf5d8a1",
+    #                 api_key="",
     #                 storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
     #                 proxy=None)  # type: ignore
 
@@ -415,7 +415,7 @@ if __name__ == "__main__":
 
     chat = Base_llm(base_url="https://gemini.watershed.ip-ddns.com/v1",
                     model="gemini-1.5-flash",
-                    api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
+                    api_key="",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
                     proxy=None)  # type: ignore
