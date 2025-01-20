@@ -1,3 +1,7 @@
+from dataclasses import dataclass, field
+from typing import Dict, List
+import subprocess
+import base64
 import os
 from uuid import uuid4
 import json
@@ -5,7 +9,6 @@ import requests
 import queue
 from typing import Union
 import logging
-from requests import RequestException
 
 
 class Base_llm:
@@ -36,7 +39,7 @@ class Base_llm:
         self.proxy = proxy
 
         self.event = queue.Queue()
-        self.result = queue.Queue(1)
+        
         self.ready = False
 
         if not self.is_valid_path(storage):
@@ -50,9 +53,10 @@ class Base_llm:
     def result_appender(func):  # type: ignore
         def wrapper(self, *args, **kwargs):
             result = func(self, *args, **kwargs)  # type: ignore
+            if not hasattr(self, "result"):
+                return result
             self.result.put(result)
             self.ready = True
-            return result
         return wrapper
 
     def is_valid_path(self, path_str: str):
@@ -66,8 +70,12 @@ class Base_llm:
         return os.path.getctime(file_path)
 
     def clear_history(self):
-        self.chat_history = [self.chat_history[0]]
-        self.store_history = [self.store_history[0]]
+        if self.chat_history and self.chat_history[0].get("role") == "system":
+            self.chat_history = [self.chat_history[0]]
+            self.store_history = [self.store_history[0]]
+        else:
+            self.chat_history = []
+            self.store_history = []
 
     @result_appender  # type: ignore
     def send(self, messages: Union[dict, list[dict]]):
@@ -88,8 +96,8 @@ class Base_llm:
                     self.chat_history.append(messages)
                     self.store_history.append(messages)
                 else:
-                    self.chat_history+=messages
-                    self.store_history+=messages
+                    self.chat_history += messages
+                    self.store_history += messages
                 result = response.json()
                 total_tokens = result.get("usage").get("total_tokens")
                 if total_tokens >= self.max_len:
@@ -238,6 +246,7 @@ class Base_llm:
         return None
 
     def run(self):
+        self.result = queue.Queue(1)
         while True:
             event = self.event.get()
             if event:
@@ -251,8 +260,8 @@ class Base_llm:
                     if message.get("tool_calls"):
                         for tool in message.get("tool_calls"):  # type: ignore
                             if tool.get("function"):  # type: ignore
-                                if tool.get("function").get("name") == function_name:  # type: ignore                               
-                                    tools.put(tool.get("function"))# type: ignore
+                                if tool.get("function").get("name") == function_name:  # type: ignore
+                                    tools.put(tool.get("function")) # type: ignore
                                     return tools
                                 else:
                                     continue
@@ -292,11 +301,136 @@ class Base_llm:
         return None
 
 
+@dataclass
+class File_Format:
+    image: List[str]
+    audio: List[str]
+
+
+ChatGPT = File_Format(image=[".png", ".jpeg", ".jpg", ".webp", ".gif"],
+                      audio=[".wav", ".mp3"]
+                      )
+Gemini = File_Format(
+    image=[".png", ".jpeg", ".jpg", ".webp", ".heic", ".heif"],
+    audio=[".wav", ".mp3", ".aiff", ".aac", ".ogg", ".flac"]
+
+)
+
+
+class MessageGenerator:
+    def __init__(self, format: str = "openai", file_format=ChatGPT, ffmpeg_path: str = "ffmpeg"):
+        self.format = format
+        self.file_format = file_format
+        self.ffmpeg_path = ffmpeg_path
+
+    def get_file_format(self, file_path: str):
+        return os.path.splitext(file_path)[-1].lower()
+
+    def audio_to_base64(self, file_path: str):
+        if self.get_file_format(file_path) not in self.file_format.audio:
+            file_path = self.ffmpeg_convert(file_path, ".wav")
+        with open(file_path, "rb") as audio_file:
+            encoded_string = base64.b64encode(
+                audio_file.read()).decode('utf-8')
+        return encoded_string
+
+    def image_to_base64(self, file_path):
+        if self.get_file_format(file_path) not in self.file_format.image:
+            file_path = self.ffmpeg_convert(file_path, ".png")
+        with open(file_path, "rb") as image_file:
+            encoded_string = base64.b64encode(
+                image_file.read()).decode('utf-8')
+        return encoded_string
+
+    def ffmpeg_convert(self, file_path: str, target_format: str, target_path: str = ""):
+        if not target_path:
+            target_path = file_path.rsplit('.', 1)[0] + target_format
+        else:
+            if not os.path.isfile(target_path):
+                raise ValueError("target_path is not a valid file path")
+        try:
+            process = subprocess.Popen(
+                [self.ffmpeg_path, '-i', file_path, target_path],
+            )
+            process.wait()
+            process.terminate()
+            
+            return target_path
+        except subprocess.CalledProcessError as e:
+            raise ValueError(
+                f"Error converting file {file_path} to {target_format}: {e}")
+            # return False
+
+    def gen_user_msg(self, text: str, file_path: Union[str, list[str]] = ""):
+        if self.format == "openai":
+            payload = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": text},
+                    ],
+                }
+            ]
+            if isinstance(file_path, list):
+                for file in file_path:
+                    if self.get_file_format(file) in self.file_format.image:
+                        payload[0]["content"].append({
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/{self.get_file_format(file)[1:]};base64,"
+                                          + self.image_to_base64(file)},
+                        })
+                    elif self.get_file_format(file) in self.file_format.audio:
+                        payload[0]["content"].append({
+                            "type": "input_audio",
+                        "input_audio": {"data": self.audio_to_base64(file),
+                                        "format": self.get_file_format(file)[1:]}
+                        })
+            else:
+                if self.get_file_format(file_path) in self.file_format.image:
+                    payload[0]["content"].append({
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/{self.get_file_format(file_path)[1:]};base64,"
+                                      + self.image_to_base64(file_path)},
+                    })
+                elif self.get_file_format(file_path) in self.file_format.audio:
+                    payload[0]["content"].append({
+                        "type": "input_audio",
+                        "input_audio": {"data": self.audio_to_base64(file_path),
+                                        "format": self.get_file_format(file_path)[1:]}
+                    })
+            return payload
+
+
 if __name__ == "__main__":
-    chat = Base_llm(base_url="https://api.deepseek.com",
-                    model="deepseek-chat",
-                    api_key="",
+    # chat = Base_llm(base_url="https://api.deepseek.com",
+    #                 model="deepseek-chat",
+    #                 api_key="sk-63bcccdd316243aeac4e8cc5fcf5d8a1",
+    #                 storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+    #                 proxy=None)  # type: ignore
+
+    # result = chat.send({"role": "user", "content": "你好"})
+    # print(result)
+    # result = chat.send({"role": "user", "content": "你好"})
+    # print(result)
+
+    chat = Base_llm(base_url="https://gemini.watershed.ip-ddns.com/v1",
+                    model="gemini-1.5-flash",
+                    api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+                    system_prompt="使用中文回复",
                     proxy=None)  # type: ignore
 
-    chat.send({"role": "user", "content": "你好"})
+    message_generator = MessageGenerator(
+        format="openai", file_format=Gemini, ffmpeg_path="ffmpeg")
+
+    message=message_generator.gen_user_msg("图片里有什么",['C:\\Users\\water\\Desktop\\cover.png'])
+    result = chat.send(messages=message)  # type: ignore
+    print(result)
+
+    chat.clear_history()
+    print("history cleared")
+
+    message = message_generator.gen_user_msg(
+        "将音频转换为文字", [r"D:\storage\Desktop 2024.10.14 - 22.31.37.04.DVR.mp3"])
+    result = chat.send(messages=message)  # type: ignore
+    print(result)
