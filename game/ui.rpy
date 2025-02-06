@@ -32,7 +32,7 @@ screen main_ui:
         button:
             pos (1780,10)
             add "images/ui/refresh1.png"
-            action [Function(llm.clear_history),
+            action [Function(chat.clear_history),
                     Notify("历史记录已清除")]
 
 
@@ -46,4 +46,44 @@ screen log:
     use game_menu(_("日志"), scroll="viewport"):
         add DynamicDisplayable(show_game_output)
 
-
+screen uploaded_file():
+    frame:
+        background None
+        # background Solid("#FFFFFF")
+        pos (0,725)
+        xsize 350
+        ysize 355
+        hbox:
+            spacing 10
+            button:
+                add "images/icon/upload.png"
+                action Function(uploader.add_file)
+        viewport:
+            pos(0,68)
+            xsize 350
+            ysize 287
+            mousewheel True
+            draggable True
+            vbox:
+                spacing 10
+                for file in uploader.files:
+                    hbox:
+                        xsize 350
+                        ysize 48
+                        spacing 10
+                        if uploader.get_file_type(file) == "image":
+                            add "images/icon/image.png"
+                        elif uploader.get_file_type(file) == "audio":
+                            add "images/icon/audio.png"
+                        $ filename=os.path.basename(file)
+                        viewport:
+                            # mousewheel "horizontal"
+                            # draggable True
+                            xsize 220
+                            text "[filename]":
+                                yoffset 3
+                        button:
+                            yoffset -11
+                            xalign 1.0
+                            add "images/icon/del.png"
+                            action Function(uploader.remove_file,file)                         

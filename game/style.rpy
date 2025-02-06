@@ -16,5 +16,8 @@ style speak:
     color "#ffffff"
     font "fonts/SourceHanSansCN-Bold.otf"
 
-style tmp:
-    color "#ff0000"
+style ui_blue:
+    outlines [ (2, "#284058", 0, 0 ) ]
+    size 32
+    color "#7cd0ff"
+    font "fonts/SourceHanSansCN-Bold.otf"

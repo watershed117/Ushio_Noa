@@ -14,10 +14,6 @@ class Audio_generator:
         # self.sovits_path = sovits_path
         self.port = port
 
-        self.event = queue.Queue()
-        self.result = queue.Queue()
-        self.ready = False
-
     def gen(self, text: str, language: str = "all_ja", refer_data: dict = {}, cut_method: str = "cut3"):
         """
         cut0: 不切
@@ -87,57 +83,9 @@ class Audio_generator:
                 audio.write(response.content)
                 audio.seek(0)
                 # self.result.put(audio.getvalue())
-                self.result.put(audio)
-                self.ready = True
+                return audio
             else:
-                self.result.put(response.json())
-                self.ready = True
-
-    def call_method(self, method_name: str, *args, **kwargs):
-        if hasattr(self, method_name):
-            method = getattr(self, method_name)
-            if callable(method):
-                print(f"call method {method_name}")
-                return method(*args, **kwargs)
-            else:
-                print(f"{method_name} not callable")
-                return None
-        else:
-            print(f"{method_name} not found")
-            return None
-
-    def process_event(self, event):
-        """
-        处理事件，根据事件类型调用相应的方法。
-
-        参数:
-            event: 可以是字符串（方法名）或元组 (method_name, args, kwargs)。
-
-        返回:
-            方法调用的结果或 None。
-        """
-        if isinstance(event, str):  # 事件是一个方法名字符串
-            return self.call_method(event)
-        elif isinstance(event, tuple) and len(event) > 0:  # 事件是一个元组
-            method_name = event[0]  # 第一个元素是方法名
-            if len(event) == 1:  # 只有方法名，无参数
-                return self.call_method(method_name)
-            elif len(event) == 2:  # 方法名和参数
-                if isinstance(event[1], dict):  # 第二个元素是字典，作为 kwargs 处理
-                    return self.call_method(method_name, **event[1])
-                elif isinstance(event[1], tuple):  # 第二个元素是元组，作为 args 处理
-                    return self.call_method(method_name, *event[1])
-            elif len(event) == 3:  # 方法名、args 和 kwargs
-                args = event[1] if isinstance(event[1], tuple) else ()
-                kwargs = event[2] if isinstance(event[2], dict) else {}
-                return self.call_method(method_name, *args, **kwargs)
-        return None
-
-    def run(self):
-        while True:
-            event = self.event.get()
-            if event:
-                self.process_event(event)
+                return response.json()
 
     def exit(self):
         try:
@@ -145,29 +93,3 @@ class Audio_generator:
                 pass
         except:
             pass
-
-
-if __name__ == "__main__":
-    import sounddevice as sd
-    import soundfile as sf
-    import threading
-    import time
-
-    generator = Audio_generator(port=9880)
-    # generator.exit()
-    t = threading.Thread(target=generator.run)
-    t.start()
-    refer_data = {"refer_wav_path": r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\audio\gsv\434335.ogg",
-                  "prompt_text": "ふふ、この光景、ユウカちゃんにも見せてあげたいです。",
-                  "prompt_language": "ja"}
-    generator.event.put(
-        ("gen", {"text": "こんにちは、どういたしまして？", "language": "ja", "refer_data": refer_data}))
-    while not generator.ready:
-        time.sleep(0.1)
-    generator.ready = False
-    audio = generator.result.get()
-    data, samplerate = sf.read(audio)
-    sd.play(data, samplerate)
-    sd.wait()
-
-

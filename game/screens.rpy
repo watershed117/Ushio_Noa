@@ -202,6 +202,7 @@ screen input(prompt):
             input id "input":
                 xoffset -35
                 yoffset -65
+    use uploaded_file()
 
 style input_prompt is default
 
