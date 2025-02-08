@@ -71,7 +71,7 @@ class Base_llm:
             self.chat_history = []
             self.store_history = []
 
-    def send(self, messages: Union[dict, list[dict]]):
+    def send(self, messages: Union[dict, list[dict]]) -> dict:
         """
         发送消息到API并获取响应。
 
@@ -472,6 +472,8 @@ class MessageGenerator:
                     raise ValueError(
                         f"file {file_path} format {format} is not supported")
             return payload
+        else:
+            raise ValueError(f"format {self.format} is not supported")
 
 class Gemini(Base_llm):
     def list_models(self):
@@ -495,6 +497,16 @@ class Gemini(Base_llm):
                 error_info = response.text
             raise Exception(f"{response.status_code} : {error_info}")
 
+class DeepSeek(Base_llm):
+    def list_models(self):
+        url = f"{self.base_url}/models"
+        response = self.client.get(url, proxies=self.proxy)
+        if response.status_code == 200:
+            result = response.json()
+            return result.get("data")
+        else:
+            return response.status_code, response.json()
+        
 if __name__ == "__main__":
     # chat = Base_llm(base_url="https://api.deepseek.com",
     #                 model="deepseek-chat",

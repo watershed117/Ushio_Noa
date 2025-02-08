@@ -167,7 +167,6 @@ label message_processor(reply):
         renpy.store.tool_result=queue.Queue()
         tool_id=queue.Queue()
         tts_ready=False
-        root_logger.info("开始处理消息")
 
     python:
         if reply.get("tool_calls"):
@@ -201,7 +200,7 @@ label message_processor(reply):
                 
             eid=eventloop.add_event(chat.send,messages)
             while eventloop.event_results[eid]["status"] == "pending":
-                time.sleep(0.1)
+                renpy.pause(0.1)
             if eventloop.event_results[eid]["status"] == "completed":
                 reply=eventloop.get_event_result(eid).get("result")
             else:
@@ -218,7 +217,7 @@ label message_processor(reply):
                 eid=eventloop.add_event(translator.send,{"role":"user","content":reply.get("content")})
                 renpy.notify("翻译中")
                 while eventloop.event_results[eid]["status"] == "pending":
-                    time.sleep(0.1)
+                    renpy.pause(0.1)
                 if eventloop.event_results[eid]["status"] == "completed":
                     ja_reply=eventloop.get_event_result(eid).get("result")
                 else:
@@ -252,7 +251,7 @@ label message_processor(reply):
                     eid=eventloop.add_event(tts.gen, {"text": ja, "language": "ja", "refer_data": refer_data})
                     renpy.notify("合成语音中")
                     while eventloop.event_results[eid]["status"] == "pending":
-                        time.sleep(0.1)
+                        renpy.pause(0.1)
                     if eventloop.event_results[eid]["status"] == "completed":
                         audio=eventloop.get_event_result(eid).get("result")
                     else:
@@ -293,7 +292,7 @@ label main_loop:
             if message:
                 eid=eventloop.add_event(chat.send,{"role":"user","content":message})
                 while eventloop.event_results[eid]["status"] == "pending":
-                    time.sleep(0.1)
+                    renpy.pause(0.1)
                 if eventloop.event_results[eid]["status"] == "completed":
                     reply=eventloop.get_event_result(eid).get("result")
                 else:

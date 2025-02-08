@@ -89,12 +89,12 @@ screen chat(position,emotion,action=blank,effect=blank,scaleup=blank):
         add "emoji chat" at emoji_chat
     on ("show","replace") action Play("sound","audio/emotion/chat.wav")
 
-screen dot(noa_position,emotion,action=blank,effect=blank,scaleup=blank):
+screen dot(position,emotion,action=blank,effect=blank,scaleup=blank):
     tag emoji
     frame at scaleup,action:
         xsize 754
         ysize 880
-        pos position_map[noa_position]
+        pos position_map[position]
         background None
         if effect=="hide":
             add "ushio_noa black"

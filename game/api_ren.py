@@ -1,5 +1,5 @@
 """renpy
-init 2 python:
+init 0 python:
 """
 import logging
 from api_ver import Base_llm, Gemini
@@ -8,6 +8,75 @@ from audio_generator import Audio_generator
 import os
 import json
 
+class LogCaptureHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.logs = []
+
+    def emit(self, record):
+        if len(self.logs) > 1000:
+            self.logs=self.logs[100:]
+        self.logs.append(self.format(record))
+
+root_logger = setup_logging("root", False)
+root_logger.setLevel(logging.DEBUG)
+log_capture_handler = LogCaptureHandler()
+log_capture_handler.setLevel(logging.DEBUG)
+root_logger.addHandler(log_capture_handler)
+
+class Config:
+    def __init__(self, config_dict):
+        self.chat_model = config_dict.get("chat_model")
+        self.chat_base_url = config_dict.get("chat_base_url")
+        self.chat_api_key = config_dict.get("chat_api_key")
+
+        self.translator_model = config_dict.get("translator_model")
+        self.translator_base_url = config_dict.get("translator_base_url")
+        self.translator_api_key = config_dict.get("translator_api_key")
+
+        self.multimodal_model = config_dict.get("multimodal_model")
+        self.multimodal_base_url = config_dict.get("multimodal_base_url")
+        self.multimodal_api_key = config_dict.get("multimodal_api_key")
+
+        self.proxy = config_dict.get("proxy")
+
+        self.tts = config_dict.get("tts", False)
+        self.limit = config_dict.get("limit", "8k")
+        self.siliconflow_api_key = config_dict.get("siliconflow_api_key")
+
+if not os.path.exists(os.path.join(renpy.config.gamedir, "history")): # type: ignore
+    os.makedirs(os.path.join(renpy.config.gamedir, "history")) # type: ignore
+if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")): # type: ignore
+    with open(os.path.join(renpy.config.gamedir,"config.json"), "w", encoding="utf-8") as file: # type: ignore
+        data = {
+                "chat_model": "deepseek-chat",
+                "chat_base_url": "https://api.deepseek.com",
+                "chat_api_key": "",
+
+                "translator_model": "glm-4-flash",
+                "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
+                "translator_api_key": "",
+
+                "multimodal_model": "gemini-1.5-flash",
+                "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
+                "multimodal_api_key": "",
+
+                "proxy": {
+                    "http": None,
+                    "https": None
+                },
+
+                "tts": False,
+                "limit": "8k",
+                }
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
+with open(os.path.join(renpy.config.gamedir, "config.json"), "r", encoding="utf-8") as file: # type: ignore
+    game_config = Config(json.load(file))
+
+"""renpy
+init 2 python:
+"""
 dirs=tools_caller.get_dirs(os.path.join(renpy.config.gamedir, "images/background")) # type: ignore
 tools = [
     {
@@ -82,55 +151,7 @@ tools = [
         }
     }
 ]
-class Config:
-    def __init__(self, config_dict):
-        self.chat_model = config_dict.get("chat_model")
-        self.chat_base_url = config_dict.get("chat_base_url")
-        self.chat_api_key = config_dict.get("chat_api_key")
 
-        self.translator_model = config_dict.get("translator_model")
-        self.translator_base_url = config_dict.get("translator_base_url")
-        self.translator_api_key = config_dict.get("translator_api_key")
-
-        self.multimodal_model = config_dict.get("multimodal_model")
-        self.multimodal_base_url = config_dict.get("multimodal_base_url")
-        self.multimodal_api_key = config_dict.get("multimodal_api_key")
-
-        self.proxy = config_dict.get("proxy")
-
-        self.tts = config_dict.get("tts", False)
-        self.limit = config_dict.get("limit", "8k")
-        self.siliconflow_api_key = config_dict.get("siliconflow_api_key")
-
-if not os.path.exists(os.path.join(renpy.config.gamedir, "history")): # type: ignore
-    os.makedirs(os.path.join(renpy.config.gamedir, "history")) # type: ignore
-if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")): # type: ignore
-    with open(os.path.join(renpy.config.gamedir,"config.json"), "w", encoding="utf-8") as file: # type: ignore
-        data = {
-                "chat_model": "deepseek-chat",
-                "chat_base_url": "https://api.deepseek.com",
-                "chat_api_key": "",
-
-                "translator_model": "glm-4-flash",
-                "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
-                "translator_api_key": "",
-
-                "multimodal_model": "gemini-1.5-flash",
-                "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
-                "multimodal_api_key": "",
-
-                "proxy": {
-                    "http": None,
-                    "https": None
-                },
-
-                "tts": False,
-                "limit": "8k",
-                }
-        json.dump(data, file, indent=4, ensure_ascii=False)
-
-with open(os.path.join(renpy.config.gamedir, "config.json"), "r", encoding="utf-8") as file: # type: ignore
-    game_config = Config(json.load(file))
 
 with open(os.path.join(renpy.config.gamedir, "promot.txt"), "r", encoding="utf-8") as file: # type: ignore
     complex_prompt = file.read()
@@ -138,12 +159,29 @@ with open(os.path.join(renpy.config.gamedir, "promot.txt"), "r", encoding="utf-8
 with open(os.path.join(renpy.config.gamedir,"translator.txt"), "r", encoding="utf-8") as file: # type: ignore
     translator_prompt = file.read()
 
-chat = Base_llm(api_key=game_config.chat_api_key,
-                base_url=game_config.chat_base_url,
+# chat = Base_llm(api_key=game_config.chat_api_key,
+#                 base_url=game_config.chat_base_url,
+#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
+#                 model=game_config.chat_model, 
+#                 proxy=game_config.proxy,
+#                 system_prompt=complex_prompt,
+#                 tools=tools)
+
+chat = Base_llm(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
+                base_url="https://open.bigmodel.cn/api/paas/v4",
                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-                model=game_config.chat_model, 
+                model="glm-4-flash", 
                 proxy=game_config.proxy,
-                system_prompt=complex_prompt)
+                system_prompt=complex_prompt,
+                tools=tools)
+
+# chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
+#                 base_url="https://api.siliconflow.cn/v1",
+#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
+#                 model="deepseek-ai/DeepSeek-V3", 
+#                 proxy=game_config.proxy,
+#                 system_prompt=complex_prompt,
+#                 tools=tools)
 
 translator = Base_llm(api_key=game_config.translator_api_key, 
                       base_url=game_config.translator_base_url,
@@ -151,29 +189,7 @@ translator = Base_llm(api_key=game_config.translator_api_key,
                       proxy=game_config.proxy,
                       system_prompt=translator_prompt)
 
-multimodal = Gemini(api_key=game_config.multimodal_api_key, 
-                    base_url=game_config.multimodal_base_url,
-                    model=game_config.multimodal_model, 
-                    proxy=game_config.proxy)
-
-eventloop = EventLoop(validate_arguments=False)
 renpy.invoke_in_thread(eventloop.run) # type: ignore
-
-class LogCaptureHandler(logging.Handler):
-    def __init__(self):
-        super().__init__()
-        self.logs = []
-
-    def emit(self, record):
-        if len(self.logs) > 1000:
-            self.logs=self.logs[100:]
-        self.logs.append(self.format(record))
-
-root_logger = setup_logging("root", False)
-root_logger.setLevel(logging.DEBUG)
-log_capture_handler = LogCaptureHandler()
-log_capture_handler.setLevel(logging.DEBUG)
-root_logger.addHandler(log_capture_handler)
 
 tts_terminal_output=[]
 if game_config.tts:

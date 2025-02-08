@@ -3,7 +3,6 @@ init 1 python:
 """
 from api_ver import GEMINI
 import file_upload
-import time
 import title_changer
 import os
 import json
