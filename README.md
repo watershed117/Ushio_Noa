@@ -22,25 +22,35 @@
 
 ### 1. 配置 API Key  
 进入 `game` 文件夹，修改config.json 配置文件以设置 API Key。  
+若不存在config.json，启动一次游戏退出即可。  
 
 示例配置文件：  
 ```json
 {
-  "chatglm_api_key": "***",
-  "deepseek_api_key": "***",
-  "model": "glm-4-flash",
-  "tts": false,
-  "limit": "8k",
+  "chat_model": "deepseek-chat",
+  "chat_base_url": "https://api.deepseek.com",
+  "chat_api_key": "",
+
+  "translator_model": "glm-4-flash",
+  "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
+  "translator_api_key": "",
+
+  "multimodal_model": "gemini-2.0-flash-exp",
+  "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
+  "multimodal_api_key": "",
+
   "proxy": {
     "http": null,
     "https": null
-  }
+  },
+
+  "tts": false,
+  "limit": "8k",
 }
+
 ```
-chatglm_api_key 和 deepseek_api_key 分别为 ChatGlass 和 DeepSeek 的 API Key。  
-model 选项为翻译模型名称，glm-4-flash 为默认模型。  
-tts 选项为是否使用 TTS，false 为不使用。目前不启用tts，暂未嵌入gsv包。  
-limit 选项为上下文长度限制，8k 为默认值。  
+请填写好对应的模型apikey以及接口地址，请参照默认值
+chat_model为对话模型，translator_model为翻译模型，multimodal_model多模态模型  
 proxy为代理设置：<br>
 例如:
 ```json
@@ -49,6 +59,9 @@ proxy为代理设置：<br>
   "https": "http://127.0.0.1:7890"
 }
 ```
+tts 选项为是否使用 TTS，false 为不使用。默认不启用tts，如需启用请参考下方步骤完成配置。  
+limit 选项为上下文长度限制，8k 为默认值。  
+
 
 ---
 ### 2. 配置 tts 语音合成 
