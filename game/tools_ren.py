@@ -5,6 +5,7 @@ import os
 import json
 from api_ver import Gemini, GEMINI, MessageGenerator
 from event_loop import EventLoop
+from renpy.revertable import RevertableList # type: ignore
 
 eventloop = EventLoop(validate_arguments=False)
 
@@ -13,61 +14,6 @@ class Tools:
     def __init__(self):
         self.function_args_data = {}
         self.map_data = {}
-
-        self.args_register("dir_walker", {"dir": str}, ["dir"])
-        self.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
-                           "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
-        self.args_register("bg_changer", {"name": str}, ["name"])
-
-        self.map_register("control_character",
-                          {
-                              "position": {"1": "1",
-                                           "2": "2",
-                                           "3": "3",
-                                           "4": "4",
-                                           "5": "5"},
-                              "emotion": {"joy": "joy",
-                                          "sadness": "sadness",
-                                          "anger": "anger",
-                                          "surprise": "surprise",
-                                          "fear": "fear",
-                                          "disgust": "disgust",
-                                          "embarrassed": "embarrassed",
-                                          "normal": "normal"},
-                              "emoji":  {"angry": "angry",
-                                         "bulb": "bulb",
-                                         "chat": "chat",
-                                         "dot": "dot",
-                                         "exclaim": "exclaim",
-                                         "heart": "heart",
-                                         "music": "music",
-                                         "question": "question",
-                                         "respond": "respond",
-                                         "sad": "sad",
-                                         "shy": "shy",
-                                         "sigh": "sigh",
-                                         "steam": "steam",
-                                         "surprise": "surprise",
-                                         "sweat": "sweat",
-                                         "tear": "tear",
-                                         "think": "think",
-                                         "twinkle": "twinkle",
-                                         "upset": "upset",
-                                         "zzz": "zzz"},
-                              "action": {"blank": blank,  # type: ignore
-                                         "sightly_down": sightly_down,  # type: ignore
-                                         "fall_left": fall_left,  # type: ignore
-                                         "fall_right": fall_right,  # type: ignore
-                                         "jump": jump,  # type: ignore
-                                         "jump_more": jump_more,  # type: ignore
-                                         "shake": shake,  # type: ignore
-                                         "shake_more": shake_more},  # type: ignore
-                              "effect": {"blank": blank,  # type: ignore
-                                         "hide": "hide",
-                                         "holography": "holography"},
-                              "scaleup": {"blank": blank,  # type: ignore
-                                          "scaleup": scaleup}  # type: ignore
-                          })
 
         self.message_generator = MessageGenerator(
             format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
@@ -85,6 +31,7 @@ class Tools:
     def args_check(self, name: str, args: dict):
         if name not in self.function_args_data:
             raise ValueError(f"function {name}'s arguments are not registered")
+        
         missed_required = []
         type_error_args = []
         unexpected_args = []
@@ -94,8 +41,9 @@ class Tools:
         for k, v in args.items():
             if k not in self.function_args_data[name]["args"]:
                 unexpected_args.append(k)
-            if not isinstance(v, self.function_args_data[name]["args"][k]):
-                type_error_args.append(k)
+            expected_type = self.function_args_data[name]["args"][k]
+            if not isinstance(v, expected_type):
+                type_error_args.append(f"{k}: expected {expected_type}, got {type(v)}")
 
         args_error = []
         if len(missed_required) > 0:
@@ -105,7 +53,7 @@ class Tools:
         if len(type_error_args) > 0:
             args_error.append(f"argument type error: {type_error_args}")
         if len(args_error) > 0:
-            error_message = ",".join(args_error)
+            error_message = ", ".join(args_error)
             return error_message
         else:
             return True
@@ -144,6 +92,10 @@ class Tools:
             renpy.store.tool_result.put({"bg_changer": result})  # type: ignore
             return None
 
+        if name == "chat_with_multimodal":
+            if "files" in kwargs:
+                kwargs["files"] = RevertableList(kwargs["files"])
+                
         if hasattr(self, name):  # type: ignore
             if callable(getattr(self, name)):  # type: ignore
                 args_check = self.args_check(name, kwargs)  # type: ignore
@@ -220,26 +172,84 @@ class Tools:
 
     def bg_changer(self, name: str):
         if renpy.loadable("images/background/"+name):  # type: ignore
-            renpy.store.tool_result.put({"bg_changer": "success"}) # type: ignore
-            renpy.call("bg_changer", name)  # type: ignore
-            # renpy.scene() # type: ignore
-            # renpy.show(name.split('/')[1][:-4], at_list=[dissolve_in]) # type: ignore
+            # renpy.store.tool_result.put({"bg_changer": "success"}) # type: ignore
+            # renpy.call("bg_changer", name)  # type: ignore
+            renpy.scene()
+            renpy.show(name.split("/")[1][:-4])
+            renpy.with_statement(dissolve)
             return "success"
         else:
             return "file not found"
 
     def chat_with_multimodal(self, message: str, files: list[str]):
-        messages = self.message_generator.gen_user_msg(message, files)
+        if files:
+            messages = self.message_generator.gen_user_msg(message, files)
+        else:
+            messages = self.message_generator.gen_user_msg(message)
         result = self.multimodal.send(messages)
+        self.multimodal.clear_history()
         return result
 
     def clear_multimodal_history(self):
         self.multimodal.clear_history()
         return "success"
 
-
 tools_caller = Tools()
+tools_caller.args_register("dir_walker", {"dir": str}, ["dir"])
+tools_caller.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
+                    "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
+tools_caller.args_register("bg_changer", {"name": str}, ["name"])
+tools_caller.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"]) 
 
+tools_caller.map_register("control_character",
+                    {
+                        "position": {"1": "1",
+                                    "2": "2",
+                                    "3": "3",
+                                    "4": "4",
+                                    "5": "5"},
+                        "emotion": {"joy": "joy",
+                                    "sadness": "sadness",
+                                    "anger": "anger",
+                                    "surprise": "surprise",
+                                    "fear": "fear",
+                                    "disgust": "disgust",
+                                    "embarrassed": "embarrassed",
+                                    "normal": "normal"},
+                        "emoji":  {"angry": "angry",
+                                    "bulb": "bulb",
+                                    "chat": "chat",
+                                    "dot": "dot",
+                                    "exclaim": "exclaim",
+                                    "heart": "heart",
+                                    "music": "music",
+                                    "question": "question",
+                                    "respond": "respond",
+                                    "sad": "sad",
+                                    "shy": "shy",
+                                    "sigh": "sigh",
+                                    "steam": "steam",
+                                    "surprise": "surprise",
+                                    "sweat": "sweat",
+                                    "tear": "tear",
+                                    "think": "think",
+                                    "twinkle": "twinkle",
+                                    "upset": "upset",
+                                    "zzz": "zzz"},
+                        "action": {"blank": blank,  # type: ignore
+                                    "sightly_down": sightly_down,  # type: ignore
+                                    "fall_left": fall_left,  # type: ignore
+                                    "fall_right": fall_right,  # type: ignore
+                                    "jump": jump,  # type: ignore
+                                    "jump_more": jump_more,  # type: ignore
+                                    "shake": shake,  # type: ignore
+                                    "shake_more": shake_more},  # type: ignore
+                        "effect": {"blank": blank,  # type: ignore
+                                    "hide": "hide",
+                                    "holography": "holography"},
+                        "scaleup": {"blank": blank,  # type: ignore
+                                    "scaleup": scaleup}  # type: ignore
+                    })
 """renpy
 label bg_changer(file_name):
     scene expression "images/background/"+file_name with dissolve

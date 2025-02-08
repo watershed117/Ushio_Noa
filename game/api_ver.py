@@ -78,7 +78,7 @@ class Base_llm:
         :param messages: 要发送的消息，可以是单个消息或消息列表
         :return: API返回的消息
         """
-        logging.info(f"send args: {messages}")
+        # logging.info(f"send args: {messages}")
         url = f"{self.base_url}/chat/completions"
         with self.client as client:
             if isinstance(messages, dict):

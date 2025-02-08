@@ -196,6 +196,7 @@ label message_processor(reply):
                     "content": str(renpy.store.tool_result.get()),
                     "tool_call_id": tool_id.get()
                 }
+                root_logger.info(f"send tool result:{payload}")
                 messages.append(payload)
                 
             eid=eventloop.add_event(chat.send,messages)
@@ -287,9 +288,12 @@ label main_loop:
             if renpy.store.reply_ready:
                 renpy.store.reply_ready=False
                 renpy.call("message_processor",renpy.store.reply)
+            uploader.files=[]
             message=renpy.input("sensei")
 
             if message:
+                if uploader.files:
+                    message=f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
                 eid=eventloop.add_event(chat.send,{"role":"user","content":message})
                 while eventloop.event_results[eid]["status"] == "pending":
                     renpy.pause(0.1)
