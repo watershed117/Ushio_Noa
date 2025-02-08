@@ -174,9 +174,9 @@ class Tools:
         if renpy.loadable("images/background/"+name):  # type: ignore
             # renpy.store.tool_result.put({"bg_changer": "success"}) # type: ignore
             # renpy.call("bg_changer", name)  # type: ignore
-            renpy.scene()
-            renpy.show(name.split("/")[1][:-4])
-            renpy.with_statement(dissolve)
+            renpy.scene() # type: ignore
+            renpy.show(name.split("/")[1][:-4]) # type: ignore
+            renpy.with_statement(dissolve) # type: ignore
             return "success"
         else:
             return "file not found"

@@ -114,13 +114,8 @@ label main:
             if bg_recall:
                 renpy.store.recall_data.put(bg_recall[0])
 
-            if recall_data.empty():
-                recall_statue=False
-            else:
-                recall_statue=True
-
+            recall_statue=True
             renpy.call("ready")
-
         else:
             recall_statue=False
             

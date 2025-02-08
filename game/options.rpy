@@ -21,7 +21,7 @@ define gui.show_name = True
 
 ## 游戏版本号。
 
-define config.version = "1.0.0"
+define config.version = "1.1.0"
 
 
 ## 放置在游戏内“关于”屏幕上的文本。将文本放在三个引号之间，并在段落之间留出空
@@ -170,6 +170,8 @@ init python:
     build.classify('**/#**', None)
     build.classify('**/thumbs.db', None)
     build.classify('**.rpy', None)
+    build.classify('game/config.json', None)
+    build.classify('game/history', None)
     ## 若要封装文件，需将其列为“archive”。
 
     build.classify('game/images/emoji/**.png', 'archive')
