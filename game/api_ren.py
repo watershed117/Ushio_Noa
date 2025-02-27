@@ -1,9 +1,10 @@
 """renpy
+default preferences.gl_framerate = 30
 init 0 python:
 """
 import logging
-from api_ver import Base_llm, Gemini
-from event_loop import EventLoop, setup_logging
+from api_ver import Base_llm
+from event_loop import setup_logging
 from audio_generator import Audio_generator
 import os
 import json

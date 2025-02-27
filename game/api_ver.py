@@ -9,6 +9,37 @@ from typing import Union
 import logging
 import pathlib
 
+class HTTPException(Exception):
+    """
+    自定义异常类，用于处理HTTP请求中非200状态码的情况。
+    
+    属性:
+        status_code (int): HTTP响应状态码。
+        message (str): 异常信息。
+        response (str): HTTP响应内容。
+    """
+    
+    def __init__(self, status_code, response=None, message=None):
+        """
+        初始化异常类。
+        
+        参数:
+            status_code (int): HTTP响应状态码。
+            response (str, optional): HTTP响应内容。默认为 None。
+            message (str, optional): 自定义异常信息。默认为 None。
+        """
+        self.status_code = status_code
+        self.response = response
+        self.message = message or f"HTTP请求失败，状态码: {status_code}"
+        super().__init__(self.message)
+    
+    def __str__(self):
+        """
+        返回异常的字符串表示。
+        """
+        return f"{self.message}\n状态码: {self.status_code}\n响应内容: {self.response}"
+
+
 class Base_llm:
     """
     基础大语言模型类，用于与API进行交互并管理聊天历史记录。
@@ -113,7 +144,7 @@ class Base_llm:
                     error_info = response.json()
                 except Exception:
                     error_info = response.text
-                raise Exception(f"{response.status_code} : {error_info}")
+                raise HTTPException(response.status_code, error_info)
 
     def save(self, id: str = ""):
         """
@@ -495,7 +526,7 @@ class Gemini(Base_llm):
                 error_info = response.json()
             except Exception:
                 error_info = response.text
-            raise Exception(f"{response.status_code} : {error_info}")
+            raise HTTPException(response.status_code, error_info)
 
 class DeepSeek(Base_llm):
     def list_models(self):
