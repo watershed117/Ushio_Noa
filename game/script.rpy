@@ -204,7 +204,6 @@ label message_processor(reply):
                 raise error.get("result")
 
             renpy.store.reply_ready=True
-            renpy.jump("main_loop")
 
     python:
         if reply.get("content"):
@@ -273,8 +272,9 @@ label message_processor(reply):
             if tts_ready:
                 renpy.play(AudioData(renpy.store.tts_audio,"wav"))
                 renpy.store.tts_filename=reply.get("content")[:10]
-            renpy.say(noa,reply.get("content"))
+            renpy.say(noa,reply.get("content")+"{nw}")
 
+    jump main_loop
     return
 
 label main_loop:

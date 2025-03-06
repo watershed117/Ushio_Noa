@@ -155,9 +155,12 @@ class Tools:
                           action: str = "blank",
                           effect: str = "blank",
                           scaleup: str = "blank"):
-        
-        mapped_args = self.map_check("control_character", position=position,
-                                     emotion=emotion, emoji=emoji, action=action, effect=effect, scaleup=scaleup)
+        if emoji:
+            mapped_args = self.map_check("control_character", position=position,
+                                        emotion=emotion, emoji=emoji, action=action, effect=effect, scaleup=scaleup)
+        else:
+            mapped_args = self.map_check("control_character", position=position,
+                                        emotion=emotion, action=action, effect=effect, scaleup=scaleup)
 
         if isinstance(mapped_args, str):
             return mapped_args

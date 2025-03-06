@@ -95,27 +95,33 @@ tools = [
                 "properties": {
                     "position": {
                         "type": "string",
-                        "description": "position of the character, choose from the following:1~5"
+                        "description": "position of the character",
+                        "enum":["1","2","3","4","5"]
                     },
                     "emotion": {
                         "type": "string",
-                        "description": "character's emotion, choose from the following:joy,sadness,anger,surprise,fear,disgust,normal,embarrassed"
+                        "description": "display character's face with emotion",
+                        "enum":["joy","sadness","anger","surprise","fear","disgust","normal","embarrassed"]
                     },
                     "emoji": {
                         "type": "string",
-                        "description": "display an emoji above a character's head or in a chat bubble,choose from the following:angry,bulb,chat,dot,exclaim,heart,music,question,respond,sad,shy,sigh,steam,surprise,sweat,tear,think,twinkle,upset,zzz"
+                        "description": "display an emoji above a character's head or in a chat bubble",
+                        "enum":["angry","bulb","chat","dot","exclaim","heart","music","question","respond","sad","shy","sigh","steam","surprise","sweat","tear","think","twinkle","upset","zzz"]
                     },
                     "action": {
                         "type": "string",
-                        "description": "character's action, choose from the following:sightly_down,fall_left,fall_right,jump,jump_more"
+                        "description": "character's action",
+                        "enum":["sightly_down","fall_left","fall_right","jump","jump_more"]
                     },
                     "effect": {
                         "type": "string",
-                        "description": "character's effect, choose from the following:hide(use hide to hide the character),holography(use when chat through phone)"
+                        "description": "character's effect,use hide to hide the character,use holography when chat through phone",
+                        "enum":["hide","holography"]
                     },
                     "scaleup": {
                         "type": "string",
-                        "description": "scale up the character when approaching the speaker, choose from the following:scaleup"
+                        "description": "scale up the character when approaching the speaker",
+                        "enum":["scaleup"]
                     }
                 },
                 "required": ["position", "emotion"]
@@ -132,7 +138,8 @@ tools = [
                 "properties": {
                     "dir": {
                         "type": "string",
-                        "description": f"directory name, choose from the following:{dirs}",
+                        "description": "directory name",
+                        "enum": dirs
                     }
                 },
                 "required": ["dir"],
@@ -177,17 +184,108 @@ tools = [
             },
         }
     },
-    # {
-    #     "type": "function",
-    #     "function": {
-    #         "name": "clear_multimodal_history",
-    #         "description": "clear the multimodal language model's history",
-    #         "parameters": {
-    #             "type": "object",
-    #             "properties": {}
-    #         }
-    #     }
-    # },
+    {
+        "type": "function",
+        "function": {
+            "name": "end_of_tool_calls",
+            "description": "identifier of the end of the tool_calls, must be the last tool_call",
+        }
+    },
+        {
+            "type": "function",
+            "function": {
+                "name": "query_memory",
+                "description": "query memory of Ushio Noa in RAG, return text, metadata, uuid",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query_text": {
+                            "type": "string",
+                            "description": "the text to query",
+                        },
+                        "top_k": {
+                            "type": "integer",
+                            "description": "the number of results to return",
+                            "default": 1
+                        }
+                    },
+                    "required": ["query_text"]
+                },
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "handle_memory",
+                "description": "handle memory of Ushio Noa in RAG",
+                "parameters": {
+                "type": "object",
+                "properties": {
+                    "method": {
+                    "type": "string",
+                    "description": "how to handle the memory",
+                    "enum": ["store", "query","update", "delete"]
+                    }
+                },
+                "oneOf": [
+                    {
+                    "properties": {
+                        "method": { "const": "store" },
+                        "text": {
+                        "type": "string",
+                        "description": "the text to store"
+                        },
+                        "metadata": {
+                        "type": "object",
+                        "description": "Metadata to associate with the stored text, should be a dictionary"
+                        }
+                    },
+                    "required": ["store_text"]
+                    },
+                    {
+                    "properties": {
+                        "method": { "const": "query" },
+                        "query_text": {
+                        "type": "string",
+                        "description": "text to query"
+                        }
+                    },
+                    "required": ["query_text"]
+                    },
+                    {
+                    "properties": {
+                        "method": { "const": "update" },
+                        "id": {
+                        "type": "string",
+                        "description": "the uuid of the memory to update"
+                        },
+                        "text": {
+                        "type": "string",
+                        "description": "the text to update"
+                        },
+                        "metadata": {
+                        "type": "object",
+                        "description": "Metadata to associate with the updated text, should be a dictionary"
+                            }
+                        },
+                    "required": ["update_id","update_text"]
+                    },
+                    {
+                    "properties": {
+                        "method": { "const": "delete" },
+                        "delete_id": {
+                        "type": "string",
+                        "description": "the uuid of the memory to delete"
+                        }
+                    },
+                    "required": ["delete_id"]
+                    }
+
+                ],
+                "required": ["method"]
+                }
+            }
+        }
 ]
 
 with open(os.path.join(renpy.config.gamedir, "promot.txt"), "r", encoding="utf-8") as file:  # type: ignore
