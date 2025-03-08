@@ -272,7 +272,7 @@ label message_processor(reply):
             if tts_ready:
                 renpy.play(AudioData(renpy.store.tts_audio,"wav"))
                 renpy.store.tts_filename=reply.get("content")[:10]
-            renpy.say(noa,reply.get("content")+"{nw}")
+            renpy.invoke_in_main_thread(renpy.say,"noa",reply.get("content"))
 
     jump main_loop
     return
@@ -284,6 +284,8 @@ label main_loop:
                 renpy.store.reply_ready=False
                 renpy.call("message_processor",renpy.store.reply)
             uploader.files=[]
+            # renpy.end_interaction(None)
+            renpy.hide_screen("say")
             message=renpy.input("sensei")
 
             if message:

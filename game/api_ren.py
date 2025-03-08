@@ -46,6 +46,10 @@ class Config:
 
         self.tts = config_dict.get("tts", False)
         self.limit = config_dict.get("limit", "8k")
+
+        self.gsv_bat_path = config_dict.get("gsv_bat_path")
+        self.gsv_port = config_dict.get("gsv_port")
+        
         self.siliconflow_api_key = config_dict.get("siliconflow_api_key")
 
 
@@ -73,6 +77,9 @@ if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")):  # typ
 
             "tts": False,
             "limit": "8k",
+
+            "gsv_bat_path":"",
+            "gsv_port":9880
         }
         json.dump(data, file, indent=4, ensure_ascii=False)
 
@@ -299,7 +306,7 @@ chat = Base_llm(api_key=game_config.chat_api_key,
                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
                 model=game_config.chat_model,
                 proxy=game_config.proxy,
-                system_prompt=complex_prompt,
+                # system_prompt=complex_prompt,
                 tools=tools)
 
 # chat = Base_llm(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
@@ -338,13 +345,9 @@ if game_config.tts:
                 tts_terminal_output = tts_terminal_output[-1000:]
             tts_terminal_output.append(line.decode("gbk").strip())
 
-    # bat_file_path = os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821","api.bat")
-    bat_file_path = r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821\api.bat"
-
     process = subprocess.Popen(
-        bat_file_path,
-        # cwd=os.path.join(renpy.config.gamedir,"GPT-SoVITS-v2-240821","GPT-SoVITS-v2-240821"),
-        cwd=r"D:\GPT-SoVITS-v2-240821\GPT-SoVITS-v2-240821",
+        game_config.gsv_bat_path,
+        cwd=os.path.dirname(game_config.gsv_bat_path),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=False,
@@ -356,4 +359,4 @@ if game_config.tts:
     renpy.invoke_in_thread(read_output, process.stderr)  # type: ignore
 
     tts_refer = load_gsv_refer()  # type: ignore
-    tts = Audio_generator()
+    tts = Audio_generator(port=game_config.gsv_port)

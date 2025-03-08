@@ -35,17 +35,20 @@
   "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
   "translator_api_key": "",
 
-  "multimodal_model": "gemini-2.0-flash-exp",
+  "multimodal_model": "gemini-1.5-flash",
   "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
   "multimodal_api_key": "",
 
   "proxy": {
-    "http": null,
-    "https": null
+      "http": null,
+      "https": null
   },
 
   "tts": false,
   "limit": "8k",
+  
+  "gsv_bat_path":"",
+  "gsv_port":9880
 }
 
 ```

@@ -193,8 +193,11 @@ class Tools:
         self.multimodal.clear_history()
         return result
 
-    def clear_multimodal_history(self):
-        self.multimodal.clear_history()
+    # def clear_multimodal_history(self):
+    #     self.multimodal.clear_history()
+    #     return "success"
+
+    def end_of_tool_calls(self):
         return "success"
 
 tools_caller = Tools()
@@ -202,7 +205,8 @@ tools_caller.args_register("dir_walker", {"dir": str}, ["dir"])
 tools_caller.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
                     "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
 tools_caller.args_register("bg_changer", {"name": str}, ["name"])
-tools_caller.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"]) 
+tools_caller.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"])
+tools_caller.args_register("end_of_tool_calls", {}, [])
 
 tools_caller.map_register("control_character",
                     {
@@ -253,6 +257,7 @@ tools_caller.map_register("control_character",
                         "scaleup": {"blank": blank,  # type: ignore
                                     "scaleup": scaleup}  # type: ignore
                     })
+
 """renpy
 label bg_changer(file_name):
     scene expression "images/background/"+file_name with dissolve

@@ -133,6 +133,7 @@ class Base_llm:
                     self.store_history += messages
                 result = response.json()
                 total_tokens = result.get("usage").get("total_tokens")
+                print(result.get("usage"))
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
                 message = result["choices"][0]["message"]
