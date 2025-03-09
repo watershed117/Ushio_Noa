@@ -219,13 +219,13 @@ class Base_llm:
                 message_exist = False
                 for message in data:
                     if message.get("role") == "user":
-                        conversations.append({"title": message.get("content")[
+                        conversations.append({"title": message.get("content","")[
                                              :10], "id": pathlib.Path(file_path).name[:-5]})
                         message_exist = True
                         break
                 if not message_exist:
                     conversations.append(
-                        {"title": None, "id": pathlib.Path(file_path).name[:-5]})
+                        {"title": "", "id": pathlib.Path(file_path).name[:-5]})
         return conversations
 
     def delete_conversation(self, id: str):

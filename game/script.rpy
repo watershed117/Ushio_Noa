@@ -100,10 +100,10 @@ label ready:
     return
 
 label main:
-    hide screen entry
-    show loading
     python:
-        if not new_conversation:
+        renpy.hide_screen("entry")
+        renpy.show("loading")
+        if not renpy.store.new_conversation:
             latest_message=chat.get_latest_message(chat.chat_history)
             control_recall=chat.latest_tool_recall(chat.chat_history,"control_character")
             bg_recall=chat.latest_tool_recall(chat.chat_history,"bg_changer")
@@ -114,98 +114,80 @@ label main:
             if bg_recall:
                 renpy.store.recall_data.put(bg_recall[0])
 
-            recall_statue=True
-            renpy.call("ready")
-        else:
-            recall_statue=False
-            
-    if not new_conversation:
-        if recall_statue:
+            renpy.with_statement(None)
+            renpy.show("ready")
+            renpy.with_statement(CropMove(1.0, "wipedown"))
+
             while not recall_data.empty():
-                python:
-                    root_logger.info("recalling...")
-                    data=recall_data.get()
-                    if data.get("name") in tool_call_counts:
-                        renpy.store.tool_call_counts[data.get("name")]+=1
-                    tools_caller.caller(data)
-                    
-    python:
-        if recall_statue:
+                root_logger.info("recalling...")
+                data=recall_data.get()
+                if data.get("name") in tool_call_counts:
+                    renpy.store.tool_call_counts[data.get("name")]+=1
+                tools_caller.caller(data)
+            
             root_logger.info(renpy.store.tool_call_counts)
             if renpy.store.tool_call_counts.get("control_character")==0:
                 renpy.show_screen("noa_base","3","joy")
             if renpy.store.tool_call_counts.get("bg_changer")==0:
                 renpy.call("bg_changer", "office/mainoffice.jpg")
 
-    python:
-        if not new_conversation:
             if latest_message:
                 renpy.say(noa,latest_message)
 
-    python:
-        if new_conversation:
-            new_conversation=False
+        else:
+            renpy.store.new_conversation=False
             renpy.show_screen("noa_base","3","joy")
-            renpy.call("bg_changer", "office/mainoffice.jpg")
+            renpy.with_statement(None)
+            renpy.scene()
+            renpy.show("mainoffice")
+            renpy.with_statement(dissolve)
 
-    hide ready
-    show screen main_ui
-    jump main_loop
-    return
+        renpy.hide("ready")
+        renpy.show_screen("main_ui")
+        renpy.jump("main_loop")
 
 label message_processor(reply):
     python:
         root_logger.info(reply)
-        tool_statue=False
-        tool_data=queue.Queue()
+        tool_ids=[]
+        tool_result=[]
         result_statue=False
-        renpy.store.tool_result=queue.Queue()
-        tool_id=queue.Queue()
         tts_ready=False
 
-    python:
         if reply.get("tool_calls"):
             root_logger.info("获取tool参数")
             for tool in reply.get("tool_calls"):
-                tool_id.put(tool.get("id"))
+                tool_ids.append(tool.get("id"))
                 function=tool.get("function")
-                tool_data.put(function)
-            tool_statue=True            
-            
-    if tool_statue:
-        while not tool_data.empty():
-            python:
-                data=tool_data.get()
-                root_logger.info(f"调用tool:{data}")
-                tools_caller.caller(data)
-        $ result_statue=True
+                root_logger.info(f"调用tool:{function}")
+                renpy.invoke_in_thread(tools_caller.caller,function)
 
-    python:
-        if result_statue:
-            root_logger.info("获取tool结果")
-            result_statue=False
             messages=[]
-            while not renpy.store.tool_result.empty():
-                payload = {
-                    "role": "tool",
-                    "content": str(renpy.store.tool_result.get()),
-                    "tool_call_id": tool_id.get()
-                }
-                root_logger.info(f"send tool result:{payload}")
-                messages.append(payload)
-                
+            for tool_id in tool_ids:
+                while True:
+                    if tools_caller.tool_result.empty():
+                        renpy.pause(0.1)
+                    else:
+                        payload = {
+                            "role": "tool",
+                            "content": str(tools_caller.tool_result.get()),
+                            "tool_call_id": tool_id
+                        }
+                        messages.append(payload)
+                        break
+
+            root_logger.info(f"send tool result:{messages}")   
             eid=eventloop.add_event(chat.send,messages)
             while eventloop.event_results[eid]["status"] == "pending":
                 renpy.pause(0.1)
             if eventloop.event_results[eid]["status"] == "completed":
-                reply=eventloop.get_event_result(eid).get("result")
+                renpy.store.reply=eventloop.get_event_result(eid).get("result")
             else:
                 error=eventloop.get_event_result(eid)
                 raise error.get("result")
 
             renpy.store.reply_ready=True
 
-    python:
         if reply.get("content"):
             if game_config.tts:
                 # 翻译为日语
@@ -272,35 +254,95 @@ label message_processor(reply):
             if tts_ready:
                 renpy.play(AudioData(renpy.store.tts_audio,"wav"))
                 renpy.store.tts_filename=reply.get("content")[:10]
-            renpy.invoke_in_main_thread(renpy.say,"noa",reply.get("content"))
+            # renpy.invoke_in_main_thread(renpy.say,"noa",reply.get("content"))
+            renpy.say(noa,reply.get("content"))
 
     jump main_loop
     return
 
+# label main_loop:
+#     while True:
+#         python:
+#             if renpy.store.reply_ready:
+#                 renpy.store.reply_ready=False
+#                 renpy.call("message_processor",renpy.store.reply)
+#             uploader.files=[]
+#             message=renpy.input("sensei")
+
+#             if message:
+#                 if uploader.files:
+#                     message=f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
+#                 eid=eventloop.add_event(chat.send,{"role":"user","content":message})
+#                 while eventloop.event_results[eid]["status"] == "pending":
+#                     renpy.pause(0.1)
+#                 if eventloop.event_results[eid]["status"] == "completed":
+#                     reply=eventloop.get_event_result(eid).get("result")
+#                 else:
+#                     error=eventloop.get_event_result(eid)
+#                     raise error.get("result")
+
+#                 renpy.call("message_processor",reply)
+#             else:
+#                 renpy.say(noa,"输入不能为空，请重新输入。")
+#     return
+
+# label main_loop:
+#     python: 
+#         while True:
+#             uploader.files=[]
+#             message=renpy.input("sensei")
+#             if message:
+#                 if uploader.files:
+#                     message=f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
+#                 eid=eventloop.add_event(chat.send,{"role":"user","content":message})
+#                 while eventloop.event_results[eid]["status"] == "pending":
+#                     renpy.pause(0.1)
+#                 if eventloop.event_results[eid]["status"] == "completed":
+#                     reply=eventloop.get_event_result(eid).get("result")
+#                 else:
+#                     error=eventloop.get_event_result(eid)
+#                     raise error.get("result")
+#             else:
+#                 renpy.say(noa,"输入不能为空，请重新输入。")
+
+#             # handle_reply(reply)
+#             renpy.invoke_in_thread(handle_reply,reply)
+#             while True:
+#                 if not renpy.store.reply_handle_status:
+#                     renpy.pause(0.1)
+#                 else:
+#                     renpy.store.reply_handle_status=False
+#                     break
+#     return
+
 label main_loop:
-    while True:
-        python:
-            if renpy.store.reply_ready:
-                renpy.store.reply_ready=False
-                renpy.call("message_processor",renpy.store.reply)
+    python:
+        while True:
             uploader.files=[]
-            # renpy.end_interaction(None)
-            renpy.hide_screen("say")
-            message=renpy.input("sensei")
+            # 1. 获取用户输入 (在循环开始时)
+            message = renpy.input("sensei")
 
-            if message:
-                if uploader.files:
-                    message=f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
-                eid=eventloop.add_event(chat.send,{"role":"user","content":message})
-                while eventloop.event_results[eid]["status"] == "pending":
-                    renpy.pause(0.1)
-                if eventloop.event_results[eid]["status"] == "completed":
-                    reply=eventloop.get_event_result(eid).get("result")
-                else:
-                    error=eventloop.get_event_result(eid)
-                    raise error.get("result")
+            # 2. 输入为空的处理
+            if not message:
+                renpy.say(noa, "输入不能为空，请重新输入。")
+                continue  # 跳过本次循环，重新获取输入
 
-                renpy.call("message_processor",reply)
+            # 3. 处理文件上传 (如果存在)
+            if uploader.files:
+                message = f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
+
+            # 4. 发送消息并等待结果
+            eid = eventloop.add_event(chat.send, {"role": "user", "content": message})
+            while eventloop.event_results[eid]["status"] == "pending":
+                renpy.pause(0.1)
+
+            # 5. 处理结果 (成功或失败)
+            if eventloop.event_results[eid]["status"] == "completed":
+                reply = eventloop.get_event_result(eid).get("result")
             else:
-                renpy.say(noa,"输入不能为空，请重新输入。")
+                error = eventloop.get_event_result(eid)
+                raise error.get("result")
+
+            handle_reply(reply)
+
     return

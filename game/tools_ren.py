@@ -6,6 +6,9 @@ import json
 from api_ver import Gemini, GEMINI, MessageGenerator
 from event_loop import EventLoop
 from renpy.revertable import RevertableList # type: ignore
+import queue
+import time
+import ast
 
 eventloop = EventLoop(validate_arguments=False)
 
@@ -21,6 +24,8 @@ class Tools:
                                  base_url=game_config.multimodal_base_url,  # type: ignore
                                  model=game_config.multimodal_model,   # type: ignore
                                  proxy=game_config.proxy)  # type: ignore
+        
+        self.tool_result = queue.Queue()  
 
     def map_register(self, name: str, map_data: dict):
         self.map_data[name] = map_data
@@ -86,11 +91,8 @@ class Tools:
     def caller(self, function_data: dict):
         name = function_data.get("name")
         kwargs = json.loads(function_data.get("arguments"))  # type: ignore
-
-        if name == "bg_changer":
-            result = self.bg_changer(**kwargs)
-            renpy.store.tool_result.put({"bg_changer": result})  # type: ignore
-            return None
+        if isinstance(kwargs, str):
+            kwargs = ast.literal_eval(kwargs)
 
         if name == "chat_with_multimodal":
             if "files" in kwargs:
@@ -101,26 +103,20 @@ class Tools:
                 args_check = self.args_check(name, kwargs)  # type: ignore
                 if args_check is True:
                     executor = getattr(self, name)  # type: ignore
-                    if kwargs:
-                        eid = eventloop.add_event(executor, **kwargs)
-                    else:
-                        eid = eventloop.add_event(executor)
-
-                    while eventloop.event_results[eid]["status"] == "pending":
-                        renpy.pause(0.1)  # type: ignore
-
-                    # 无论是否发生异常都返回结果
-                    result = eventloop.get_event_result(eid).get("result")
-                    renpy.store.tool_result.put(  # type: ignore
+                    try:
+                        result = executor(**kwargs)  # type: ignore
+                    except Exception as e:
+                        result = e
+                    self.tool_result.put(  # type: ignore
                         {name: result})
                 else:
-                    renpy.store.tool_result.put(  # type: ignore
+                    self.tool_result.put(  # type: ignore
                         {name: args_check})
             else:
-                renpy.store.tool_result.put(  # type: ignore
+                self.tool_result.put(  # type: ignore
                     {name: "is not callable"})
         else:
-            renpy.store.tool_result.put(  # type: ignore
+            self.tool_result.put(  # type: ignore
                 {name: "function not found"})
 
     def dir_walker(self, dir: str):
@@ -175,8 +171,6 @@ class Tools:
 
     def bg_changer(self, name: str):
         if renpy.loadable("images/background/"+name):  # type: ignore
-            # renpy.store.tool_result.put({"bg_changer": "success"}) # type: ignore
-            # renpy.call("bg_changer", name)  # type: ignore
             renpy.scene() # type: ignore
             renpy.show(name.split("/")[1][:-4]) # type: ignore
             renpy.with_statement(dissolve) # type: ignore

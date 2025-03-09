@@ -26,7 +26,7 @@ default conversation_id=""
 default tool_call_counts={"control_character":0,"bg_changer":0}
 
 
-default reply_ready=False
-default tool_result=queue.Queue()
 default tts_audio=None
 default tts_filename=""
+
+default reply_handle_status=False

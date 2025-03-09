@@ -6,6 +6,7 @@ import file_upload
 import title_changer
 import os
 import json
+import time
 
 def load_gsv_refer():
     refer_path = os.path.join(renpy.config.gamedir, "audio", "gsv") # type: ignore
@@ -144,4 +145,121 @@ class display_files():
         
 uploader = display_files()
 
+def handle_tool_calls(reply: dict):
+    """
+    处理回复中的 tool 调用。
+    """
+    tool_ids = [tool.get("id") for tool in reply.get("tool_calls", [])] # type: ignore
+    # 并发调用 tool
+    for tool in reply.get("tool_calls", []):# type: ignore
+        function=tool.get("function")
+        root_logger.info(f"调用tool:{function}")# type: ignore
+        tools_caller.caller(function)# type: ignore
+    # 等待所有 tool 调用完成并收集结果
+    messages = []
+    for tool_id in tool_ids:
+        while tools_caller.tool_result.empty(): # type: ignore
+            renpy.pause(0.1)
+        payload = {
+            "role": "tool",
+            "content": str(tools_caller.tool_result.get()),
+            "tool_call_id": tool_id
+        }
+        messages.append(payload)
+    # 将 tool 结果发送回 chat.send
+    eid = eventloop.add_event(chat.send, messages)
+    # 等待消息发送完成
+    while eventloop.event_results[eid]["status"] == "pending": # type: ignore
+        renpy.pause(0.1) 
+    if eventloop.event_results[eid]["status"] == "completed":
+        reply=eventloop.get_event_result(eid).get("result")
+        return reply
+    else:
+        error=eventloop.get_event_result(eid)
+        raise error.get("result")
 
+
+def handle_content(reply: dict):
+    if reply.get("content"):
+        tts_ready=False
+        if game_config.tts: # type: ignore
+            # 翻译为日语
+            eid=eventloop.add_event(translator.send,{"role":"user","content":reply.get("content")}) # type: ignore
+            renpy.notify("翻译中") # type: ignore
+            while eventloop.event_results[eid]["status"] == "pending": # type: ignore
+                renpy.pause(0.1) # type: ignore
+            if eventloop.event_results[eid]["status"] == "completed":
+                ja_reply=eventloop.get_event_result(eid).get("result")
+            else:
+                error=eventloop.get_event_result(eid)
+                raise error.get("result")
+            translator.clear_history()
+            renpy.notify("翻译完成")
+
+            # 加载json格式
+            try:
+                ja_reply=json.loads(ja_reply.get("content"))
+                ja_load=True
+            except:
+                root_logger.info("failed to load json")
+                ja_load=False
+
+            # 获取参考音频
+            if ja_load:
+                ja=ja_reply.get("text")
+                emotion=ja_reply.get("emotion")
+                root_logger.info(f"ja:{ja}")
+                root_logger.info(f"emotion:{emotion}")
+                refer = tts_refer.get(emotion)
+                if not refer:
+                    refer = tts_refer.get("normal")
+                refer_path=os.path.join(renpy.config.gamedir, "audio", "gsv",refer[0])
+                refer_text=refer[1]
+                refer_data={"refer_wav_path": refer_path, "prompt_text": refer_text, "prompt_language": "all_ja"}
+                
+                # 合成语音
+                eid=eventloop.add_event(tts.gen, {"text": ja, "language": "ja", "refer_data": refer_data})
+                renpy.notify("合成语音中")
+                while eventloop.event_results[eid]["status"] == "pending":
+                    renpy.pause(0.1)
+                if eventloop.event_results[eid]["status"] == "completed":
+                    audio=eventloop.get_event_result(eid).get("result")
+                else:
+                    error=eventloop.get_event_result(eid)
+                    raise error.get("result")
+
+                # 判断是否成功
+                if isinstance(audio,BytesIO):
+                    renpy.store.tts_audio=audio.getvalue()
+                    tts_ready=True
+                    renpy.notify("合成语音成功")
+                else:
+                    renpy.notify("合成语音失败")
+                    root_logger.info(f"语音合成失败: {audio}")
+
+            else:
+                renpy.notify("翻译格式转换失败")
+                root_logger.info(f"failed to load json: {ja_reply}")
+
+        # 播放音频+显示消息
+        if tts_ready:
+            renpy.play(AudioData(renpy.store.tts_audio,"wav"))
+            renpy.store.tts_filename=reply.get("content")[:10]
+        renpy.say(noa,reply.get("content"))
+        # renpy.invoke_in_main_thread(renpy.say,noa,reply.get("content"))
+
+def handle_reply(reply: dict):
+    """
+    处理来自聊天系统的回复，包括 tool 调用和内容。
+    """
+    tmp=None
+    # 1. Tool 调用处理
+    if reply.get("tool_calls"):
+        tmp=handle_tool_calls(reply) # 不直接返回，通过queue传递结果
+    # 2. 内容处理
+    if reply.get("content"):
+        handle_content(reply) # 处理内容
+    if tmp:
+        handle_reply(tmp) # 处理子回复
+
+    renpy.store.reply_handle_status = True # 确保主循环能继续

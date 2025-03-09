@@ -154,6 +154,7 @@ class EventLoop:
         """事件循环主逻辑"""
         while True:
             event_id, event = self.event_queue.get()
+            self.logger.debug(f"\n{Fore.BLUE}事件 {event_id} 开始处理: \n{event[0].__name__}\nargs: {event[1]}\nkwargs: {event[2]}{Style.RESET_ALL}")
             try:
                 if event == "stop":
                     # 处理剩余事件

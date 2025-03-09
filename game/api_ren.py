@@ -318,13 +318,13 @@ chat = Base_llm(api_key=game_config.chat_api_key,
 #                 system_prompt=complex_prompt,
 #                 tools=tools)
 
-# chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
-#                 base_url="https://api.siliconflow.cn/v1",
-#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-#                 model="deepseek-ai/DeepSeek-V3",
-#                 proxy=game_config.proxy,
-#                 system_prompt=complex_prompt,
-#                 tools=tools)
+chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
+                base_url="https://api.siliconflow.cn/v1",
+                storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
+                model="Qwen/Qwen2.5-32B-Instruct",
+                proxy=game_config.proxy,
+                # system_prompt=complex_prompt,
+                tools=tools)
 
 translator = Base_llm(api_key=game_config.translator_api_key,
                       base_url=game_config.translator_base_url,
