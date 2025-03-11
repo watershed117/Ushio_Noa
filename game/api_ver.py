@@ -102,14 +102,13 @@ class Base_llm:
             self.chat_history = []
             self.store_history = []
 
-    def send(self, messages: Union[dict, list[dict]]) -> dict:
+    def send(self, messages: Union[dict, list[dict]], **kwargs) -> dict:
         """
         发送消息到API并获取响应。
 
         :param messages: 要发送的消息，可以是单个消息或消息列表
         :return: API返回的消息
         """
-        # logging.info(f"send args: {messages}")
         url = f"{self.base_url}/chat/completions"
         with self.client as client:
             if isinstance(messages, dict):
@@ -120,6 +119,8 @@ class Base_llm:
                            "messages": self.chat_history+messages}
             if self.tools:
                 payload.update({"tools": self.tools})
+            payload.update(kwargs)
+            print(payload)
             try:
                 response = client.post(url, json=payload, proxies=self.proxy)
             except Exception as e:
@@ -553,11 +554,38 @@ if __name__ == "__main__":
 
 #https://r.aya1.de/aya/https/gemini.watershed.ip-ddns.com/v1
 #https://gemini.watershed.ip-ddns.com/v1
-    chat = Gemini(base_url="https://r.aya1.de/aya/https/gemini.watershed.ip-ddns.com/v1",
-                    model="gemini-1.5-flash",
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "agent_commander",
+                "description": "send command to agent with a collection of tools",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "message": {
+                            "type": "string",
+                            "description": "Natural Language message to send to agent",
+                        },
+                        "files": {
+                            "type": "array",
+                            "description": "full file paths",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["message"],
+                },
+            }
+        }
+    ]
+    chat = Gemini(base_url="https://generativelanguage.googleapis.com/v1beta/openai",
+                    model="gemini-2.0-flash",
                     api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
+                    tools=tools,
                     )  # type: ignore
     
     # result = chat.list_models()
@@ -566,8 +594,21 @@ if __name__ == "__main__":
     message_generator = MessageGenerator(
         format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
 
-    message = message_generator.gen_user_msg("分析图片内容", [r"C:\Users\water\Downloads\illust_125655621_20250108_034020.jpg"])
-    result = chat.send(messages=message)  # type: ignore
+    format={
+        "type": "object",
+        "properties": {
+            "text": {
+                "type": "string"
+            },
+            "emotion": {
+                "type": "string"
+            }
+        },
+        "required": ["text", "emotion"]
+    }
+    
+    message = message_generator.gen_user_msg("翻译“你的笑容，照亮了我的世界。”为日语")
+    result = chat.send(messages=message,parsed=format)
     print(result)
 
     # import asyncio

@@ -191,13 +191,6 @@ tools = [
             },
         }
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "end_of_tool_calls",
-            "description": "identifier of the end of the tool_calls, must be the last tool_call",
-        }
-    },
         {
             "type": "function",
             "function": {
@@ -295,7 +288,33 @@ tools = [
         }
 ]
 
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "agent_commander",
+            "description": "send command to agent with a collection of tools",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Natural Language message to send to agent",
+                    },
+                    "files":{
+                        "type": "array",
+                        "description": "full file paths",
+                    }
+                },
+                "required": ["message"],
+            },
+        }
+    }
+]
 with open(os.path.join(renpy.config.gamedir, "promot.txt"), "r", encoding="utf-8") as file:  # type: ignore
+    complex_prompt = file.read()
+
+with open(os.path.join(renpy.config.gamedir, "tmp.txt"), "r", encoding="utf-8") as file:  # type: ignore
     complex_prompt = file.read()
 
 with open(os.path.join(renpy.config.gamedir, "translator.txt"), "r", encoding="utf-8") as file:  # type: ignore
@@ -306,7 +325,7 @@ chat = Base_llm(api_key=game_config.chat_api_key,
                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
                 model=game_config.chat_model,
                 proxy=game_config.proxy,
-                # system_prompt=complex_prompt,
+                system_prompt=complex_prompt,
                 tools=tools)
 
 # chat = Base_llm(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
