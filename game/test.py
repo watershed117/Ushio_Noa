@@ -419,26 +419,25 @@ if __name__ == "__main__":
     error=0
     noexist=0
     for eid in event_ids[:]:
-        event_loop.get_event_result(eid,5)
-        # try:
-        #     result = event_loop.get_event_result(eid,5)
-        #     if result["status"] == "error":
-        #         root_logger.error(f"事件 {eid} 处理失败: {result['result']}")
-        #         error+=1
-        #     else:
-        #         root_logger.debug(f"事件 {eid} 已处理，结果: {result['result']}")
-        #         if result["result"].status_code != 200:
-        #             root_logger.error(f"事件 {eid} 处理失败: {result['result'].status_code}")
-        #             error+=1
-        #     event_ids.remove(eid)  # 移除已处理的事件ID
-        # except TimeoutError:
-        #     root_logger.error(f"事件 {eid} 处理超时")
-        #     event_ids.remove(eid)  # 移除超时的事件ID
-        #     timeout+=1
-        # except EventLoopError as e:
-        #     root_logger.error(f"事件 {eid} 不存在或已被移除: {e}")
-        #     event_ids.remove(eid)  # 从列表中移除无效的任务
-        #     noexist+=1
+        try:
+            result = event_loop.get_event_result(eid,5)
+            if result["status"] == "error":
+                root_logger.error(f"事件 {eid} 处理失败: {result['result']}")
+                error+=1
+            else:
+                root_logger.debug(f"事件 {eid} 已处理，结果: {result['result']}")
+                if result["result"].status_code != 200:
+                    root_logger.error(f"事件 {eid} 处理失败: {result['result'].status_code}")
+                    error+=1
+            event_ids.remove(eid)  # 移除已处理的事件ID
+        except TimeoutError:
+            root_logger.error(f"事件 {eid} 处理超时")
+            event_ids.remove(eid)  # 移除超时的事件ID
+            timeout+=1
+        except EventLoopError as e:
+            root_logger.error(f"事件 {eid} 不存在或已被移除: {e}")
+            event_ids.remove(eid)  # 从列表中移除无效的任务
+            noexist+=1
 
     end = time.monotonic()
     root_logger.info(f"总耗时: {end - start:.4f} 秒")

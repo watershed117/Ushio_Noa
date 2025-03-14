@@ -102,7 +102,7 @@ class Base_llm:
             self.chat_history = []
             self.store_history = []
 
-    def send(self, messages: Union[dict, list[dict]], **kwargs) -> dict:
+    def send(self, messages: Union[dict, list[dict]],usage : bool = False, **kwargs) -> dict|tuple[dict,dict]:
         """
         发送消息到API并获取响应。
 
@@ -120,7 +120,6 @@ class Base_llm:
             if self.tools:
                 payload.update({"tools": self.tools})
             payload.update(kwargs)
-            print(payload)
             try:
                 response = client.post(url, json=payload, proxies=self.proxy)
             except Exception as e:
@@ -134,12 +133,13 @@ class Base_llm:
                     self.store_history += messages
                 result = response.json()
                 total_tokens = result.get("usage").get("total_tokens")
-                print(result.get("usage"))
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
                 message = result["choices"][0]["message"]
                 self.chat_history.append(message)
                 self.store_history.append(message)
+                if usage:
+                    return message,result["usage"]
                 return message
             else:
                 try:
@@ -585,7 +585,7 @@ if __name__ == "__main__":
                     api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
-                    tools=tools,
+                    # tools=tools,
                     )  # type: ignore
     
     # result = chat.list_models()
@@ -594,21 +594,31 @@ if __name__ == "__main__":
     message_generator = MessageGenerator(
         format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
 
-    format={
-        "type": "object",
-        "properties": {
+    response_format={
+        "type": "json_schema",
+        "json_schema": {
+        "schema": {
+            "properties": {
             "text": {
+                # "title": "Text",
                 "type": "string"
             },
             "emotion": {
+                # "title": "Emotion",
                 "type": "string"
-            }
+            },
+            },
+            "required": ["text", "emotion"],
+            # "title": "CalendarEvent",
+            "type": "object",
+            # "additionalProperties": False
         },
-        "required": ["text", "emotion"]
+        # "name": "CalendarEvent",
+        "strict": True
+        }
     }
-    
     message = message_generator.gen_user_msg("翻译“你的笑容，照亮了我的世界。”为日语")
-    result = chat.send(messages=message,parsed=format)
+    result = chat.send(messages=message,response_format=response_format)
     print(result)
 
     # import asyncio
