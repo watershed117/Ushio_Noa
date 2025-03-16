@@ -102,7 +102,7 @@ class Base_llm:
             self.chat_history = []
             self.store_history = []
 
-    def send(self, messages: Union[dict, list[dict]],usage : bool = False, **kwargs) -> dict|tuple[dict,dict]:
+    def send(self, messages: Union[dict, list[dict]],usage : bool = False, **kwargs) -> Union[dict,tuple[dict,dict]]:
         """
         发送消息到API并获取响应。
 

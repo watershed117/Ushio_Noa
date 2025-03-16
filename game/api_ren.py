@@ -4,11 +4,12 @@ init 0 python:
 """
 import logging
 from api_ver import Base_llm
-from event_loop import setup_logging
+from thread_pool import create_logger,EventLoop,EnhancedColoredFormatter
 from audio_generator import Audio_generator
 import os
 import json
 
+eventloop = EventLoop(num_workers=4, logger=True,color=False,result_ttl=600, cleanup_interval=600)
 
 class LogCaptureHandler(logging.Handler):
     def __init__(self):
@@ -18,15 +19,17 @@ class LogCaptureHandler(logging.Handler):
     def emit(self, record):
         if len(self.logs) > 1000:
             self.logs = self.logs[100:]
-        self.logs.append(self.format(record))
+        self.logs.append(eventloop.logger.handlers[0].format(record))
 
-
-root_logger = setup_logging("root", False)
+root_logger = create_logger("Global",False)
 root_logger.setLevel(logging.DEBUG)
-log_capture_handler = LogCaptureHandler()
-log_capture_handler.setLevel(logging.DEBUG)
-root_logger.addHandler(log_capture_handler)
 
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+logging.getLogger("urllib3").propagate = False
+
+log_capture_handler = LogCaptureHandler()
+root_logger.addHandler(log_capture_handler)
+eventloop.logger.addHandler(log_capture_handler)
 
 class Config:
     def __init__(self, config_dict):
@@ -191,126 +194,126 @@ tools = [
             },
         }
     },
-        {
-            "type": "function",
-            "function": {
-                "name": "query_memory",
-                "description": "query memory of Ushio Noa in RAG, return text, metadata, uuid",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "query_text": {
-                            "type": "string",
-                            "description": "the text to query",
-                        },
-                        "top_k": {
-                            "type": "integer",
-                            "description": "the number of results to return",
-                            "default": 1
-                        }
-                    },
-                    "required": ["query_text"]
-                },
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "handle_memory",
-                "description": "handle memory of Ushio Noa in RAG",
-                "parameters": {
-                "type": "object",
-                "properties": {
-                    "method": {
-                    "type": "string",
-                    "description": "how to handle the memory",
-                    "enum": ["store", "query","update", "delete"]
-                    }
-                },
-                "oneOf": [
-                    {
-                    "properties": {
-                        "method": { "const": "store" },
-                        "text": {
-                        "type": "string",
-                        "description": "the text to store"
-                        },
-                        "metadata": {
-                        "type": "object",
-                        "description": "Metadata to associate with the stored text, should be a dictionary"
-                        }
-                    },
-                    "required": ["store_text"]
-                    },
-                    {
-                    "properties": {
-                        "method": { "const": "query" },
-                        "query_text": {
-                        "type": "string",
-                        "description": "text to query"
-                        }
-                    },
-                    "required": ["query_text"]
-                    },
-                    {
-                    "properties": {
-                        "method": { "const": "update" },
-                        "id": {
-                        "type": "string",
-                        "description": "the uuid of the memory to update"
-                        },
-                        "text": {
-                        "type": "string",
-                        "description": "the text to update"
-                        },
-                        "metadata": {
-                        "type": "object",
-                        "description": "Metadata to associate with the updated text, should be a dictionary"
-                            }
-                        },
-                    "required": ["update_id","update_text"]
-                    },
-                    {
-                    "properties": {
-                        "method": { "const": "delete" },
-                        "delete_id": {
-                        "type": "string",
-                        "description": "the uuid of the memory to delete"
-                        }
-                    },
-                    "required": ["delete_id"]
-                    }
+        # {
+        #     "type": "function",
+        #     "function": {
+        #         "name": "query_memory",
+        #         "description": "query memory of Ushio Noa in RAG, return text, metadata, uuid",
+        #         "parameters": {
+        #             "type": "object",
+        #             "properties": {
+        #                 "query_text": {
+        #                     "type": "string",
+        #                     "description": "the text to query",
+        #                 },
+        #                 "top_k": {
+        #                     "type": "integer",
+        #                     "description": "the number of results to return",
+        #                     "default": 1
+        #                 }
+        #             },
+        #             "required": ["query_text"]
+        #         },
+        #     }
+        # },
+        # {
+        #     "type": "function",
+        #     "function": {
+        #         "name": "handle_memory",
+        #         "description": "handle memory of Ushio Noa in RAG",
+        #         "parameters": {
+        #         "type": "object",
+        #         "properties": {
+        #             "method": {
+        #             "type": "string",
+        #             "description": "how to handle the memory",
+        #             "enum": ["store", "query","update", "delete"]
+        #             }
+        #         },
+        #         "oneOf": [
+        #             {
+        #             "properties": {
+        #                 "method": { "const": "store" },
+        #                 "text": {
+        #                 "type": "string",
+        #                 "description": "the text to store"
+        #                 },
+        #                 "metadata": {
+        #                 "type": "object",
+        #                 "description": "Metadata to associate with the stored text, should be a dictionary"
+        #                 }
+        #             },
+        #             "required": ["store_text"]
+        #             },
+        #             {
+        #             "properties": {
+        #                 "method": { "const": "query" },
+        #                 "query_text": {
+        #                 "type": "string",
+        #                 "description": "text to query"
+        #                 }
+        #             },
+        #             "required": ["query_text"]
+        #             },
+        #             {
+        #             "properties": {
+        #                 "method": { "const": "update" },
+        #                 "id": {
+        #                 "type": "string",
+        #                 "description": "the uuid of the memory to update"
+        #                 },
+        #                 "text": {
+        #                 "type": "string",
+        #                 "description": "the text to update"
+        #                 },
+        #                 "metadata": {
+        #                 "type": "object",
+        #                 "description": "Metadata to associate with the updated text, should be a dictionary"
+        #                     }
+        #                 },
+        #             "required": ["update_id","update_text"]
+        #             },
+        #             {
+        #             "properties": {
+        #                 "method": { "const": "delete" },
+        #                 "delete_id": {
+        #                 "type": "string",
+        #                 "description": "the uuid of the memory to delete"
+        #                 }
+        #             },
+        #             "required": ["delete_id"]
+        #             }
 
-                ],
-                "required": ["method"]
-                }
-            }
-        }
+        #         ],
+        #         "required": ["method"]
+        #         }
+        #     }
+        # }
 ]
 
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "agent_commander",
-            "description": "send command to agent with a collection of tools",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "description": "Natural Language message to send to agent",
-                    },
-                    "files":{
-                        "type": "array",
-                        "description": "full file paths",
-                    }
-                },
-                "required": ["message"],
-            },
-        }
-    }
-]
+# tools = [
+#     {
+#         "type": "function",
+#         "function": {
+#             "name": "agent_commander",
+#             "description": "send command to agent with a collection of tools",
+#             "parameters": {
+#                 "type": "object",
+#                 "properties": {
+#                     "message": {
+#                         "type": "string",
+#                         "description": "Natural Language message to send to agent",
+#                     },
+#                     "files":{
+#                         "type": "array",
+#                         "description": "full file paths",
+#                     }
+#                 },
+#                 "required": ["message"],
+#             },
+#         }
+#     }
+# ]
 with open(os.path.join(renpy.config.gamedir, "promot.txt"), "r", encoding="utf-8") as file:  # type: ignore
     complex_prompt = file.read()
 
@@ -337,13 +340,13 @@ chat = Base_llm(api_key=game_config.chat_api_key,
 #                 system_prompt=complex_prompt,
 #                 tools=tools)
 
-chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
-                base_url="https://api.siliconflow.cn/v1",
-                storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-                model="Qwen/Qwen2.5-32B-Instruct",
-                proxy=game_config.proxy,
-                # system_prompt=complex_prompt,
-                tools=tools)
+# chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
+#                 base_url="https://api.siliconflow.cn/v1",
+#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
+#                 model="deepseek-ai/DeepSeek-V3",
+#                 proxy=game_config.proxy,
+#                 # system_prompt=complex_prompt,
+#                 tools=tools)
 
 translator = Base_llm(api_key=game_config.translator_api_key,
                       base_url=game_config.translator_base_url,
@@ -351,7 +354,7 @@ translator = Base_llm(api_key=game_config.translator_api_key,
                       proxy=game_config.proxy,
                       system_prompt=translator_prompt)
 
-renpy.invoke_in_thread(eventloop.run)  # type: ignore
+renpy.invoke_in_thread(eventloop.start)  # type: ignore
 
 tts_terminal_output = []
 if game_config.tts:

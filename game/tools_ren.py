@@ -10,13 +10,12 @@ import queue
 import time
 import ast
 
-eventloop = EventLoop(validate_arguments=False)
-
 
 class Tools:
     def __init__(self):
         self.function_args_data = {}
         self.map_data = {}
+        self.run_in_main = []
 
         self.message_generator = MessageGenerator(
             format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
@@ -32,6 +31,9 @@ class Tools:
 
     def args_register(self, name: str, args: dict[str, type], required: list[str]):
         self.function_args_data[name] = {"args": args, "required": required}
+
+    def run_in_main_register(self, name: str):
+        self.run_in_main.append(name)
 
     def args_check(self, name: str, args: dict):
         if name not in self.function_args_data:
@@ -88,11 +90,25 @@ class Tools:
         else:
             return mapped_args
 
-    def caller(self, function_data: dict):
+    def caller(self, function_data: dict,tool_call_id: str):
         name = function_data.get("name")
-        kwargs = json.loads(function_data.get("arguments"))  # type: ignore
+        try:
+            if function_data.get("arguments"):
+                kwargs = json.loads(function_data.get("arguments"))  # type: ignore
+            else:
+                kwargs = {}
+        except:
+            self.tool_result.put(  # type: ignore
+                {name: "arguments error"})
+            return
+        
         if isinstance(kwargs, str):
-            kwargs = ast.literal_eval(kwargs)
+            try:
+                kwargs = ast.literal_eval(kwargs)
+            except:
+                self.tool_result.put(  # type: ignore
+                    {name: "arguments error"})
+                return
 
         if name == "chat_with_multimodal":
             if "files" in kwargs:
@@ -104,20 +120,28 @@ class Tools:
                 if args_check is True:
                     executor = getattr(self, name)  # type: ignore
                     try:
-                        result = executor(**kwargs)  # type: ignore
+                        if name in self.run_in_main:
+                            # renpy.invoke_in_thread(renpy.invoke_in_thread, executor, **kwargs)  # type: ignore
+                            result = executor(**kwargs)
+                        else:
+                            eid=eventloop.add_event(executor, **kwargs)  # type: ignore
+                            while True:
+                                if eventloop.event_results[eid].get("status")=="pending": # type: ignore
+                                    renpy.pause(0.1)  # type: ignore
+                                else:
+                                    result = eventloop.get_event_result(eid)  # type: ignore
+                                    break
+
                     except Exception as e:
                         result = e
-                    self.tool_result.put(  # type: ignore
-                        {name: result})
+                    self.tool_result.put({"result": {name: result},"tool_call_id":tool_call_id})
                 else:
-                    self.tool_result.put(  # type: ignore
-                        {name: args_check})
+                    self.tool_result.put({"result": {name: args_check},"tool_call_id":tool_call_id})
             else:
-                self.tool_result.put(  # type: ignore
-                    {name: "is not callable"})
+                self.tool_result.put({"result": {name: "is not callable"},"tool_call_id":tool_call_id})
         else:
-            self.tool_result.put(  # type: ignore
-                {name: "function not found"})
+            self.tool_result.put({"result": {name: "function not found"},"tool_call_id":tool_call_id})
+        return
 
     def dir_walker(self, dir: str):
         background_path = os.path.join(
@@ -251,6 +275,8 @@ tools_caller.map_register("control_character",
                         "scaleup": {"blank": blank,  # type: ignore
                                     "scaleup": scaleup}  # type: ignore
                     })
+tools_caller.run_in_main_register("control_character")
+tools_caller.run_in_main_register("bg_changer")
 
 """renpy
 label bg_changer(file_name):

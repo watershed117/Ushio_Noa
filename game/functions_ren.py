@@ -149,23 +149,24 @@ def handle_tool_calls(reply: dict):
     """
     处理回复中的 tool 调用。
     """
-    tool_ids = [tool.get("id") for tool in reply.get("tool_calls", [])] # type: ignore
     # 并发调用 tool
     for tool in reply.get("tool_calls", []):# type: ignore
         function=tool.get("function")
+        tool_id=tool.get("id")
         root_logger.info(f"调用tool:{function}")# type: ignore
-        tools_caller.caller(function)# type: ignore
+        tools_caller.caller(function,tool_id)# type: ignore
     # 等待所有 tool 调用完成并收集结果
     messages = []
-    for tool_id in tool_ids:
-        while tools_caller.tool_result.empty(): # type: ignore
-            renpy.pause(0.1)
-        payload = {
-            "role": "tool",
-            "content": str(tools_caller.tool_result.get()),
-            "tool_call_id": tool_id
-        }
-        messages.append(payload)
+
+    while tools_caller.tool_result.empty(): # type: ignore
+        renpy.pause(0.1)
+    data=tools_caller.tool_result.get()
+    payload = {
+        "role": "tool",
+        "content": str(data.get("result")).replace("\\'", "'"),
+        "tool_call_id": data.get("tool_call_id")
+    }
+    messages.append(payload)
     # 将 tool 结果发送回 chat.send
     eid = eventloop.add_event(chat.send, messages)
     # 等待消息发送完成

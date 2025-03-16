@@ -4,7 +4,6 @@ import threading
 import time
 import logging
 from typing import Any, Callable, Dict, Optional, List
-from pydantic import validate_call, ValidationError
 from colorama import Fore, Style, init
 from datetime import datetime, timedelta
 from itertools import count
@@ -61,7 +60,68 @@ class LogFilter(logging.Filter):
             elif isinstance(value, str) and not value.strip():
                 setattr(record, field, "")
         return True
+    
+class EnhancedPlainTextFormatter(logging.Formatter):
+    """智能日志格式化器，自动隐藏空字段且无颜色格式"""
+    
+    def __init__(self, max_exc_len: int = 1000, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.empty_checker = LogFilter()
+        self.max_exc_len = max_exc_len
 
+    def format(self, record: logging.LogRecord) -> str:
+        # 应用过滤器清理空字段
+        self.empty_checker.filter(record)
+
+        # 构建基础信息
+        time_str = self.formatTime(record, self.datefmt)
+        level_str = record.levelname
+        name_str = record.name
+
+        # 智能字段组装
+        parts = []
+        
+        # 事件ID
+        event_id = getattr(record, 'event_id', '')
+        if event_id:
+            parts.append(f"[EVENT {event_id}]")
+
+        # 函数信息
+        func_name = getattr(record, 'func_name', '')
+        func_args = getattr(record, 'func_args', ())
+        func_kwargs = getattr(record, 'func_kwargs', {})
+
+        if func_name:
+            # 构建参数表示
+            args_str = ""
+            if func_args:
+                args_str += f"{func_args}"
+            if func_kwargs:
+                args_str += (", " if args_str else "") + f"{func_kwargs}"
+            
+            func_str = func_name
+            if args_str:
+                func_str += f"({args_str})"
+            parts.append(func_str)
+
+        # 原始消息
+        msg = record.getMessage().strip()
+        if msg:
+            # 处理多行消息
+            if '\n' in msg and parts:
+                msg = "\n  " + msg.replace('\n', '\n  ')
+            parts.append(msg)
+
+        # 组合日志行
+        log_line = f"{time_str} | {level_str} | {name_str} | {' | '.join(parts)}"
+
+        # 异常信息
+        if record.exc_info:
+            exc_text = self.formatException(record.exc_info)
+            log_line += f"\n{exc_text[:self.max_exc_len]}"
+
+        return log_line
+    
 class EnhancedColoredFormatter(logging.Formatter):
     """智能日志格式化器，自动隐藏空字段"""
     COLOR_MAP = {
@@ -139,16 +199,21 @@ class EnhancedColoredFormatter(logging.Formatter):
 
         return log_line
 
-def create_logger(name: str) -> logging.Logger:
+def create_logger(name: str,color: bool = True) -> logging.Logger:
     """创建优化后的日志记录器"""
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
     
     handler = logging.StreamHandler()
-    handler.setFormatter(EnhancedColoredFormatter(
-        datefmt="%Y-%m-%d %H:%M:%S"
-    ))
+    if color:
+        handler.setFormatter(EnhancedColoredFormatter(
+            datefmt="%Y-%m-%d %H:%M:%S"
+        ))
+    else:
+        handler.setFormatter(EnhancedPlainTextFormatter(
+            datefmt="%Y-%m-%d %H:%M:%S"
+        ))
     
     logger.addHandler(handler)
     logger.addFilter(LogFilter())
@@ -168,17 +233,15 @@ class MethodNotFoundError(EventLoopError):
         self.method_name = method_name
 
 class EventLoop:
-    def __init__(self, num_workers: Optional[int] = None, validate_args: bool = True, logger:bool = True,result_ttl: int = 600,cleanup_interval: int = 600):
+    def __init__(self, num_workers: Optional[int] = None, logger:bool = True,color:bool = True,result_ttl: int = 600,cleanup_interval: int = 600):
         self.event_results = {}
         self.event_queue = queue.Queue()
         
-        self.logger = create_logger("EventLoop")
+        self.logger = create_logger("EventLoop",color=color)
         if logger:
             self.logger.setLevel(logging.DEBUG)
         else:
             self.logger.setLevel(logging.ERROR)
-
-        self.validate_args = validate_args
 
         self.lock = threading.RLock()
 
@@ -274,25 +337,10 @@ class EventLoop:
         """调用函数并处理异常及参数验证"""
         if not callable(func):
             raise TypeError(f"传入的对象 {func} 不可调用")
-        if self.validate_args:
-            try:
-                validated_func = validate_call(func)
-                return validated_func(*args, **kwargs)
-            except ValidationError as e:
-                error_messages = []
-                for error in e.errors():
-                    loc = error.get("loc", ())
-                    param_name = loc[-1] if loc else "未知参数"
-                    msg = f"参数 '{param_name}': {error['msg']}"
-                    error_messages.append(msg)
-                raise InvalidArgumentsError(func.__name__, error_messages)
-            except Exception as e:
-                raise e
-        else:
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                raise e
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            raise e
 
     def process_event(self, event: Any) -> Any:
         """处理事件并返回结果或异常字典"""
@@ -355,7 +403,7 @@ class EventLoop:
             else:
                 self.event_results[event_id].update({"status": "completed", "result": result})
                 self.logger.info(
-                    "任务执行完成",
+                    f"任务执行完成，结果:{result}",
                     extra={
                         "event_id": str(event_id),
                         "func_name": "EventLoop._update_event_result",
@@ -390,7 +438,7 @@ if __name__ == "__main__":
             return None
 
     test_instance = Test()
-    event_loop = EventLoop(num_workers=2, validate_args=False, logger=False,result_ttl=30, cleanup_interval=30)  # 使用线程池版本
+    event_loop = EventLoop(num_workers=2,logger=False,result_ttl=30, cleanup_interval=30)  # 使用线程池版本
     t=threading.Thread(target=event_loop.start)  # 启动线程池
     t.start()
     
