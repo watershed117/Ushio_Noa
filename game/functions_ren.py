@@ -262,5 +262,3 @@ def handle_reply(reply: dict):
         handle_content(reply) # 处理内容
     if tmp:
         handle_reply(tmp) # 处理子回复
-
-    renpy.store.reply_handle_status = True # 确保主循环能继续

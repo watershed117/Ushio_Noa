@@ -5,7 +5,7 @@ import base64
 from uuid import uuid4
 import json
 import requests
-from typing import Union
+from typing import Union,Callable
 import logging
 import pathlib
 
@@ -52,6 +52,7 @@ class Base_llm:
     :param system_prompt: 系统提示，默认为空
     :param limit: 聊天记录的最大长度限制，默认为"128k"
     :param proxy: 代理设置，默认为本地代理
+    :param tool_collection: 一个tool集合的类对象实例，类方法需要和tools入参中定义的函数名一致
     """
     def __init__(self,
                  api_key: str,
@@ -65,6 +66,7 @@ class Base_llm:
                      'http': 'http://127.0.0.1:7890',
                      'https': 'http://127.0.0.1:7890',
                  },
+                 tool_collection: object = None
                  ):
         self.base_url = base_url
         self.model = model
@@ -84,6 +86,7 @@ class Base_llm:
                         "32k": 32000, "64k": 64000, "128k": 128000}
         self.max_len = self.len_map.get(limit, 128000)
         self.proxy = proxy
+        self.tool_collection = tool_collection
 
         if system_prompt:
             self.chat_history.append(
@@ -102,7 +105,7 @@ class Base_llm:
             self.chat_history = []
             self.store_history = []
 
-    def send(self, messages: Union[dict, list[dict]],usage : bool = False, **kwargs) -> Union[dict,tuple[dict,dict]]:
+    def send(self, messages: Union[dict, list[dict]],usage : bool = False, **kwargs) -> dict:
         """
         发送消息到API并获取响应。
 
@@ -136,10 +139,11 @@ class Base_llm:
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
                 message = result["choices"][0]["message"]
+                print(message)
                 self.chat_history.append(message)
                 self.store_history.append(message)
                 if usage:
-                    return message,result["usage"]
+                    message.update(result.get("usage"))
                 return message
             else:
                 try:
@@ -337,7 +341,106 @@ class Base_llm:
                     return message.get("content")
         return None
             
+    def handle_message(self, handle_content: Callable, handle_tool_calls: Callable,callback: Union[Callable,None]=None)->Callable:
+        """
+        handle_content(content:str)
+        handle_tool_calls(tool_calls:list[dict])
+        """
+        def processor(reply: dict):
+            tool_messages=None
+            if reply.get("role") == "assistant":
+                if reply.get("content"):
+                    handle_content(reply.get("content"))
+                if reply.get("tool_calls"):
+                    tool_messages=handle_tool_calls(reply.get("tool_calls"))
+                if tool_messages:
+                    if callback:
+                        callback(self.send,tool_messages)
+                    processor(self.send(tool_messages))
+        return processor
+        
+    def handle_content(self, content: str):
+        print(content)
+
+    def handle_tool_calls(self, tool_calls: list[dict])->list[dict]:
+        messages = []
+        for tool in tool_calls:
+            tool_call_id = tool.get("id")
+            tool_data=tool.get("function")
+            function_name = tool_data.get("name") # type: ignore
+            try:
+                if tool_data.get("arguments"): # type: ignore
+                    kwargs = json.loads(tool_data.get("arguments"))  # type: ignore
+                else:
+                    kwargs = {}
+            except:
+                result = f"{function_name} arguments is not json valid"
+                payload = {
+                    "role": "tool",
+                    "content": result,
+                    "tool_call_id":tool_call_id 
+                }
+                messages.append(payload)
+                continue
+
+            if hasattr(self.tool_collection,function_name):
+                func = getattr(self.tool_collection,function_name)
+                if callable(func):
+                    try:
+                        print(f"调用函数{function_name}，参数{kwargs}")
+                        result=func(**kwargs)
+                        if not isinstance(result,str):
+                            result = str(result)
+                    except Exception as e:
+                        result = str(e)
+                else:
+                    result = f"{function_name} is not callable"
+            else:
+                result = f"{function_name} does not exist"
+
+            print(result)
+            payload = {
+                        "role": "tool",
+                        "content": result,
+                        "tool_call_id":tool_call_id 
+                    }
+            messages.append(payload)
+        return messages
     
+    def reply_json(self, json_schema:dict,messages: Union[dict, list[dict]],usage : bool = False,**kwargs) -> Union[dict,list]:
+        """
+        json_schema example:
+        ```python
+        response_format={
+            "type": "json_schema",
+            "json_schema": {
+                "properties": {
+                "text": {
+                    "type": "string"
+                }
+                },
+                "required": ["text"],
+                "type": "object"
+            },
+            "strict": True
+            }
+        ```
+        """
+        data=self.send(messages=messages,usage=usage,response_format=json_schema,**kwargs)
+        return json.loads(data.get("content",""))
+    
+    def terminal(self):
+        """
+        终端交互模式。
+        """
+        handler=self.handle_message(self.handle_content,self.handle_tool_calls)
+        while True:
+            user_input = input("User: ")
+            if user_input == "exit":
+                break
+            reply = self.send({"role": "user", "content": user_input})
+            handler(reply)
+            
 @dataclass
 class File_Format:
     """
@@ -508,6 +611,16 @@ class MessageGenerator:
         else:
             raise ValueError(f"format {self.format} is not supported")
 
+class DeepSeek(Base_llm):
+    def list_models(self):
+        url = f"{self.base_url}/models"
+        response = self.client.get(url, proxies=self.proxy)
+        if response.status_code == 200:
+            result = response.json()
+            return result.get("data")
+        else:
+            return response.status_code, response.json()
+        
 class Gemini(Base_llm):
     def list_models(self):
         """
@@ -529,29 +642,8 @@ class Gemini(Base_llm):
             except Exception:
                 error_info = response.text
             raise HTTPException(response.status_code, error_info)
-
-class DeepSeek(Base_llm):
-    def list_models(self):
-        url = f"{self.base_url}/models"
-        response = self.client.get(url, proxies=self.proxy)
-        if response.status_code == 200:
-            result = response.json()
-            return result.get("data")
-        else:
-            return response.status_code, response.json()
         
 if __name__ == "__main__":
-    # chat = Base_llm(base_url="https://api.deepseek.com",
-    #                 model="deepseek-chat",
-    #                 api_key="",
-    #                 storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-    #                 proxy=None)  # type: ignore
-
-    # result = chat.send({"role": "user", "content": "你好"})
-    # print(result)
-    # result = chat.send({"role": "user", "content": "你好"})
-    # print(result)
-
 #https://r.aya1.de/aya/https/gemini.watershed.ip-ddns.com/v1
 #https://gemini.watershed.ip-ddns.com/v1
     tools = [
@@ -580,12 +672,73 @@ if __name__ == "__main__":
             }
         }
     ]
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "add",
+                "description": "Add two numbers and return the sum.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "num1": {
+                            "type": "number",
+                            "description": "The first number to add.",
+                        },
+                        "num2": {
+                            "type": "number",
+                            "description": "The second number to add.",
+                        }
+                    },
+                    "required": ["num1", "num2"],
+                },
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "subtract",
+                "description": "Subtract the second number from the first number and return the difference.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "num1": {
+                            "type": "number",
+                            "description": "The number to subtract from.",
+                        },
+                        "num2": {
+                            "type": "number",
+                            "description": "The number to subtract.",
+                        }
+                    },
+                    "required": ["num1", "num2"],
+                },
+            }
+        }
+    ]
+
+    class ToolCollection:
+        @staticmethod
+        def add(num1: float, num2: float) -> float:
+            """
+            加法运算：返回两个数字的和。
+            """
+            return num1 + num2
+
+        @staticmethod
+        def subtract(num1: float, num2: float) -> float:
+            """
+            减法运算：返回第一个数字减去第二个数字的结果。
+            """
+            return num1 - num2
+    
     chat = Gemini(base_url="https://generativelanguage.googleapis.com/v1beta/openai",
                     model="gemini-2.0-flash",
                     api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
-                    # tools=tools,
+                    tools=tools,
+                    tool_collection=ToolCollection()
                     )  # type: ignore
     
     # result = chat.list_models()
@@ -600,48 +753,20 @@ if __name__ == "__main__":
         "schema": {
             "properties": {
             "text": {
-                # "title": "Text",
                 "type": "string"
             },
             "emotion": {
-                # "title": "Emotion",
-                "type": "string"
+                "type": "string",
+                "enum":["joy", "sadness", "anger", "surprise", "fear", "disgust", "normal", "embarrassed"]
             },
             },
             "required": ["text", "emotion"],
-            # "title": "CalendarEvent",
             "type": "object",
-            # "additionalProperties": False
         },
-        # "name": "CalendarEvent",
         "strict": True
         }
     }
-    message = message_generator.gen_user_msg("翻译“你的笑容，照亮了我的世界。”为日语")
-    result = chat.send(messages=message,response_format=response_format)
-    print(result)
+    chat.terminal()
 
-    # import asyncio
-    # async def main():
-    #     chat = Async_Base_llm( base_url="https://open.bigmodel.cn/api/paas/v4",
-    #                 model="glm-4-plus", 
-    #                 api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE", 
-    #                 storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
-    #                 limit="8k",
-    #                 proxy=None)
-    #     conversation_id=await chat.load("5f70360e-fee6-4ab0-a1c3-e190edb8813b")
-    #     print(conversation_id)
-    #     result=chat.latest_tool_recall(chat.chat_history,"bg_changer")
-    #     print(result)
-    #     result=chat.get_latest_message(chat.chat_history)
-    #     print(result)
-    #     result=await chat.get_conversations()
-    #     print(result)
-    #     result=await chat.send({"role": "user", "content": "你好"})
-    #     print(result)
-    #     result=await chat.save(conversation_id)
-    #     print(result)
-    #     chat.delete_conversation(conversation_id)
 
-    # asyncio.run(main())
     
