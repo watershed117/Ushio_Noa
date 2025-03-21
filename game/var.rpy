@@ -28,3 +28,5 @@ default tool_call_counts={"control_character":0,"bg_changer":0}
 
 default tts_audio=None
 default tts_filename=""
+
+default run_in_main_context=["bg_changer","control_character"]

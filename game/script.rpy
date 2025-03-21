@@ -138,30 +138,17 @@ label main_loop:
     python:
         while True:
             uploader.files=[]
-            # 1. 获取用户输入 (在循环开始时)
             message = renpy.input("sensei")
-
-            # 2. 输入为空的处理
             if not message:
                 renpy.say(noa, "输入不能为空，请重新输入。")
-                continue  # 跳过本次循环，重新获取输入
-
-            # 3. 处理文件上传 (如果存在)
+                continue
             if uploader.files:
                 message = f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
 
-            # 4. 发送消息并等待结果
-            eid = eventloop.add_event(chat.send, {"role": "user", "content": message})
-            while eventloop.event_results[eid]["status"] == "pending":
-                renpy.pause(0.1)
-
-            # 5. 处理结果 (成功或失败)
-            if eventloop.event_results[eid]["status"] == "completed":
-                reply = eventloop.get_event_result(eid).get("result")
-            else:
-                error = eventloop.get_event_result(eid)
-                raise error.get("result")
-
-            handle_reply(reply)
-
+            reply = run_in_eventloop(
+                                    chat.send,
+                                    {"role": "user", "content": message},
+                                    raise_or_not=True
+                                )
+            handler(reply)
     return

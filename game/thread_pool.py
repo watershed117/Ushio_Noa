@@ -385,6 +385,17 @@ class EventLoop:
                     raise TimeoutError(f"等待结果超时 ({timeout}s)")
                 self.results_condition.wait(remaining)
         return self.event_results.pop(event_id)
+    
+    def polling_result(self,eid:str,sleep_func:Callable[[float],None]=time.sleep,timeout:float=0.1)->Dict[str,Any]:
+        """
+        轮询事件结果
+        """
+        while True:
+            if self.event_results[eid]["status"] == "pending":
+                sleep_func(timeout)
+            else:
+                return self.event_results.pop(eid)
+
         
     def _update_event_result(self, event_id: str, result: Any):
         """更新事件结果并通知等待的线程"""

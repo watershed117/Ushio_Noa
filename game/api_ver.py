@@ -62,7 +62,7 @@ class Base_llm:
                  tools: list = [],
                  system_prompt: str = "",
                  limit: str = "128k",
-                 proxy: dict = {
+                 proxy: Union[None, dict] = {
                      'http': 'http://127.0.0.1:7890',
                      'https': 'http://127.0.0.1:7890',
                  },
@@ -139,7 +139,7 @@ class Base_llm:
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
                 message = result["choices"][0]["message"]
-                print(message)
+                # print(message)
                 self.chat_history.append(message)
                 self.store_history.append(message)
                 if usage:
@@ -362,50 +362,55 @@ class Base_llm:
     def handle_content(self, content: str):
         print(content)
 
-    def handle_tool_calls(self, tool_calls: list[dict])->list[dict]:
-        messages = []
-        for tool in tool_calls:
-            tool_call_id = tool.get("id")
-            tool_data=tool.get("function")
-            function_name = tool_data.get("name") # type: ignore
-            try:
-                if tool_data.get("arguments"): # type: ignore
-                    kwargs = json.loads(tool_data.get("arguments"))  # type: ignore
-                else:
-                    kwargs = {}
-            except:
-                result = f"{function_name} arguments is not json valid"
-                payload = {
-                    "role": "tool",
-                    "content": result,
-                    "tool_call_id":tool_call_id 
-                }
-                messages.append(payload)
-                continue
-
-            if hasattr(self.tool_collection,function_name):
-                func = getattr(self.tool_collection,function_name)
-                if callable(func):
-                    try:
-                        print(f"调用函数{function_name}，参数{kwargs}")
-                        result=func(**kwargs)
-                        if not isinstance(result,str):
-                            result = str(result)
-                    except Exception as e:
-                        result = str(e)
-                else:
-                    result = f"{function_name} is not callable"
-            else:
-                result = f"{function_name} does not exist"
-
-            print(result)
-            payload = {
+    def handle_tool_calls(self,callback: Union[Callable,None]=None)->Callable:
+        def handler(tool_calls: list[dict])->list[dict]:
+            messages = []
+            for tool in tool_calls:
+                tool_call_id = tool.get("id")
+                tool_data=tool.get("function")
+                function_name = tool_data.get("name") # type: ignore
+                try:
+                    if tool_data.get("arguments"): # type: ignore
+                        kwargs = json.loads(tool_data.get("arguments"))  # type: ignore
+                    else:
+                        kwargs = {}
+                except:
+                    result = f"{function_name} arguments is not json valid"
+                    payload = {
                         "role": "tool",
                         "content": result,
                         "tool_call_id":tool_call_id 
                     }
-            messages.append(payload)
-        return messages
+                    messages.append(payload)
+                    continue
+
+                if hasattr(self.tool_collection,function_name):
+                    func = getattr(self.tool_collection,function_name)
+                    if callable(func):
+                        try:
+                            print(f"调用函数{function_name}，参数{kwargs}")
+                            if callback:
+                                result=callback(func,**kwargs)
+                            else:
+                                result=func(**kwargs)
+                            if not isinstance(result,str):
+                                result = str(result)
+                        except Exception as e:
+                            result = str(e)
+                    else:
+                        result = f"{function_name} is not callable"
+                else:
+                    result = f"{function_name} does not exist"
+
+                # print(result)
+                payload = {
+                            "role": "tool",
+                            "content": result,
+                            "tool_call_id":tool_call_id 
+                        }
+                messages.append(payload)
+            return messages
+        return handler
     
     def reply_json(self, json_schema:dict,messages: Union[dict, list[dict]],usage : bool = False,**kwargs) -> Union[dict,list]:
         """
@@ -433,7 +438,8 @@ class Base_llm:
         """
         终端交互模式。
         """
-        handler=self.handle_message(self.handle_content,self.handle_tool_calls)
+        tool_handler=self.handle_tool_calls()
+        handler=self.handle_message(self.handle_content,tool_handler)
         while True:
             user_input = input("User: ")
             if user_input == "exit":
@@ -644,8 +650,6 @@ class Gemini(Base_llm):
             raise HTTPException(response.status_code, error_info)
         
 if __name__ == "__main__":
-#https://r.aya1.de/aya/https/gemini.watershed.ip-ddns.com/v1
-#https://gemini.watershed.ip-ddns.com/v1
     tools = [
         {
             "type": "function",
@@ -732,14 +736,15 @@ if __name__ == "__main__":
             """
             return num1 - num2
     
-    chat = Gemini(base_url="https://generativelanguage.googleapis.com/v1beta/openai",
+    chat = Gemini(base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
                     model="gemini-2.0-flash",
                     api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
                     tools=tools,
-                    tool_collection=ToolCollection()
-                    )  # type: ignore
+                    tool_collection=ToolCollection(),
+                    proxy=None
+                    )
     
     # result = chat.list_models()
     # print(result)

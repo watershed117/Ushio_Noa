@@ -90,59 +90,6 @@ class Tools:
         else:
             return mapped_args
 
-    def caller(self, function_data: dict,tool_call_id: str):
-        name = function_data.get("name")
-        try:
-            if function_data.get("arguments"):
-                kwargs = json.loads(function_data.get("arguments"))  # type: ignore
-            else:
-                kwargs = {}
-        except:
-            self.tool_result.put(  # type: ignore
-                {name: "arguments error"})
-            return
-        
-        if isinstance(kwargs, str):
-            try:
-                kwargs = ast.literal_eval(kwargs)
-            except:
-                self.tool_result.put(  # type: ignore
-                    {name: "arguments error"})
-                return
-
-        if name == "chat_with_multimodal":
-            if "files" in kwargs:
-                kwargs["files"] = RevertableList(kwargs["files"])
-                
-        if hasattr(self, name):  # type: ignore
-            if callable(getattr(self, name)):  # type: ignore
-                args_check = self.args_check(name, kwargs)  # type: ignore
-                if args_check is True:
-                    executor = getattr(self, name)  # type: ignore
-                    try:
-                        if name in self.run_in_main:
-                            # renpy.invoke_in_thread(renpy.invoke_in_thread, executor, **kwargs)  # type: ignore
-                            result = executor(**kwargs)
-                        else:
-                            eid=eventloop.add_event(executor, **kwargs)  # type: ignore
-                            while True:
-                                if eventloop.event_results[eid].get("status")=="pending": # type: ignore
-                                    renpy.pause(0.1)  # type: ignore
-                                else:
-                                    result = eventloop.get_event_result(eid)  # type: ignore
-                                    break
-
-                    except Exception as e:
-                        result = e
-                    self.tool_result.put({"result": {name: result},"tool_call_id":tool_call_id})
-                else:
-                    self.tool_result.put({"result": {name: args_check},"tool_call_id":tool_call_id})
-            else:
-                self.tool_result.put({"result": {name: "is not callable"},"tool_call_id":tool_call_id})
-        else:
-            self.tool_result.put({"result": {name: "function not found"},"tool_call_id":tool_call_id})
-        return
-
     def dir_walker(self, dir: str):
         background_path = os.path.join(
             renpy.config.gamedir, "images/background")  # type: ignore
@@ -218,15 +165,15 @@ class Tools:
     def end_of_tool_calls(self):
         return "success"
 
-tools_caller = Tools()
-tools_caller.args_register("dir_walker", {"dir": str}, ["dir"])
-tools_caller.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
+tool_collection = Tools()
+tool_collection.args_register("dir_walker", {"dir": str}, ["dir"])
+tool_collection.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
                     "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
-tools_caller.args_register("bg_changer", {"name": str}, ["name"])
-tools_caller.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"])
-tools_caller.args_register("end_of_tool_calls", {}, [])
+tool_collection.args_register("bg_changer", {"name": str}, ["name"])
+tool_collection.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"])
+tool_collection.args_register("end_of_tool_calls", {}, [])
 
-tools_caller.map_register("control_character",
+tool_collection.map_register("control_character",
                     {
                         "position": {"1": "1",
                                     "2": "2",
@@ -275,8 +222,8 @@ tools_caller.map_register("control_character",
                         "scaleup": {"blank": blank,  # type: ignore
                                     "scaleup": scaleup}  # type: ignore
                     })
-tools_caller.run_in_main_register("control_character")
-tools_caller.run_in_main_register("bg_changer")
+tool_collection.run_in_main_register("control_character")
+tool_collection.run_in_main_register("bg_changer")
 
 """renpy
 label bg_changer(file_name):
