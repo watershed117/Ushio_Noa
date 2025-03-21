@@ -165,24 +165,20 @@ def run_in_eventloop(func: Callable, *args, raise_or_not: bool = False, **kwargs
     :param kwargs: 函数的关键字参数
     :return: 函数的执行结果
     """
-    # 将函数添加到事件循环中
-    eid = eventloop.add_event(func, *args, **kwargs)
+    eid = eventloop.add_event(func, *args, **kwargs) # type: ignore
     try:
-        # 通过 poller 获取结果
         return poller(eid)
     except Exception as e:
-        # 记录错误日志
-        root_logger.error(
+        root_logger.error( # type: ignore
             f"Failed to call {func.__name__} with args={args}, kwargs={kwargs}: {e}"
         )
         if raise_or_not:
-            # 根据参数决定是否重新抛出异常
             raise e
 
 def translate(content:str):
     eid=eventloop.add_event(translator.send,{"role":"user","content":content}) # type: ignore
     reply=poller(eid)
-    translator.clear_history()
+    translator.clear_history() # type: ignore
     return reply
 
 def handle_content(content: str):
@@ -195,46 +191,46 @@ def handle_content(content: str):
             try:
                 ja_data=json.loads(ja_data.get("content"))
             except:
-                renpy.notify("翻译json转换失败")
-                root_logger.info(f"failed to load json: {ja_data}")
+                renpy.notify("翻译json转换失败") # type: ignore
+                root_logger.info(f"failed to load json: {ja_data}") # type: ignore
                 ja_data=None
             if ja_data:
                 ja=ja_data.get("text")
                 emotion=ja_data.get("emotion")
-                refer = tts_refer.get(emotion,tts_refer.get("normal"))
-                refer_path=os.path.join(renpy.config.gamedir, "audio", "gsv",refer[0])
+                refer = tts_refer.get(emotion,tts_refer.get("normal")) # type: ignore
+                refer_path=os.path.join(renpy.config.gamedir, "audio", "gsv",refer[0]) # type: ignore
                 refer_text=refer[1]
                 refer_data={"refer_wav_path": refer_path, "prompt_text": refer_text, "prompt_language": "all_ja"}
                 
                 # 合成语音
-                eid=eventloop.add_event(tts.gen, {"text": ja, "language": "ja", "refer_data": refer_data})
+                eid=eventloop.add_event(tts.gen, {"text": ja, "language": "ja", "refer_data": refer_data}) # type: ignore
                 try:
                     audio=poller(eid)
                 except Exception as e:
-                    renpy.notify("语音合成失败")
+                    renpy.notify("语音合成失败") # type: ignore
                     audio=None
 
                 if audio:
                     if isinstance(audio,BytesIO):
-                        renpy.store.tts_audio=audio.getvalue()
-                        renpy.store.tts_filename=content[:10]
-                        renpy.play(AudioData(renpy.store.tts_audio,"wav"))
+                        renpy.store.tts_audio=audio.getvalue() # type: ignore
+                        renpy.store.tts_filename=content[:10] # type: ignore
+                        renpy.play(AudioData(renpy.store.tts_audio,"wav")) # type: ignore
                     else:
-                        renpy.notify("合成语音失败")
+                        renpy.notify("合成语音失败") # type: ignore
 
-    renpy.say(noa, content)
+    renpy.say(noa, content) # type: ignore
 
 def tool_calls_callback(func:Callable,**kwargs):
-    if func.__name__ in renpy.store.run_in_main_context:
-        root_logger.info(f"calling {func.__name__} in main context")
+    if func.__name__ in renpy.store.run_in_main_context: # type: ignore
+        root_logger.info(f"calling {func.__name__} in main context") # type: ignore
         return func(**kwargs)
     else:
-        eid=eventloop.add_event(func,**kwargs)
+        eid=eventloop.add_event(func,**kwargs) # type: ignore
         try:
-            root_logger.info(f"calling {func.__name__} in background")
+            root_logger.info(f"calling {func.__name__} in background") # type: ignore
             return background_poller(eid)
         except Exception as e:
-            root_logger.error(f"failed to call {func.__name__}: {e}")
+            root_logger.error(f"failed to call {func.__name__}: {e}") # type: ignore
 
-tool_calls_handler=chat.handle_tool_calls(tool_calls_callback)
-handler=chat.handle_message(handle_content,tool_calls_handler,callback=run_in_eventloop)
+tool_calls_handler=chat.handle_tool_calls(tool_calls_callback) # type: ignore
+handler=chat.handle_message(handle_content,tool_calls_handler,callback=run_in_eventloop) # type: ignore

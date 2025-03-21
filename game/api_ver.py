@@ -123,6 +123,7 @@ class Base_llm:
             if self.tools:
                 payload.update({"tools": self.tools})
             payload.update(kwargs)
+            # print(payload)
             try:
                 response = client.post(url, json=payload, proxies=self.proxy)
             except Exception as e:
@@ -139,6 +140,7 @@ class Base_llm:
                 if total_tokens >= self.max_len:
                     self.del_earliest_history()
                 message = result["choices"][0]["message"]
+                # print(result)
                 # print(message)
                 self.chat_history.append(message)
                 self.store_history.append(message)
@@ -355,8 +357,9 @@ class Base_llm:
                     tool_messages=handle_tool_calls(reply.get("tool_calls"))
                 if tool_messages:
                     if callback:
-                        callback(self.send,tool_messages)
-                    processor(self.send(tool_messages))
+                        processor(callback(self.send,tool_messages))
+                    else:
+                        processor(self.send(tool_messages))
         return processor
         
     def handle_content(self, content: str):

@@ -333,7 +333,7 @@ chat = Base_llm(api_key=game_config.chat_api_key,
                 proxy=game_config.proxy,
                 system_prompt=complex_prompt,
                 tools=tools,
-                tool_collection=tool_collection)
+                tool_collection=tool_collection) # type: ignore
 
 chat = Base_llm(api_key=game_config.multimodal_api_key,
                 base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
@@ -342,7 +342,7 @@ chat = Base_llm(api_key=game_config.multimodal_api_key,
                 proxy=game_config.proxy,
                 system_prompt=complex_prompt,
                 tools=tools,
-                tool_collection=tool_collection)
+                tool_collection=tool_collection) # type: ignore
 
 # chat = Base_llm(api_key="6b98385d296d8687ec15b54faa43a01c.43RrndejVMU5KmJE",
 #                 base_url="https://open.bigmodel.cn/api/paas/v4",
