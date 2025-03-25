@@ -25,8 +25,7 @@ default new_conversation=False
 default conversation_id=""
 default tool_call_counts={"control_character":0,"bg_changer":0}
 
-
 default tts_audio=None
 default tts_filename=""
 
-default run_in_main_context=["bg_changer","control_character"]
+default run_in_main_context=["bg_changer","control_character","agent_commander"]

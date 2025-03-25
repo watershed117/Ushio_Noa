@@ -2,29 +2,21 @@
 init 1 python:
 """
 import os
-import json
-from api_ver import Gemini, GEMINI, MessageGenerator
-from event_loop import EventLoop
-from renpy.revertable import RevertableList # type: ignore
-import queue
-import time
-import ast
+from typing import Callable, Union
+from api_ver import Gemini, GEMINI, MessageGenerator,Base_llm
 
-
+message_generator = MessageGenerator(
+    format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
+multimodal = Gemini(api_key=game_config.multimodal_api_key,  # type: ignore
+                            base_url=game_config.multimodal_base_url,  # type: ignore
+                            model=game_config.multimodal_model,   # type: ignore
+                            proxy=game_config.proxy)  # type: ignore
 class Tools:
-    def __init__(self):
+    def __init__(self,mutimoal,message_generator,*args, **kwargs):
         self.function_args_data = {}
         self.map_data = {}
-        self.run_in_main = []
-
-        self.message_generator = MessageGenerator(
-            format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
-        self.multimodal = Gemini(api_key=game_config.multimodal_api_key,  # type: ignore
-                                 base_url=game_config.multimodal_base_url,  # type: ignore
-                                 model=game_config.multimodal_model,   # type: ignore
-                                 proxy=game_config.proxy)  # type: ignore
-        
-        self.tool_result = queue.Queue()  
+        self.multimodal = mutimoal
+        self.message_generator = message_generator
 
     def map_register(self, name: str, map_data: dict):
         self.map_data[name] = map_data
@@ -32,10 +24,7 @@ class Tools:
     def args_register(self, name: str, args: dict[str, type], required: list[str]):
         self.function_args_data[name] = {"args": args, "required": required}
 
-    def run_in_main_register(self, name: str):
-        self.run_in_main.append(name)
-
-    def args_check(self, name: str, args: dict):
+    def args_check(self, name: str, args: dict)->Union[bool, str]:
         if name not in self.function_args_data:
             raise ValueError(f"function {name}'s arguments are not registered")
         
@@ -65,7 +54,7 @@ class Tools:
         else:
             return True
 
-    def map_check(self, name: str, **kwargs):
+    def map_check(self, name: str, **kwargs)->Union[dict, str]:
         if name not in self.map_data:
             raise ValueError(f"Map data for '{name}' is not registered.")
 
@@ -101,8 +90,9 @@ class Tools:
             file_names = []
             with os.scandir(path) as it:
                 for entry in it:
-                    if entry.is_file():
-                        file_names.append(entry.name)
+                    if entry.is_file(): 
+                        if entry.name.endswith(".jpg"):
+                            file_names.append(entry.name)
                     elif entry.is_dir():
                         dir_names.append(entry.name)
             return file_names
@@ -158,14 +148,7 @@ class Tools:
         self.multimodal.clear_history()
         return result
 
-    # def clear_multimodal_history(self):
-    #     self.multimodal.clear_history()
-    #     return "success"
-
-    def end_of_tool_calls(self):
-        return "success"
-
-tool_collection = Tools()
+tool_collection = Tools(mutimoal=multimodal,message_generator=message_generator) # type: ignore
 tool_collection.args_register("dir_walker", {"dir": str}, ["dir"])
 tool_collection.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
                     "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
@@ -222,18 +205,3 @@ tool_collection.map_register("control_character",
                         "scaleup": {"blank": blank,  # type: ignore
                                     "scaleup": scaleup}  # type: ignore
                     })
-tool_collection.run_in_main_register("control_character")
-tool_collection.run_in_main_register("bg_changer")
-
-"""renpy
-label bg_changer(file_name):
-    scene expression "images/background/"+file_name with dissolve
-    return
-"""
-# transform dissolve_in(s = 1.0):
-#     alpha 0.0
-#     linear s alpha 1.0
-
-# transform dissolve_out(s = 1.0):
-#     alpha 1.0
-#     linear s alpha 0.0

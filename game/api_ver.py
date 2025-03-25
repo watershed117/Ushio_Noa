@@ -391,7 +391,7 @@ class Base_llm:
                     func = getattr(self.tool_collection,function_name)
                     if callable(func):
                         try:
-                            print(f"调用函数{function_name}，参数{kwargs}")
+                            # print(f"调用函数{function_name}，参数{kwargs}")
                             if callback:
                                 result=callback(func,**kwargs)
                             else:
