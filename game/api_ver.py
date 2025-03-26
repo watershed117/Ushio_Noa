@@ -749,8 +749,10 @@ if __name__ == "__main__":
                     proxy=None
                     )
     
-    # result = chat.list_models()
-    # print(result)
+    result = chat.list_models()
+    print(result)
+    with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\gemini_models.json", "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=4)
 
     message_generator = MessageGenerator(
         format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")

@@ -2,238 +2,214 @@
     "object": "list",
     "data": [
         {
-            "id": "chat-bison-001",
+            "id": "models/chat-bison-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "text-bison-001",
+            "id": "models/text-bison-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "embedding-gecko-001",
+            "id": "models/embedding-gecko-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.0-pro-latest",
+            "id": "models/gemini-1.0-pro-vision-latest",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.0-pro",
+            "id": "models/gemini-pro-vision",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-pro",
+            "id": "models/gemini-1.5-pro-latest",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.0-pro-001",
+            "id": "models/gemini-1.5-pro-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.0-pro-vision-latest",
+            "id": "models/gemini-1.5-pro-002",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-pro-vision",
+            "id": "models/gemini-1.5-pro",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-pro-latest",
+            "id": "models/gemini-1.5-flash-latest",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-pro-001",
+            "id": "models/gemini-1.5-flash-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-pro-002",
+            "id": "models/gemini-1.5-flash-001-tuning",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-pro",
+            "id": "models/gemini-1.5-flash",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-latest",
+            "id": "models/gemini-1.5-flash-002",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-001",
+            "id": "models/gemini-1.5-flash-8b",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-001-tuning",
+            "id": "models/gemini-1.5-flash-8b-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash",
+            "id": "models/gemini-1.5-flash-8b-latest",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-002",
+            "id": "models/gemini-1.5-flash-8b-exp-0827",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-8b",
+            "id": "models/gemini-1.5-flash-8b-exp-0924",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-8b-001",
+            "id": "models/gemini-2.5-pro-exp-03-25",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-8b-latest",
+            "id": "models/gemini-2.0-flash-exp",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-8b-exp-0827",
+            "id": "models/gemini-2.0-flash",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-1.5-flash-8b-exp-0924",
+            "id": "models/gemini-2.0-flash-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-exp",
+            "id": "models/gemini-2.0-flash-exp-image-generation",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash",
+            "id": "models/gemini-2.0-flash-lite-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-001",
+            "id": "models/gemini-2.0-flash-lite",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-lite-preview",
+            "id": "models/gemini-2.0-flash-lite-preview-02-05",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-lite-preview-02-05",
+            "id": "models/gemini-2.0-flash-lite-preview",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-pro-exp",
+            "id": "models/gemini-2.0-pro-exp",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-pro-exp-02-05",
+            "id": "models/gemini-2.0-pro-exp-02-05",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-exp-1206",
+            "id": "models/gemini-exp-1206",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-thinking-exp-01-21",
+            "id": "models/gemini-2.0-flash-thinking-exp-01-21",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-thinking-exp",
+            "id": "models/gemini-2.0-flash-thinking-exp",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "gemini-2.0-flash-thinking-exp-1219",
+            "id": "models/gemini-2.0-flash-thinking-exp-1219",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "learnlm-1.5-pro-experimental",
+            "id": "models/learnlm-1.5-pro-experimental",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "embedding-001",
+            "id": "models/gemma-3-27b-it",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "text-embedding-004",
+            "id": "models/embedding-001",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "aqa",
+            "id": "models/text-embedding-004",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
         },
         {
-            "id": "imagen-3.0-generate-002",
+            "id": "models/gemini-embedding-exp-03-07",
             "object": "model",
-            "created": 0,
-            "owned_by": ""
+            "owned_by": "google"
+        },
+        {
+            "id": "models/gemini-embedding-exp",
+            "object": "model",
+            "owned_by": "google"
+        },
+        {
+            "id": "models/aqa",
+            "object": "model",
+            "owned_by": "google"
+        },
+        {
+            "id": "models/imagen-3.0-generate-002",
+            "object": "model",
+            "owned_by": "google"
         }
     ]
 }

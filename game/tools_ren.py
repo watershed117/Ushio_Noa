@@ -12,7 +12,7 @@ multimodal = Gemini(api_key=game_config.multimodal_api_key,  # type: ignore
                             model=game_config.multimodal_model,   # type: ignore
                             proxy=game_config.proxy)  # type: ignore
 class Tools:
-    def __init__(self,mutimoal,message_generator,*args, **kwargs):
+    def __init__(self,mutimoal,message_generator):
         self.function_args_data = {}
         self.map_data = {}
         self.multimodal = mutimoal
