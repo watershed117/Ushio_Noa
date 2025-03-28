@@ -146,6 +146,7 @@ class Base_llm:
                 self.store_history.append(message)
                 if usage:
                     message.update(result.get("usage"))
+                message.update({"model":self.model})
                 return message
             else:
                 try:

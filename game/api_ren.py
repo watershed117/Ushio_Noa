@@ -7,12 +7,12 @@ import logging
 import time
 from typing import Callable
 from api_ver import GEMINI, Base_llm, MessageGenerator
-from thread_pool import create_logger,EventLoop,EnhancedColoredFormatter
+from thread_pool import setup_logger,EventLoop
 from audio_generator import Audio_generator
 import os
 import json
 
-eventloop = EventLoop(num_workers=4, logger=True,color=False,result_ttl=600, cleanup_interval=600)
+eventloop = EventLoop(num_workers=4,colored=False,log_level=logging.DEBUG,result_ttl=600, cleanup_interval=600)
 
 class LogCaptureHandler(logging.Handler):
     def __init__(self):
@@ -24,7 +24,7 @@ class LogCaptureHandler(logging.Handler):
             self.logs = self.logs[100:]
         self.logs.append(eventloop.logger.handlers[0].format(record))
 
-root_logger = create_logger("Global",False)
+root_logger = setup_logger("Global",colored=False)
 root_logger.setLevel(logging.DEBUG)
 
 logging.getLogger("urllib3").setLevel(logging.CRITICAL)
@@ -72,7 +72,7 @@ if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")):  # typ
             "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
             "translator_api_key": "",
 
-            "multimodal_model": "gemini-1.5-flash",
+            "multimodal_model": "gemini-2.0-flash",
             "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
             "multimodal_api_key": "",
 
@@ -478,14 +478,14 @@ chat = Base_llm(api_key=game_config.chat_api_key,
                 tools=chat_tools,
                 tool_collection=chat_tool_collection) # type: ignore
 
-chat = Base_llm(api_key=game_config.multimodal_api_key,
-                base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
-                storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-                model="gemini-2.0-flash",
-                proxy=game_config.proxy,
-                system_prompt=complex_prompt,
-                tools=chat_tools,
-                tool_collection=chat_tool_collection) # type: ignore
+# chat = Base_llm(api_key=game_config.multimodal_api_key,
+#                 base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
+#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
+#                 model="gemini-2.0-flash",
+#                 proxy=game_config.proxy,
+#                 system_prompt=complex_prompt,
+#                 tools=chat_tools,
+#                 tool_collection=chat_tool_collection) # type: ignore
 
 # chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
 #                 base_url="https://api.siliconflow.cn/v1",
