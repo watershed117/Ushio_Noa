@@ -193,14 +193,16 @@ class Chat_Tool_Collection:
     def tool_calls_callback(self,func:Callable,**kwargs):
         if func.__name__ in renpy.store.run_in_main_context: # type: ignore
             root_logger.info(f"agent calling {func.__name__} in main context") # type: ignore
+            root_logger.debug(f"agent calling {func.__name__} with args={kwargs}") 
             return func(**kwargs)
         else:
             eid=eventloop.add_event(func,**kwargs) # type: ignore
             try:
-                root_logger.info(f"agent calling {func.__name__} in background") # type: ignore
+                root_logger.info(f"agent calling {func.__name__} in background")
+                root_logger.debug(f"agent calling {func.__name__} with args={kwargs}") 
                 return background_poller(eid)
             except Exception as e:
-                root_logger.error(f"agent failed to call {func.__name__}: {e}") # type: ignore
+                root_logger.error(f"agent failed to call {func.__name__}: {e}")
 
     def agent_commander(self,message: str, files: list[str] = []):
         reply = self.agent.send(self.message_generator.gen_user_msg(message, files))
@@ -209,8 +211,10 @@ class Chat_Tool_Collection:
                 tool_messages = self.tool_calls_handler(reply.get("tool_calls"))
                 reply = self.agent.send(tool_messages)
                 if not reply.get("tool_calls") and reply.get("content"):
+                    root_logger.info(f"agent reply: {reply.get('content')}") 
                     return reply.get("content")
             elif reply.get("content"):
+                root_logger.info(f"agent reply: {reply.get('content')}") 
                 return reply.get("content")
             
     def clear_history(self):

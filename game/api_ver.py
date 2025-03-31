@@ -742,7 +742,7 @@ if __name__ == "__main__":
     
     chat = Gemini(base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
                     model="gemini-2.0-flash",
-                    api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
+                    api_key="",
                     storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
                     tools=tools,
