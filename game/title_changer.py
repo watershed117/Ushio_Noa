@@ -10,13 +10,6 @@ SetWindowText = user32.SetWindowTextW
 SetWindowText.argtypes = [wintypes.HWND, wintypes.LPCWSTR]
 SetWindowText.restype = wintypes.BOOL
 
-# FindWindow = user32.FindWindowW
-# FindWindow.argtypes = [wintypes.LPCWSTR, wintypes.LPCWSTR]
-# FindWindow.restype = wintypes.HWND
-
-# def get_hwnd(window_name:str)->int:
-#     return FindWindow(None, window_name)
-
 # 修改窗口标题
 def set_window_title(hwnd:int, new_title):
     # 设置新标题
@@ -58,33 +51,3 @@ def get_all_current_process_window_handles():
     window_handles.clear()  # 清空之前存储的窗口句柄
     EnumWindows(enum_proc, 0)  # 枚举所有窗口
     return window_handles  # 返回所有窗口句柄
-
-# # 读取JSON文件函数
-# def read_json(file_path:str):
-#     """
-#     读取指定路径的JSON文件，并返回数据。
-    
-#     参数:
-#     file_path: JSON文件的路径。
-    
-#     返回:
-#     数据字典。
-#     """
-#     with open(file_path, 'r', encoding='utf-8') as file:
-#         data = json.load(file)
-#     return data
-
-# # 存储数据到JSON文件函数
-# def save_to_json(data:dict, file_path:str):
-#     """
-#     将数据保存到指定的JSON文件。
-    
-#     参数:
-#     data: 要保存的数据，可以是字典或列表。
-#     file_path: 要保存的JSON文件路径。
-#     """
-#     with open(file_path, 'w', encoding='utf-8') as file:
-#         json.dump(data, file, ensure_ascii=False, indent=4)
-
-
-

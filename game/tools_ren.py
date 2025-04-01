@@ -2,21 +2,22 @@
 init 1 python:
 """
 import os
-from typing import Callable, Union
-from api_ver import Gemini, GEMINI, MessageGenerator,Base_llm
+from typing import  Union
+from api_ver import GEMINI, MessageGenerator
+from rag_client import RAG_Client
+from datetime import datetime
+
+rag_clinet = RAG_Client("http://127.0.0.1:20000")
 
 message_generator = MessageGenerator(
     format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
-multimodal = Gemini(api_key=game_config.multimodal_api_key,  # type: ignore
-                            base_url=game_config.multimodal_base_url,  # type: ignore
-                            model=game_config.multimodal_model,   # type: ignore
-                            proxy=game_config.proxy)  # type: ignore
+
 class Tools:
-    def __init__(self,mutimoal,message_generator):
+    def __init__(self,message_generator:MessageGenerator,rag_clinet:RAG_Client):
         self.function_args_data = {}
         self.map_data = {}
-        self.multimodal = mutimoal
         self.message_generator = message_generator
+        self.rag_client = rag_clinet
 
     def map_register(self, name: str, map_data: dict):
         self.map_data[name] = map_data
@@ -138,22 +139,28 @@ class Tools:
             return "success"
         else:
             return "file not found"
+    
+    def store_memory(self, text: str, metadata: dict[str,str] = {}):
+        self.rag_client.store(text, metadata)
 
-    def chat_with_multimodal(self, message: str, files: list[str]):
-        if files:
-            messages = self.message_generator.gen_user_msg(message, files)
-        else:
-            messages = self.message_generator.gen_user_msg(message)
-        result = self.multimodal.send(messages)
-        self.multimodal.clear_history()
-        return result
+    def query_memory(self, query_text: str, top_k: int = 1):
+        return self.rag_client.query(query_text, top_k)
+    
+    def update_memory(self, id: str, text: str, metadata: dict[str,str] = {}):
+        self.rag_client.update(id, text, metadata)
 
-tool_collection = Tools(mutimoal=multimodal,message_generator=message_generator) # type: ignore
+    def delete_memory(self, id: str):
+        self.rag_client.delete(id)
+
+    def get_time(self):
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+
+tool_collection = Tools(message_generator=message_generator,rag_clinet=rag_clinet)
 tool_collection.args_register("dir_walker", {"dir": str}, ["dir"])
 tool_collection.args_register("control_character", {"position": str, "emotion": str, "emoji": str,
                     "action": str, "effect": str, "scaleup": str}, ["position", "emotion"])
 tool_collection.args_register("bg_changer", {"name": str}, ["name"])
-tool_collection.args_register("chat_with_multimodal", {"message": str, "files": list}, ["message"])
 tool_collection.args_register("end_of_tool_calls", {}, [])
 
 tool_collection.map_register("control_character",

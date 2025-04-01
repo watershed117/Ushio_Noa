@@ -44,9 +44,9 @@ class Config:
         self.translator_base_url = config_dict.get("translator_base_url")
         self.translator_api_key = config_dict.get("translator_api_key")
 
-        self.multimodal_model = config_dict.get("multimodal_model")
-        self.multimodal_base_url = config_dict.get("multimodal_base_url")
-        self.multimodal_api_key = config_dict.get("multimodal_api_key")
+        self.agent_model = config_dict.get("agent_model")
+        self.agent_base_url = config_dict.get("agent_base_url")
+        self.agent_api_key = config_dict.get("agent_api_key")
 
         self.proxy = config_dict.get("proxy")
 
@@ -72,9 +72,9 @@ if not os.path.exists(os.path.join(renpy.config.gamedir, "config.json")):  # typ
             "translator_base_url": "https://open.bigmodel.cn/api/paas/v4",
             "translator_api_key": "",
 
-            "multimodal_model": "gemini-2.0-flash",
-            "multimodal_base_url": "https://gemini.watershed.ip-ddns.com/v1",
-            "multimodal_api_key": "",
+            "agent_model": "gemini-2.0-flash",
+            "agent_base_url": "https://gemini.watershed.ip-ddns.com/v1",
+            "agent_api_key": "",
 
             "proxy": {
                 "http": None,
@@ -305,122 +305,101 @@ tools = [
     {
         "type": "function",
         "function": {
-            "name": "chat_with_multimodal",
-            "description": "Interacts with a multimodal language model to get information of file",
+            "name": "store_memory",
+            "description": "store text and metadata in RAG system,return the id of the text",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "message": {
+                    "text": {
                         "type": "string",
-                        "description": "text send to the multimodal language model",
+                        "description": "text to store"
                     },
-                    "files": {
-                        "type": "array",
-                        "items": {
-                                "type": "string"
-                            },
-                        "description": "full file paths",
+                    "metadata": {
+                        "type": "object",
+                        "description": "metadata to store,key-value pairs",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
-                "required": ["message", "files"],
-            },
+                "required": ["text"]
+            }
         }
     },
-        # {
-        #     "type": "function",
-        #     "function": {
-        #         "name": "query_memory",
-        #         "description": "query memory of Ushio Noa in RAG, return text, metadata, uuid",
-        #         "parameters": {
-        #             "type": "object",
-        #             "properties": {
-        #                 "query_text": {
-        #                     "type": "string",
-        #                     "description": "the text to query",
-        #                 },
-        #                 "top_k": {
-        #                     "type": "integer",
-        #                     "description": "the number of results to return",
-        #                     "default": 1
-        #                 }
-        #             },
-        #             "required": ["query_text"]
-        #         },
-        #     }
-        # },
-        # {
-        #     "type": "function",
-        #     "function": {
-        #         "name": "handle_memory",
-        #         "description": "handle memory of Ushio Noa in RAG",
-        #         "parameters": {
-        #         "type": "object",
-        #         "properties": {
-        #             "method": {
-        #             "type": "string",
-        #             "description": "how to handle the memory",
-        #             "enum": ["store", "query","update", "delete"]
-        #             }
-        #         },
-        #         "oneOf": [
-        #             {
-        #             "properties": {
-        #                 "method": { "const": "store" },
-        #                 "text": {
-        #                 "type": "string",
-        #                 "description": "the text to store"
-        #                 },
-        #                 "metadata": {
-        #                 "type": "object",
-        #                 "description": "Metadata to associate with the stored text, should be a dictionary"
-        #                 }
-        #             },
-        #             "required": ["store_text"]
-        #             },
-        #             {
-        #             "properties": {
-        #                 "method": { "const": "query" },
-        #                 "query_text": {
-        #                 "type": "string",
-        #                 "description": "text to query"
-        #                 }
-        #             },
-        #             "required": ["query_text"]
-        #             },
-        #             {
-        #             "properties": {
-        #                 "method": { "const": "update" },
-        #                 "id": {
-        #                 "type": "string",
-        #                 "description": "the uuid of the memory to update"
-        #                 },
-        #                 "text": {
-        #                 "type": "string",
-        #                 "description": "the text to update"
-        #                 },
-        #                 "metadata": {
-        #                 "type": "object",
-        #                 "description": "Metadata to associate with the updated text, should be a dictionary"
-        #                     }
-        #                 },
-        #             "required": ["update_id","update_text"]
-        #             },
-        #             {
-        #             "properties": {
-        #                 "method": { "const": "delete" },
-        #                 "delete_id": {
-        #                 "type": "string",
-        #                 "description": "the uuid of the memory to delete"
-        #                 }
-        #             },
-        #             "required": ["delete_id"]
-        #             }
-
-        #         ],
-        #         "required": ["method"]
-        #         }
-        #     }
-        # }
+    {
+        "type": "function",
+        "function": {
+            "name": "query_memory",
+            "description": "query RAG system for information",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query_text": {
+                        "type": "string",
+                        "description": "text to query"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "description": "number of results to return",
+                        "default": 1
+                    }
+                },
+                "required": ["query_text"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "update_memory",
+            "description": "update data in RAG system",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID of the text to update"
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "text to update"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "description": "metadata to update,key-value pairs",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["id", "text"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "delete",
+            "description": "delete data in RAG system",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID of the text to delete"
+                    }
+                },
+                "required": ["id"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_time",
+            "description": "get current time"
+            }
+    }
 ]
 
 chat_tools = [
@@ -428,13 +407,13 @@ chat_tools = [
         "type": "function",
         "function": {
             "name": "agent_commander",
-            "description": "send command to agent with a collection of tools,this agent is a llm can process image and audio",
+            "description": "send command to agent to call functions,this agent is a llm can process image and audio",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "message": {
                         "type": "string",
-                        "description": "Natural Language message to send to agent",
+                        "description": "Natural Language message to send to agent, don't include file paths in message",
                     },
                     "files":{
                         "type": "array",
@@ -462,9 +441,9 @@ with open(os.path.join(renpy.config.gamedir, "prompts","translator.txt"), "r", e
 with open(os.path.join(renpy.config.gamedir, "prompts","agent_prompt.txt"), "r", encoding="utf-8") as file:  # type: ignore
     agent_prompt = file.read()
 
-agent = Base_llm(api_key=game_config.multimodal_api_key,
-                base_url=game_config.multimodal_base_url,
-                model=game_config.multimodal_model,
+agent = Base_llm(api_key=game_config.agent_api_key,
+                base_url=game_config.agent_base_url,
+                model=game_config.agent_model,
                 proxy=game_config.proxy,
                 limit=game_config.limit,
                 system_prompt=agent_prompt,
@@ -481,23 +460,6 @@ chat = Base_llm(api_key=game_config.chat_api_key,
                 system_prompt=complex_prompt,
                 tools=chat_tools,
                 tool_collection=chat_tool_collection) # type: ignore
-
-# chat = Base_llm(api_key=game_config.multimodal_api_key,
-#                 base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
-#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-#                 model="gemini-2.0-flash",
-#                 proxy=game_config.proxy,
-#                 system_prompt=complex_prompt,
-#                 tools=chat_tools,
-#                 tool_collection=chat_tool_collection) # type: ignore
-
-# chat = Base_llm(api_key="sk-bltyfqycpshmbeferivmixvhqahjsunjofzbckflnqxpksoe",
-#                 base_url="https://api.siliconflow.cn/v1",
-#                 storage=os.path.join(renpy.config.gamedir, "history"), # type: ignore
-#                 model="deepseek-ai/DeepSeek-V3",
-#                 proxy=game_config.proxy,
-#                 # system_prompt=complex_prompt,
-#                 tools=tools)
 
 tool_calls_handler=chat.handle_tool_calls(tool_calls_callback) # type: ignore
 handler=chat.handle_message(handle_content,tool_calls_handler,callback=run_in_eventloop) # type: ignore

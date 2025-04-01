@@ -8,7 +8,6 @@ import file_upload
 import title_changer
 import os
 import json
-import time
 
 def load_gsv_refer():
     refer_path = os.path.join(renpy.config.gamedir, "audio", "gsv") # type: ignore
@@ -18,11 +17,19 @@ def load_gsv_refer():
 """renpy
 init 3 python:
 """
+def load_agent_history(content:bytes):
+    data=json.loads(content.decode("utf-8")) # type: ignore
+    agent.store_history = data.copy() # type: ignore
+    agent.chat_history =  data.copy() # type: ignore
+    tokens = agent.tokenizer(agent.chat_history) # type: ignore
+    if isinstance(tokens, int):
+        if tokens >= agent.max_len: # type: ignore
+            agent.limiter() # type: ignore
+
 def load(conversation_id: str):
-    conversation_id = chat.load(conversation_id) # type: ignore
+    conversation_id = chat.load(conversation_id,file_callbacks={"agent_history.json": load_agent_history}) # type: ignore
     change_title(conversation_id)
     renpy.store.conversation_id = conversation_id # type: ignore
-
 
 def change_title(name: str):
     hwnd = title_changer.get_all_current_process_window_handles()
@@ -54,10 +61,14 @@ def save_tts_audio():
 
 
 def save():
+    agent_history=BytesIO()
+    json_str=json.dumps(agent.store_history, ensure_ascii=False, indent=4) # type: ignore
+    agent_history.write(json_str.encode("utf-8"))
+    agent_history.seek(0)
     if renpy.store.conversation_id: # type: ignore
-        renpy.store.conversation_id = chat.save(renpy.store.conversation_id) # type: ignore
+        renpy.store.conversation_id = chat.save(renpy.store.conversation_id,files={"agent_history.json": agent_history}) # type: ignore
     else:
-        renpy.store.conversation_id = chat.save() # type: ignore
+        renpy.store.conversation_id = chat.save(files={"agent_history.json": agent_history}) # type: ignore
 
     change_title(renpy.store.conversation_id) # type: ignore
     renpy.notify("保存成功") # type: ignore

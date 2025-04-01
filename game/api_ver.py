@@ -4,9 +4,10 @@ import subprocess
 import base64
 from uuid import uuid4
 import json
+import uuid
 import requests
 from typing import Union,Callable
-import logging
+from io import BytesIO
 import pathlib
 
 class HTTPException(Exception):
@@ -155,62 +156,146 @@ class Base_llm:
                     error_info = response.text
                 raise HTTPException(response.status_code, error_info)
 
-    def save(self, id: str = ""):
+    def save(self, id: str = "",files:dict[str,BytesIO]={}):
         """
         保存当前聊天记录到文件。
 
         :param id: 文件ID，如果未提供则生成一个UUID
+        :param files: 需保存的附件文件字典，格式为 {文件名: BytesIO对象}
         :return: 文件ID
         """
         if not self.storage:
             raise ValueError("storage path is not valid")
         if not id:
             id = str(uuid4())
-        save_path = self.storage / f"{id or uuid4()}.json"
-        with save_path.open("w", encoding="utf-8") as f:
+        save_dir = self.storage / f"{id or uuid4()}"
+        if not save_dir.exists():
+            save_dir.mkdir(parents=True)
+        chat_history_path = save_dir/"chat_history.json"
+        with chat_history_path.open("w", encoding="utf-8") as f:
             json.dump(self.store_history, f, ensure_ascii=False, indent=4)
+        if files:
+            for file_name, file_content in files.items():
+                file_path = save_dir/file_name
+                with file_path.open("wb") as f:
+                    f.write(file_content.getvalue())
         return id
 
-    def load(self, id: str):
+    def load(self, id: str, file_callbacks: dict[str, Callable] = {}):
         """
         从文件加载聊天记录。
-
         :param id: 文件ID
+        :param files_callback: 自定义文件处理函数字典，key为文件名，value为函数
         :return: 文件ID
         """
         if not self.storage:
             raise ValueError("storage path is not valid")
-        load_path = self.storage / f"{id}.json"
-        with load_path.open("r", encoding="utf-8") as f:
+        load_path = self.storage / f"{id}"
+        if not load_path.exists():
+            raise ValueError(f"The path {load_path} does not exist or is not a directory.")
+        chat_history_path = load_path/"chat_history.json"
+        if not chat_history_path.exists():
+            raise ValueError(f"The file {chat_history_path} does not exist.")
+        with chat_history_path.open("r", encoding="utf-8") as f:
             data = json.load(f)
             self.chat_history = data.copy()
             self.store_history = data.copy()
-            tokens = self.tokenizer(data)
+            tokens = self.tokenizer(self.chat_history)
             if isinstance(tokens, int):
                 if tokens >= self.max_len:
                     self.limiter()
-            return id
+        if file_callbacks:
+            for file_name, file_callback in file_callbacks.items():
+                file_path = load_path/file_name
+                if file_path.exists():
+                    with file_path.open("rb") as f:
+                        file_content = f.read()
+                        file_callback(file_content)
+                else:
+                    raise ValueError(f"The file {file_path} does not exist.")
+        return id
 
-    def sort_files(self, folder_path: str = ""):
+    def _get_target_dir(self, folder_path: str = "") -> pathlib.Path:
         """
-        对文件夹中的文件按创建时间进行排序。
-
-        :param folder_path: 文件夹路径，如果未提供则使用存储路径
-        :return: 排序后的文件路径列表
+        获取并验证目标目录路径。
+        
+        :param folder_path: 用户提供的文件夹路径
+        :return: 验证通过的Path对象
         """
         if folder_path:
             target_dir = pathlib.Path(folder_path)
         elif self.storage:
             target_dir = self.storage
         else:
-            raise ValueError("storage path is not valid")
-        if not target_dir.exists() or not target_dir.is_dir():
-            raise ValueError(f"The path {target_dir} does not exist or is not a directory.")
-        files = sorted(target_dir.glob("*.json"), 
-                      key=lambda x: x.stat().st_ctime, 
-                      reverse=True)
-        return [f.as_posix() for f in files]
+            raise ValueError("Valid storage path is not provided")
 
+        if not target_dir.exists() or not target_dir.is_dir():
+            raise ValueError(f"Path {target_dir} is not a valid directory")
+            
+        return target_dir
+
+    def _generic_sort(self, folder_path: str = "", 
+                     glob_pattern: str = "*", 
+                     is_dir: bool = False) -> list:
+        """
+        通用排序方法，支持文件和目录的排序
+        
+        :param folder_path: 目标文件夹路径
+        :param glob_pattern: 文件匹配模式
+        :param is_dir: 是否筛选目录
+        :return: 排序后的路径列表
+        """
+        target_dir = self._get_target_dir(folder_path)
+        
+        items = target_dir.glob(glob_pattern)
+        if is_dir:
+            items = (item for item in items if item.is_dir())
+        else:
+            items = (item for item in items if item.is_file())
+
+        sorted_items = sorted(
+            items,
+            key=lambda x: x.stat().st_ctime,
+            reverse=True  # 默认按从新到旧排序
+        )
+        
+        return [item.as_posix() for item in sorted_items]
+
+    def sort_files(self, folder_path: str = "") -> list:
+        """
+        对文件夹中的JSON文件按创建时间进行排序
+        
+        :param folder_path: 文件夹路径
+        :return: 排序后的文件路径列表
+        """
+        return self._generic_sort(
+            folder_path=folder_path,
+            glob_pattern="*.json",
+            is_dir=False
+        )
+
+    def sort_dirs(self, folder_path: str = "") -> list:
+        """
+        对文件夹中的子目录按创建时间进行排序
+        
+        :param folder_path: 文件夹路径
+        :return: 排序后的目录路径列表
+        """
+        return self._generic_sort(
+            folder_path=folder_path,
+            glob_pattern="*",  # 匹配所有项目
+            is_dir=True
+        )
+
+    def _is_valid_uuid(self,filename):
+        try:
+            # 移除文件扩展名（如果有）
+            name_without_ext = filename.split('.')[0]
+            uuid_obj = uuid.UUID(name_without_ext)
+            return str(uuid_obj) == name_without_ext
+        except ValueError:
+            return False
+        
     def get_conversations(self):
         """
         获取所有对话记录。
@@ -219,21 +304,27 @@ class Base_llm:
         """
         if not self.storage:
             raise ValueError("storage path is not valid")
-        files = self.sort_files(self.storage.as_posix())
+        dirs = self.sort_dirs(self.storage.as_posix())
         conversations = []
-        for file_path in files:
+        for dir in dirs:
+            conversation_id = pathlib.Path(dir).name
+            if not self._is_valid_uuid(conversation_id):
+                continue
+            file_path = pathlib.Path(dir) / "chat_history.json"
+            if not file_path.exists():
+                raise ValueError(f"The file {file_path} does not exist.")
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 message_exist = False
                 for message in data:
                     if message.get("role") == "user":
                         conversations.append({"title": message.get("content","")[
-                                             :10], "id": pathlib.Path(file_path).name[:-5]})
+                                             :10], "id": conversation_id})
                         message_exist = True
                         break
                 if not message_exist:
                     conversations.append(
-                        {"title": "", "id": pathlib.Path(file_path).name[:-5]})
+                        {"title": "", "id": conversation_id})
         return conversations
 
     def delete_conversation(self, id: str):
@@ -299,12 +390,11 @@ class Base_llm:
             else:
                 break
 
-    def latest_tool_recall(self, messages: list[dict[str, str]], function_name: str = ""):
+    def latest_tool_recall(self, messages: list[dict], function_name: str = "")->list:
         """
         获取最近的工具调用记录。
 
         :param messages: 消息列表
-        :param function_name: 工具函数名，如果未提供则返回所有工具调用记录
         :return: 工具调用记录列表
         """
         # 逆序遍历消息，寻找最近的工具调用记录
@@ -315,19 +405,13 @@ class Base_llm:
             tool_calls = message.get("tool_calls")
             if not tool_calls:
                 continue  # 跳过无工具调用的消息
-            
-            # 情况1：指定了特定工具函数名
-            if function_name:
-                for tool in tool_calls:
-                    func = tool.get("function") # type: ignore
-                    if func and func.get("name") == function_name:
-                        return [func]  # 返回第一个匹配项
-            
-            # 情况2：未指定函数名，返回所有工具函数
             else:
-                functions = [tool.get("function") for tool in tool_calls if tool.get("function")] # type: ignore
-                if functions:
-                    return functions  # 返回当前消息的所有函数
+                if function_name:  # 仅处理指定函数的调用记录
+                    for tool_call in reversed(tool_calls):
+                        if tool_call.get("function").get("name") == function_name:
+                            return [tool_call]  # 找到了指定的工具调用记录
+                else:
+                    return tool_calls
         
         return []  # 未找到任何记录
 
@@ -742,8 +826,8 @@ if __name__ == "__main__":
     
     chat = Gemini(base_url="https://gateway.ai.cloudflare.com/v1/d5503cd910d7b4b9afab91f7d4e5c44c/gemini/google-ai-studio/v1beta/openai",
                     model="gemini-2.0-flash",
-                    api_key="",
-                    storage=r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\history",
+                    api_key="AIzaSyAv6RumkrxIvjLKgtiE-UceQODvvbTMd0Q",
+                    storage=r"C:\Users\watershed\Desktop\renpy\Ushio_Noa\game\history",
                     system_prompt="使用中文回复",
                     tools=tools,
                     tool_collection=ToolCollection(),
@@ -751,9 +835,9 @@ if __name__ == "__main__":
                     )
     
     result = chat.list_models()
-    print(result)
-    with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\gemini_models.json", "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
+    # print(result)
+    # with open(r"C:\Users\water\Desktop\renpy\Ushio_Noa\game\gemini_models.json", "w", encoding="utf-8") as f:
+    #     json.dump(result, f, ensure_ascii=False, indent=4)
 
     message_generator = MessageGenerator(
         format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")
@@ -777,7 +861,8 @@ if __name__ == "__main__":
         "strict": True
         }
     }
-    chat.terminal()
-
+    # chat.terminal()
+    result = chat.get_conversations()
+    print(result)
 
     

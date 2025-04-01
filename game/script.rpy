@@ -92,39 +92,29 @@ label main:
         renpy.hide_screen("entry")
         renpy.show("loading")
         if not renpy.store.new_conversation:
-            latest_message=chat.get_latest_message(chat.chat_history)
-            control_recall=chat.latest_tool_recall(chat.chat_history,"control_character")
-            bg_recall=chat.latest_tool_recall(chat.chat_history,"bg_changer")
-
-            recall_data=queue.Queue()
+            latest_message=chat.get_latest_message(chat.store_history)
+            control_recall=chat.latest_tool_recall(agent.store_history,"control_character")
+            bg_recall=chat.latest_tool_recall(agent.store_history,"bg_changer")
             if control_recall:
-                renpy.store.recall_data.put(control_recall[0])
+                renpy.store.tool_call_counts["control_character"]+=1
             if bg_recall:
-                renpy.store.recall_data.put(bg_recall[0])
-
-            renpy.with_statement(None)
-            renpy.show("ready")
-            renpy.with_statement(CropMove(1.0, "wipedown"))
-
-            while not recall_data.empty():
-                root_logger.info("recalling...")
-                data=recall_data.get()
-                if data.get("name") in tool_call_counts:
-                    renpy.store.tool_call_counts[data.get("name")]+=1
-                tools_caller.caller(data)
+                renpy.store.tool_call_counts["bg_changer"]+=1
+            result = chat_tool_collection.tool_calls_handler(control_recall+bg_recall)
             
             root_logger.info(renpy.store.tool_call_counts)
             if renpy.store.tool_call_counts.get("control_character")==0:
                 renpy.show_screen("noa_base","3","joy")
             if renpy.store.tool_call_counts.get("bg_changer")==0:
-                renpy.call("bg_changer", "office/mainoffice.jpg")
-
+                renpy.with_statement(None)
+                renpy.scene()
+                renpy.show("mainoffice")
+                renpy.with_statement(dissolve)
             if latest_message:
                 renpy.say(noa,latest_message)
 
         else:
             renpy.store.new_conversation=False
-            renpy.show_screen("noa_base","3","joy")
+            renpy.show_screen("noa_base","3","normal")
             renpy.with_statement(None)
             renpy.scene()
             renpy.show("mainoffice")
