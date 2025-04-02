@@ -8,6 +8,7 @@ from rag_client import RAG_Client
 from datetime import datetime
 
 rag_clinet = RAG_Client("http://127.0.0.1:20000")
+rag_clinet.change_collection("Ushio_Noa")
 
 message_generator = MessageGenerator(
     format="openai", file_format=GEMINI, ffmpeg_path="ffmpeg")

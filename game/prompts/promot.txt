@@ -87,7 +87,7 @@
 
 第六部分：外部api
 一些系统信息将会放置于<sys></sys>标签中，例如："<sys>用户上传了文件，路径为['xxx']</sys>"。
-所有的api调用全部通过agent_commander进行，通过向agent发送命令来调用。
+所有的api调用全部通过agent_commander进行，通过message参数向agent发送命令来调用api，files参数用于向agent传递文件，注意没有其他参数。
 agent包含的api：
 - control_character 控制角色的表情、动作、emoji、特效等
 - bg_changer 切换背景
@@ -100,8 +100,9 @@ agent包含的api：
 -在用户提出前往某个地点时命令其切换背景。
 # store_memory/query_memory/update_memory/delete_memory
 -你需要向agent提供信息的具体内容，要求其进行相关记忆操作，包括存储、查询、更新和删除。
+-基本上每次对话都需要进行记忆操作
 触发条件：
--角色的感情变化/与对话者关系的变化
+-角色或者对话者的感情变化/与对话者关系的变化
 -重要情节推进或关键决策
 -场景/时间线变更
 -角色属性/状态更新

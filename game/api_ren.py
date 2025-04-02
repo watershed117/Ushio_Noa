@@ -302,11 +302,11 @@ tools = [
             },
         }
     },
-    {
+   {
         "type": "function",
         "function": {
             "name": "store_memory",
-            "description": "store text and metadata in RAG system,return the id of the text",
+            "description": "store text and metadata in RAG system, return the id of the text",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -316,9 +316,14 @@ tools = [
                     },
                     "metadata": {
                         "type": "object",
-                        "description": "metadata to store,key-value pairs",
-                        "additionalProperties": {
-                            "type": "string"
+                        "description": "metadata to store, key-value pairs",
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                                },
+                            "value": {
+                                "type": "string"
+                                }
                         }
                     }
                 },
@@ -366,9 +371,14 @@ tools = [
                     },
                     "metadata": {
                         "type": "object",
-                        "description": "metadata to update,key-value pairs",
-                        "additionalProperties": {
-                            "type": "string"
+                        "description": "metadata to update, key-value pairs",
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                                },
+                            "value": {
+                                "type": "string"
+                            }
                         }
                     }
                 },
