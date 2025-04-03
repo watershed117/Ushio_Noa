@@ -134,9 +134,11 @@ class Tools:
 
     def bg_changer(self, name: str):
         if renpy.loadable("images/background/"+name):  # type: ignore
+            image_name = name.split("/")[1][:-4]
             renpy.scene() # type: ignore
-            renpy.show(name.split("/")[1][:-4]) # type: ignore
+            renpy.show(image_name) # type: ignore
             renpy.with_statement(dissolve) # type: ignore
+            renpy.store.current_background = image_name # type: ignore
             return "success"
         else:
             return "file not found"
