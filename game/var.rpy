@@ -31,3 +31,4 @@ default tts_filename=""
 default run_in_main_context=["bg_changer","control_character","agent_commander"]
 
 default current_background=""
+default raw_message=""

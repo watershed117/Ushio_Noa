@@ -129,15 +129,21 @@ label main_loop:
         while True:
             uploader.files=[]
             message = renpy.input("sensei")
+            renpy.store.raw_message = message
             if not message:
                 renpy.say(noa, "输入不能为空，请重新输入。")
                 continue
+            sys_messages = []
             if uploader.files:
-                message = f"<sys>用户上传了文件，路径为{uploader.files}</sys>"+message
+                sys_messages.append(f"用户上传了文件，路径为{uploader.files}")
+            
+            sys_message="\n<sys>"+"\n".join(sys_messages)"</sys>\n"
+
+            retrieval_message=
 
             reply = run_in_eventloop(
                                     chat.send,
-                                    {"role": "user", "content": message},
+                                    {"role": "user", "content": message+sys_message},
                                     raise_or_not=True
                                 )
             handler(reply)
